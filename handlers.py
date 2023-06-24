@@ -236,10 +236,11 @@ def _make_ayah_buttons(surahNo: int or str, ayahNo: int or str):
 def _make_ayah_reply(surahNo: int or str, ayahNo: int or str):
     surah = Quran.getSurahNameFromNumber(surahNo)
     ayah = Quran.getAyah(surahNo, ayahNo)
+    totalAyah = Quran.getAyahNumberCount(surahNo)
 
     say = f"""
 Surah : {surah} ({surahNo})
-Ayah  : {ayahNo}
+Ayah  : <b>{ayahNo} out of {totalAyah}</b>
 
 <u>Arabic</u>
 {ayah.arabic}
@@ -381,6 +382,9 @@ async def handleMessage(u: Update, c):
     sep = text.split(':')
     button = None
 
+    if ':' not in text:
+        return await checkSurah(u,c)
+
     if len(sep) != 2:
         say = """
 <b>Your format is not correct.</b>
@@ -451,11 +455,25 @@ async def checkSurah(u: Update, c):
     text = up.text
     sep = text.split(':')
 
+    if text.isdigit():
+        surahNo = int(text)
+        if not 1<=surahNo<=114:
+            say = """Surah number must be between 1-114"""
+            await bot.sendMessage(chat_id, say, reply_to_message_id=up.message_id)
+            return
+
+        button = _make_ayah_buttons(surahNo, 1)
+
+        say = _make_ayah_reply(surahNo, 1)
+        button = _make_ayah_buttons(surahNo, 1)
+        await bot.sendMessage(chat_id, say, reply_to_message_id=up.message_id, reply_markup=button)
+        
+
     for i in text.lower():
         if i not in string.ascii_lowercase:
             return False
 
-    res = Quran.searchSurah(text)
+    res: list = Quran.searchSurah(text)
     if not res:
         say = f"""
 Couldn't find a Surah matching the text <b>{esml(text)}</b>
@@ -469,7 +487,7 @@ nas
 
     buttons = []
     for surah, number in res:
-        button.append(inButton(f"{number} {surah}",
+        buttons.append(inButton(f"{number} {surah}",
                       callback_data=f"surah {number}"))
 
     buttons = inMark([buttons])

@@ -146,6 +146,7 @@ class Quran:
                     matching_strings.append(s)
         matching_strings = list({i: 0 for i in matching_strings})[:3]
         
-        data = {surah: self.SURAHS.index(surah) for surah in matching_strings}
+        data = [[surah, self.SURAHS.index(surah) + 1 ] for surah in matching_strings]
+        data.sort(key=lambda x: x[1])
 
-        return matching_strings
+        return data

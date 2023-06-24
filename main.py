@@ -19,9 +19,10 @@ load_dotenv()
 
 # Environment Variables
 TOKEN = os.environ.get("TOKEN")
-IS_LOCAL = os.environ.get("LOCAL")
+TOKEN = "5919367026:AAERLPSPBCXPH0sDeBR14Dr6xbCMlNDq8JU"
+IS_LOCAL = os.environ.get("LOCAL") or True
 if IS_LOCAL:
-    TOKEN = os.environ.get("TEST")
+    # TOKEN = os.environ.get("TEST")
     print("-" * 27)
     print("Running on local test Bot")
     print("-" * 27)
