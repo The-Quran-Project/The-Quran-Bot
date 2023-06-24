@@ -19,7 +19,8 @@ load_dotenv()
 
 # Environment Variables
 TOKEN = os.environ.get("TOKEN")
-IS_LOCAL = os.environ.get("LOCAL") or True
+IS_LOCAL = os.environ.get("LOCAL")
+
 if IS_LOCAL:
     TOKEN = os.environ.get("TEST")
     print("-" * 27)
