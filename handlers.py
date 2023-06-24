@@ -7,6 +7,7 @@ from telegram.ext import *
 import os
 import time
 import html
+import string
 
 from quran import Quran
 from utils import AyahNumberInvalid, SurahNumberInvalid
@@ -339,9 +340,7 @@ async def surahCallback(u: Update, c):
         start = text.find("</u>") + 4
         end = text.rfind("<u>English</u>")
         arabic = text[start:end].strip()
-        
-        
-         
+
         if ayah.arabic == arabic:
             arabic = ayah.arabic2
         else:
@@ -441,3 +440,40 @@ But you gave ayah no. {ayahNo}
     button = _make_ayah_buttons(surahNo, ayahNo)
 
     await bot.sendMessage(chat_id, say, reply_to_message_id=up.message_id, reply_markup=button)
+
+
+async def checkSurah(u: Update, c):
+    bot: Bot = c.bot
+    up = u.effective_message
+    user_id = u.effective_user.id
+    chat_id = u.effective_chat.id
+    fn = u.effective_user.first_name
+    text = up.text
+    sep = text.split(':')
+
+    for i in text.lower():
+        if i not in string.ascii_lowercase:
+            return False
+
+    res = Quran.searchSurah(text)
+    if not res:
+        say = f"""
+Couldn't find a Surah matching the text <b>{esml(text)}</b>
+
+Write something like:
+fatihah
+nas
+"""
+        await bot.sendMessage(chat_id, say, reply_to_message_id=up.message_id)
+        return False
+
+    buttons = []
+    for surah, number in res:
+        button.append(inButton(f"{number} {surah}",
+                      callback_data=f"surah {number}"))
+
+    buttons = inMark([buttons])
+
+    await bot.sendMessage(chat_id, "These are the surah that matches the most with the text you sent:", reply_to_message_id=up.message_id, reply_markup=buttons)
+    
+    return True

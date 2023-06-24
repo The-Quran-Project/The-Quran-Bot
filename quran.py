@@ -1,3 +1,4 @@
+# pylint:disable=W0105
 import json
 from utils import AyahNumberInvalid, SurahNumberInvalid
 
@@ -116,3 +117,35 @@ class Quran:
 
     def getAudioFile(self, surahNo: int or str, ayahNo: int or str):
         return self._FILE_ids.get(f"{surahNo}_{ayahNo}")
+
+    def searchSurah(self, string):
+        matching_strings = []
+        exact_match = False
+        string_list = sorted(self.SURAHS)
+
+        for s in string_list:
+            a = s.split('-')[-1].lower()
+            b = string.lower()
+            c = b.replace('k', 'q')
+            if b == a:
+                exact_match = True
+                matching_strings = [s]
+                break
+            elif a.replace("'", '').strip() in string.lower():
+                matching_strings.append(s)
+            elif c == a:
+                matching_strings.append(s)
+
+        if not exact_match:
+            for s in string_list:
+                s_lower = s.split('-')[-1].lower()
+                string_lower = string.lower()
+                if all(c in s_lower for c in string_lower):
+                    matching_strings.append(s)
+                elif all(c in string_lower for c in s_lower):
+                    matching_strings.append(s)
+        matching_strings = list({i: 0 for i in matching_strings})[:3]
+        
+        data = {surah: self.SURAHS.index(surah) for surah in matching_strings}
+
+        return matching_strings
