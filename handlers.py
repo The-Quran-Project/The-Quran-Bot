@@ -386,12 +386,14 @@ async def handleMessage(u: Update, c):
     
     if u.effective_message.via_bot:
         return
+        
+    if u.effective_chat.id != u.effective_user.id:
+        return
 
     if ':' not in text:
         return await checkSurah(u,c)
 
-    if u.effective_chat != u.effective_user:
-        return
+    
 
     if len(sep) != 2:
         say = """
