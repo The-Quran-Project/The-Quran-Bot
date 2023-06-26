@@ -49,7 +49,7 @@ def runFlask():
 
 
 def main():
-    df = Defaults(parse_mode=constants.ParseMode.HTML, block=False,disable_web_page_preview=True)
+    df = Defaults(parse_mode=constants.ParseMode.HTML, block=False,disable_web_page_preview=False)
 
     bot = ApplicationBuilder().token(TOKEN).defaults(df).connection_pool_size(
         696).write_timeout(333).read_timeout(300).connect_timeout(333).build()
