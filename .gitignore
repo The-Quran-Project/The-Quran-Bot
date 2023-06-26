@@ -3,3 +3,5 @@ benchmark.py
 test.py
 chech.py
 newfile.py
+__pycache__
+.env
