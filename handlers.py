@@ -9,6 +9,7 @@ import time
 import html
 import string
 
+from uuid import uuid4
 from quran import Quran
 from utils import AyahNumberInvalid, SurahNumberInvalid
 
@@ -382,8 +383,15 @@ async def handleMessage(u: Update, c):
     sep = text.split(':')
     button = None
 
+    
+    if u.effective_message.via_bot:
+        return
+
     if ':' not in text:
         return await checkSurah(u,c)
+
+    if u.effective_chat != u.effective_user:
+        return
 
     if len(sep) != 2:
         say = """
@@ -495,3 +503,56 @@ nas
     await bot.sendMessage(chat_id, "These are the surah that matches the most with the text you sent:", reply_to_message_id=up.message_id, reply_markup=buttons)
     
     return True
+
+
+
+
+# Inline Query Handler
+
+async def handleInlineQuery(u:Update, c):
+    query = u.inline_query.query
+    inQuery = InlineQueryResultArticle
+    if not query:
+        return
+    
+    
+    if ':' not in query:
+        res = [inQuery(
+            id=uuid4(),
+            title="Invalid Format",
+            input_message_content=InputTextMessageContent("The format is not correct. Give like: <code>surahNo : ayahNo</code> <code>1:3</code>"),
+            description="The format is not correct. Give like: <code>surahNo : ayahNo</code> <code>1:3</code>"
+        )
+        ]
+        await u.inline_query.answer(res)
+        return
+
+    sep = query.split(':')
+    if len(sep)!=2:
+        res = [inQuery(
+            id=uuid4(),
+            title="Invalid Format",
+            input_message_content=InputTextMessageContent("The format is not correct. Give like: <code>surahNo : ayahNo</code> <code>1:3</code>"),
+            description="The format is not correct. Give like: <code>surahNo : ayahNo</code> <code>1:3</code>"
+        )
+        ]
+        await u.inline_query.answer(res)
+        return
+    
+    surahNo, ayahNo = sep
+    surahNo = int(surahNo.strip())
+    ayahNo = int(ayahNo.strip())
+    
+    surahName = Quran.getSurahNameFromNumber(surahNo)
+    say = _make_ayah_reply(surahNo, ayahNo)
+    res=[
+        inQuery(
+            id=f"{surahNo}:{ayahNo}",
+            title=surahName,
+            input_message_content=InputTextMessageContent(say),
+            description=f"{surahNo}. {surahName} ({ayahNo})",
+            thumbnail_url="https://graph.org/file/728d9dda8867352e06707.jpg"
+        )
+    ]
+
+    await u.inline_query.answer(res)

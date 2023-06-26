@@ -73,6 +73,8 @@ def main():
 
     for i in callbacks:
         bot.add_handler(CallbackQueryHandler(i))
+    
+    bot.add_handler(InlineQueryHandler(handleInlineQuery))
 
     bot.add_handler(MessageHandler(filters.TEXT, handleMessage))
 
