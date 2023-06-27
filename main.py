@@ -49,7 +49,8 @@ def runFlask():
 
 
 def main():
-    df = Defaults(parse_mode=constants.ParseMode.HTML, block=False,disable_web_page_preview=False)
+    df = Defaults(parse_mode=constants.ParseMode.HTML,
+                  block=False, disable_web_page_preview=False)
 
     bot = ApplicationBuilder().token(TOKEN).defaults(df).connection_pool_size(
         696).write_timeout(333).read_timeout(300).connect_timeout(333).build()
@@ -73,7 +74,7 @@ def main():
 
     for i in callbacks:
         bot.add_handler(CallbackQueryHandler(i))
-    
+
     bot.add_handler(InlineQueryHandler(handleInlineQuery))
 
     bot.add_handler(MessageHandler(filters.TEXT, handleMessage))

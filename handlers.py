@@ -368,7 +368,6 @@ Ayah  : {ayahNo}
     elif query_data.startswith("audio"):
         surahNo, ayahNo = map(int, query_data.split()[1:])
         file_id = Quran.getAudioFile(surahNo, ayahNo)
-
         await bot.sendAudio(chat_id, file_id, reply_to_message_id=up.message_id)
         await query.answer()
 
@@ -383,17 +382,14 @@ async def handleMessage(u: Update, c):
     sep = text.split(':')
     button = None
 
-    
     if u.effective_message.via_bot:
         return
-        
+
     if u.effective_chat.id != u.effective_user.id:
         return
 
     if ':' not in text:
-        return await checkSurah(u,c)
-
-    
+        return await checkSurah(u, c)
 
     if len(sep) != 2:
         say = """
@@ -467,7 +463,7 @@ async def checkSurah(u: Update, c):
 
     if text.isdigit():
         surahNo = int(text)
-        if not 1<=surahNo<=114:
+        if not 1 <= surahNo <= 114:
             say = """Surah number must be between 1-114"""
             await bot.sendMessage(chat_id, say, reply_to_message_id=up.message_id)
             return
@@ -477,7 +473,6 @@ async def checkSurah(u: Update, c):
         say = _make_ayah_reply(surahNo, 1)
         button = _make_ayah_buttons(surahNo, 1)
         await bot.sendMessage(chat_id, say, reply_to_message_id=up.message_id, reply_markup=button)
-        
 
     for i in text.lower():
         if i not in string.ascii_lowercase:
@@ -498,31 +493,29 @@ nas
     buttons = []
     for surah, number in res:
         buttons.append(inButton(f"{number} {surah}",
-                      callback_data=f"surah {number}"))
+                                callback_data=f"surah {number}"))
 
     buttons = inMark([buttons])
 
     await bot.sendMessage(chat_id, "These are the surah that matches the most with the text you sent:", reply_to_message_id=up.message_id, reply_markup=buttons)
-    
+
     return True
-
-
 
 
 # Inline Query Handler
 
-async def handleInlineQuery(u:Update, c):
+async def handleInlineQuery(u: Update, c):
     query = u.inline_query.query
     inQuery = InlineQueryResultArticle
     if not query:
         return
-    
-    
+
     if ':' not in query:
         res = [inQuery(
             id=uuid4(),
             title="Invalid Format",
-            input_message_content=InputTextMessageContent("The format is not correct. Give like: <code>surahNo : ayahNo</code> <code>1:3</code>"),
+            input_message_content=InputTextMessageContent(
+                "The format is not correct. Give like: <code>surahNo : ayahNo</code> <code>1:3</code>"),
             description="The format is not correct. Give like: <code>surahNo : ayahNo</code> <code>1:3</code>"
         )
         ]
@@ -530,28 +523,83 @@ async def handleInlineQuery(u:Update, c):
         return
 
     sep = query.split(':')
-    if len(sep)!=2:
+    if '' in sep:
+        sep.remove('')
+
+    if len(sep) < 2:
         res = [inQuery(
             id=uuid4(),
             title="Invalid Format",
-            input_message_content=InputTextMessageContent("The format is not correct. Give like: <code>surahNo : ayahNo</code> <code>1:3</code>"),
+            input_message_content=InputTextMessageContent(
+                "The format is not correct. Give like: <code>surahNo : ayahNo</code> <code>1:3</code>"),
             description="The format is not correct. Give like: <code>surahNo : ayahNo</code> <code>1:3</code>"
         )
         ]
         await u.inline_query.answer(res)
         return
-    
-    surahNo, ayahNo = sep
-    surahNo = int(surahNo.strip())
-    ayahNo = int(ayahNo.strip())
-    
+
+    surahNo, ayahNo, *ext = sep
+
+    surahNo = surahNo.strip()
+    ayahNo = ayahNo.strip()
+
+    if not (surahNo.isdigit() and ayahNo.isdigit()):
+        res = [inQuery(
+            id=uuid4(),
+            title="Invalid Format",
+            input_message_content=InputTextMessageContent(
+                "The format is not correct. Give like: <code>surahNo : ayahNo</code> <code>1:3</code>"),
+            description="SurahNo and AyahNo must be numbers."
+        )
+        ]
+        await u.inline_query.answer(res)
+        return
+
+    surahNo = int(surahNo)
+    ayahNo = int(ayahNo)
+
+    if not 1 <= surahNo <= 144:
+        res = [inQuery(
+            id=uuid4(),
+            title="Surah Not Valid",
+            input_message_content=InputTextMessageContent(
+                "Surah Number must be between 1 114\nFormat: <code>surahNo : ayahNo</code> <code>1:3</code>"),
+            description="Surah Number not Valid"
+        )
+        ]
+        await u.inline_query.answer(res)
+        return
+
+    ayahCount = Quran.getAyahNumberCount(surahNo)
+
+    if not 1 <= ayahNo <= ayahCount:
+        res = [inQuery(
+            id=uuid4(),
+            title="Ayah Not Valid",
+            input_message_content=InputTextMessageContent(
+                f"Surah {Quran.getSurahNameFromNumber(surahNo)} has {ayahCount} ayahs only."),
+            description=f"Surah {Quran.getSurahNameFromNumber(surahNo)} has {ayahCount} ayahs only."
+        )
+        ]
+        await u.inline_query.answer(res)
+        return
+
+    try:
+        ext: str = ext[0].strip().lower()
+        if ext.startswith('n', '0'):
+            preview = True
+
+    except IndexError:
+        preview = False
+
     surahName = Quran.getSurahNameFromNumber(surahNo)
     say = _make_ayah_reply(surahNo, ayahNo)
-    res=[
+    res = [
         inQuery(
             id=f"{surahNo}:{ayahNo}",
             title=surahName,
-            input_message_content=InputTextMessageContent(say),
+            input_message_content=InputTextMessageContent(
+                say, disable_web_page_preview=preview),
             description=f"{surahNo}. {surahName} ({ayahNo})",
             thumbnail_url="https://graph.org/file/728d9dda8867352e06707.jpg"
         )
