@@ -151,7 +151,10 @@ For more in depth usage, check the <a href="{url}">Telegraph</a> link.
     """
 
     buttons = inMark([
-        [inButton("Telegraph", url=url)]
+        [inButton("Telegraph", url=url),
+         inButton("Try Inline Query",
+                  switch_inline_query_current_chat=f"1:2")
+         ]
     ])
 
     await bot.sendMessage(chat_id, say, reply_markup=buttons)
@@ -586,7 +589,7 @@ async def handleInlineQuery(u: Update, c):
 
     try:
         ext: str = ext[0].strip().lower()
-        if ext.startswith('n', '0'):
+        if ext.startswith(('n', '0')):
             preview = True
 
     except IndexError:
@@ -594,6 +597,8 @@ async def handleInlineQuery(u: Update, c):
 
     surahName = Quran.getSurahNameFromNumber(surahNo)
     say = _make_ayah_reply(surahNo, ayahNo)
+    buttons = inMark([[inButton("Try Inline Query",
+                     switch_inline_query_current_chat=f"{surahNo}:{ayahNo}")]])
     res = [
         inQuery(
             id=f"{surahNo}:{ayahNo}",
@@ -601,7 +606,8 @@ async def handleInlineQuery(u: Update, c):
             input_message_content=InputTextMessageContent(
                 say, disable_web_page_preview=preview),
             description=f"{surahNo}. {surahName} ({ayahNo})",
-            thumbnail_url="https://graph.org/file/728d9dda8867352e06707.jpg"
+            thumbnail_url="https://graph.org/file/728d9dda8867352e06707.jpg",
+            reply_markup=buttons
         )
     ]
 
