@@ -1,7 +1,8 @@
 __pycache__/
-benchmark.py
+.env
 test.py
 chech.py
 newfile.py
-__pycache__
-.env
+benchmark.py
+bot/__pycache__/
+bot/utils/__pycache__/

@@ -598,7 +598,7 @@ async def handleInlineQuery(u: Update, c):
         arabicStyle = 2
 
     surahName = Quran.getSurahNameFromNumber(surahNo)
-    say = _make_ayah_reply(surahNo, ayahNo)
+    say = _make_ayah_reply(surahNo, ayahNo, arabicStyle)
     buttons = inMark([[inButton("Try Inline Query",
                      switch_inline_query_current_chat=f"{surahNo}:{ayahNo}")]])
     res = [
