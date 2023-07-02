@@ -11,7 +11,9 @@
 
 
 ## 1) 1st July, 2023
-- Feature of sending a surah name and the bot giving the top 3 surahs that match the name
+- User can just send any surah name and the bot will send at most 3 options to choose from.
+- The options will be the most relevant surahs that matches the user's given name.
+- Example: `Fatiha` will give `1 Al-Fatihah`, `20 Taha` and `48 Al-Fath` as options. But `Fatihah` will only give `1 Al-Fatihah` as option. The capitalization from the user doesn't matter.
 
 
 ## Previous Logs have not been kept. Sorry for the inconvenience.
