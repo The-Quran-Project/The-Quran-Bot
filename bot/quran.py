@@ -1,11 +1,11 @@
 # pylint:disable=W0105
+import os
 import json
-from utils import AyahNumberInvalid, SurahNumberInvalid
+from .utils import AyahNumberInvalid, SurahNumberInvalid
 
 
 """
-
-Structure of json files:
+Structure of json files in Data folder:
 	quran_en:
 		{
 		  "1":[ayah1, ayah2, ...],		  	"2":[ayah1, ...]
@@ -32,17 +32,19 @@ class objectify:
         self.arabic: str = ""
         self.arabic2: str = ""
         self.tafsir: str = ""
-
         self.__dict__.update(entries)
 
 
+
+# Get the absolute path of the directory that contains this file
+DIR_PATH = os.path.dirname(os.path.abspath(__file__)).replace("\\", '/') + "/Data"  # root/Data
 class Quran:
     with \
-            open("Data/quran_en.json", "rb") as _f, \
-            open("Data/quran_ar.json", "rb") as _g, \
-            open("Data/surah.json", "rb") as _h, \
-            open("Data/audio_file_ids.json", "rb") as _i, \
-            open("Data/tafsirs.json", "rb") as _j:
+            open(f"{DIR_PATH}/quran_en.json", "rb") as _f, \
+            open(f"{DIR_PATH}/quran_ar.json", "rb") as _g, \
+            open(f"{DIR_PATH}/surah.json", "rb") as _h, \
+            open(f"{DIR_PATH}/audio_file_ids.json", "rb") as _i, \
+            open(f"{DIR_PATH}/tafsirs.json", "rb") as _j:
 
         _AYAHS_en = json.load(_f)
         _AYAHS_ar = json.load(_g)

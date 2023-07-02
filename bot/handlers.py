@@ -10,8 +10,8 @@ import html
 import string
 
 from uuid import uuid4
-from quran import Quran
-from utils import AyahNumberInvalid, SurahNumberInvalid
+from .quran import Quran
+from .utils import AyahNumberInvalid, SurahNumberInvalid
 
 
 Quran = Quran()
@@ -35,7 +35,7 @@ AllSurah = [[]]
 
 def _divideList(a):
     x = []
-    sep = 3
+    sep = 3  # number of buttons in a row
     while a:
         x.append(a[:sep])
         a = a[sep:]
@@ -100,7 +100,7 @@ async def help_c(u: Update, c):
     fn = u.effective_user.first_name
     say = f"""
 To know how to use the bot:
-/use - A brief overview of using the bot.
+/use - A brief overview on how to use the bot
 
 
 For any Query, contact @AlQuranDiscussion.
@@ -210,44 +210,122 @@ Time Zone   : +00:00 UTC</b>
         await c.bot.sendMessage(chat_id, say[40:])
 
 
+# Helper Function: Checks Text and returns a valid reply
+async def _giveValidReply(text):
+    sep = text.split(':')
+    if len(sep) != 2:
+        say = """
+<b>Your format is not correct.</b>
+Give like:
+
+<pre>
+surahNo : ayahNo
+1:3
+</pre>
+"""
+        reply = {"text": say, "button": None}
+        return reply
+
+    surahNo, ayahNo = sep
+    surahNo = surahNo.strip()
+    ayahNo = ayahNo.strip()
+
+    if not (surahNo.isdecimal() and ayahNo.isdecimal()):
+        say = """
+<b>Surah and Ayah number must be integers</b>
+Give like:
+<pre>
+surahNo : ayahNo
+1:3
+</pre>
+"""
+
+        reply = {"text": say, "button": None}
+        return reply
+
+    surahNo = int(surahNo)
+
+    if not 1 <= surahNo <= 114:
+        say = """
+<b>Surah number needs to be between <i>1</i> to <i>114</i>.</b>
+"""
+
+        reply = {"text": say, "button": None}
+        return reply
+
+    surah = Quran.getSurahNameFromNumber(surahNo)
+    ayahCount = Quran.getAyahNumberCount(surahNo)
+    ayahNo = int(ayahNo)
+
+    if not 1 <= ayahNo <= ayahCount:
+        say = f"""
+<b>Surah {surah} has {ayahCount} ayahs only.</b>
+
+But you gave ayah no. {ayahNo}
+"""
+
+        reply = {"text": say, "button": None}
+        return reply
+
+    say = _make_ayah_reply(surahNo, ayahNo)
+
+    button = _make_ayah_buttons(surahNo, ayahNo)
+
+    reply = {"text": say, "button": button}
+    return reply
+
+
+# Command:  /surah
 async def surah_c(u: Update, c):
     bot: Bot = c.bot
     up = u.effective_message
     user_id = u.effective_user.id
     chat_id = u.effective_chat.id
     fn = u.effective_user.first_name
+    text = up.text[6:].strip()
+
     say = f"""
 <b>Select a surah from below:</b>
     """
-
     # Sends buttons with Surah names
-    await bot.sendMessage(chat_id, say, reply_markup=inMark(AllSurah[0]))
+    if not text:
+        await bot.sendMessage(chat_id, say, reply_markup=inMark(AllSurah[0]))
+        return
+
+    reply = await _giveValidReply(text)
+    say = reply["text"]
+    button = reply["button"]
+
+    await bot.sendMessage(chat_id, say, reply_to_message_id=up.message_id, reply_markup=button)
 
 
-def _make_ayah_buttons(surahNo: int or str, ayahNo: int or str):
+# Helper Function: Makes the buttons for Ayahs
+def _make_ayah_buttons(surahNo: int or str, ayahNo: int or str, arabicStyle: int = 2):
     button = inMark([[inButton("Prev",
                                callback_data=f"goback {surahNo} {ayahNo}"),
                       inButton("Next",
                                callback_data=f"goforward  {surahNo} {ayahNo}")],
                      [inButton("Change Arabic Style",
-                               callback_data=f"change-arabic  {surahNo} {ayahNo}"),
+                               callback_data=f"change-arabic  {surahNo} {ayahNo} {arabicStyle}"),
                       inButton("Audio",
                                callback_data=f"audio {surahNo} {ayahNo}")]])
 
     return button
 
 
-def _make_ayah_reply(surahNo: int or str, ayahNo: int or str):
+# Helper Function: Makes the reply for Ayahs
+def _make_ayah_reply(surahNo: int or str, ayahNo: int or str, arabicStyle: int = 1):
     surah = Quran.getSurahNameFromNumber(surahNo)
     ayah = Quran.getAyah(surahNo, ayahNo)
     totalAyah = Quran.getAyahNumberCount(surahNo)
+    arabic = ayah.arabic if arabicStyle == 1 else ayah.arabic2
 
     say = f"""
 Surah : {surah} ({surahNo})
 Ayah  : <b>{ayahNo} out of {totalAyah}</b>
 
 <u>Arabic</u>
-{ayah.arabic}
+{arabic}
 
 <u>English</u>
 <b>{ayah.english}</b>
@@ -336,37 +414,15 @@ async def surahCallback(u: Update, c):
     # Toggling the style of Arabic.
     # Toggle between (with and without) harakat
     elif query_data.startswith("change-arabic"):
-        surahNo, ayahNo = map(int, query_data.split()[1:])
+        surahNo, ayahNo, arabicStyle = map(int, query_data.split()[1:])
+        # if not arabicStyle:
+        #     arabicStyle = '2'
 
         surah = Quran.getSurahNameFromNumber(surahNo)
         ayah = Quran.getAyah(surahNo, ayahNo)
-
-        text = up.text_html
-        start = text.find("</u>") + 4
-        end = text.rfind("<u>English</u>")
-        arabic = text[start:end].strip()
-
-        if ayah.arabic == arabic:
-            arabic = ayah.arabic2
-        else:
-            arabic = ayah.arabic
-
-        say = f"""
-Surah : {surah} ({surahNo})
-Ayah  : {ayahNo}
-
-<u>Arabic</u>
-{arabic}
-
-<u>English</u>
-<b>{ayah.english}</b>
-
-<u>Tafsir</u>
-<b>Read Here: <a href="{ayah.tafsir}">Telegraph</a></b>
-        """
-        button = _make_ayah_buttons(surahNo, ayahNo)
-
-        await edit_text(say, reply_markup=button)
+        toggle = {1: 2, 2: 1}
+        say = _make_ayah_reply(surahNo, ayahNo, arabicStyle)
+        await edit_text(say, reply_markup=_make_ayah_buttons(surahNo, ayahNo, toggle[arabicStyle]))
 
     elif query_data.startswith("audio"):
         surahNo, ayahNo = map(int, query_data.split()[1:])
@@ -384,74 +440,20 @@ async def handleMessage(u: Update, c):
     text = up.text
     sep = text.split(':')
     button = None
+    group = u.effective_chat.id != u.effective_user.id  # Checks if
 
     if u.effective_message.via_bot:
         return
 
-    if u.effective_chat.id != u.effective_user.id:
-        return
-
-    if ':' not in text:
+    if ':' not in text and not group:
         return await checkSurah(u, c)
 
-    if len(sep) != 2:
-        say = """
-<b>Your format is not correct.</b>
-Give like:
+    reply = await _giveValidReply(text)
+    say = reply["text"]
+    button = reply["button"]
 
-<pre>
-surahNo : ayahNo
-1:3
-</pre>
-"""
-
-        await bot.sendMessage(chat_id, say, reply_to_message_id=up.message_id)
+    if not button and group:  # Means the reply is invalid
         return
-
-    surahNo, ayahNo = sep
-    surahNo = surahNo.strip()
-    ayahNo = ayahNo.strip()
-
-    if not (surahNo.isdecimal() and ayahNo.isdecimal()):
-        say = """
-<b>Surah and Ayah number must be integers</b>
-Give like:
-<pre>
-surahNo : ayahNo
-1:3
-</pre>
-"""
-
-        await bot.sendMessage(chat_id, say, reply_to_message_id=up.message_id)
-        return
-
-    surahNo = int(surahNo)
-    if not 1 <= surahNo <= 114:
-        say = """
-<b>Surah number needs to be between <i>1</i> to <i>114</i>.</b>
-"""
-
-        await bot.sendMessage(chat_id, say, reply_to_message_id=up.message_id)
-        return
-
-    surah = Quran.getSurahNameFromNumber(surahNo)
-    ayahCount = Quran.getAyahNumberCount(surahNo)
-    ayahNo = int(ayahNo)
-
-    if not 1 <= ayahNo <= ayahCount:
-        say = f"""
-<b>Surah {surah} has {ayahCount} ayahs only.</b>
-
-But you gave ayah no. {ayahNo}
-"""
-
-        await bot.sendMessage(chat_id, say, reply_to_message_id=up.message_id)
-        return
-
-    say = _make_ayah_reply(surahNo, ayahNo)
-
-    button = _make_ayah_buttons(surahNo, ayahNo)
-
     await bot.sendMessage(chat_id, say, reply_to_message_id=up.message_id, reply_markup=button)
 
 
@@ -589,11 +591,11 @@ async def handleInlineQuery(u: Update, c):
 
     try:
         ext: str = ext[0].strip().lower()
-        if ext.startswith(('n', '0')):
-            preview = True
+        if ext == '1':
+            arabicStyle = 1
 
     except IndexError:
-        preview = False
+        arabicStyle = 2
 
     surahName = Quran.getSurahNameFromNumber(surahNo)
     say = _make_ayah_reply(surahNo, ayahNo)
@@ -604,7 +606,7 @@ async def handleInlineQuery(u: Update, c):
             id=f"{surahNo}:{ayahNo}",
             title=surahName,
             input_message_content=InputTextMessageContent(
-                say, disable_web_page_preview=preview),
+                say, disable_web_page_preview=True),
             description=f"{surahNo}. {surahName} ({ayahNo})",
             thumbnail_url="https://graph.org/file/728d9dda8867352e06707.jpg",
             reply_markup=buttons
