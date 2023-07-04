@@ -1,6 +1,10 @@
-# All Changes and Modifications that have been made to the project
-**Newer Changes are on top**
+# Changes and Modifications
+**Newers are on top**
 
+## 3) 4th July, 2023
+- `/random` or `/rand` command added. As guessed, it'll give you a random verse from the Quran.
+- Example: `/rand` or `/random` [Both are the same]
+- Fixed a bug that was rejecting to search for surah if the text contained space. 
 
 
 ## 2) 2nd July, 2023

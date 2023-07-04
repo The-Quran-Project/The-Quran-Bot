@@ -8,6 +8,7 @@ import os
 import time
 import html
 import string
+import secrets
 
 from uuid import uuid4
 from .quran import Quran
@@ -210,6 +211,34 @@ Time Zone   : +00:00 UTC</b>
         await c.bot.sendMessage(chat_id, say[40:])
 
 
+
+
+
+
+async def randomAyah(u:Update, c):
+    bot: Bot = c.bot
+    up = u.effective_message
+    user_id = u.effective_user.id
+    chat_id = u.effective_chat.id
+    fn = u.effective_user.first_name
+    
+    randSurah = secrets.randbelow(114) or 13 # if value is 0, then it becomes 13
+    ayahCount = Quran.getAyahNumberCount(randSurah)
+    randAyah = secrets.randbelow(ayahCount) or ayahCount//2
+    
+    say = _make_ayah_reply(randSurah, randAyah)
+    buttons = _make_ayah_buttons(randSurah, randAyah)
+    
+    await bot.sendMessage(chat_id, say, reply_markup=buttons, reply_to_message_id=up.message_id)
+    
+
+
+
+
+
+
+
+
 # Helper Function: Checks Text and returns a valid reply
 async def _giveValidReply(text):
     sep = text.split(':')
@@ -321,7 +350,7 @@ def _make_ayah_reply(surahNo: int or str, ayahNo: int or str, arabicStyle: int =
     arabic = ayah.arabic if arabicStyle == 1 else ayah.arabic2
 
     say = f"""
-Surah : {surah} ({surahNo})
+Surah : <b>{surah} ({surahNo})</b>
 Ayah  : <b>{ayahNo} out of {totalAyah}</b>
 
 <u>Arabic</u>
@@ -415,11 +444,8 @@ async def surahCallback(u: Update, c):
     # Toggle between (with and without) harakat
     elif query_data.startswith("change-arabic"):
         surahNo, ayahNo, arabicStyle = map(int, query_data.split()[1:])
-        # if not arabicStyle:
-        #     arabicStyle = '2'
 
         surah = Quran.getSurahNameFromNumber(surahNo)
-        ayah = Quran.getAyah(surahNo, ayahNo)
         toggle = {1: 2, 2: 1}
         say = _make_ayah_reply(surahNo, ayahNo, arabicStyle)
         await edit_text(say, reply_markup=_make_ayah_buttons(surahNo, ayahNo, toggle[arabicStyle]))
@@ -479,7 +505,7 @@ async def checkSurah(u: Update, c):
         button = _make_ayah_buttons(surahNo, 1)
         await bot.sendMessage(chat_id, say, reply_to_message_id=up.message_id, reply_markup=button)
 
-    for i in text.lower():
+    for i in text.lower().replace(' ',''):
         if i not in string.ascii_lowercase:
             return False
 
@@ -507,8 +533,8 @@ nas
     return True
 
 
-# Inline Query Handler
 
+# Inline Query Handler
 async def handleInlineQuery(u: Update, c):
     query = u.inline_query.query
     inQuery = InlineQueryResultArticle

@@ -14,7 +14,7 @@ def check():
         try:
             r = httpx.get(renderUrl, timeout=30, follow_redirects=1).status_code
         except:r=404
-        print(f"\nStatus {r} at: {datetime.now()}\n")
+        print(f"\nStatus {r} at: {datetime.now()}", end="\r")
         time.sleep(13)
 
 

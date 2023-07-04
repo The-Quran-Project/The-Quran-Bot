@@ -65,7 +65,9 @@ def runBot():
         "ping": ping,
         "info": info_c,
         "surah": surah_c,
-
+        "random": randomAyah,
+        "rand": randomAyah,
+        
     }
 
     callbacks = (
