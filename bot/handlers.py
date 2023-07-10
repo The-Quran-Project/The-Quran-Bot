@@ -254,7 +254,7 @@ surahNo : ayahNo
 """
         reply = {"text": say, "button": None}
         return reply
-
+    
     surahNo, ayahNo = sep
     surahNo = surahNo.strip()
     ayahNo = ayahNo.strip()
@@ -313,7 +313,7 @@ async def surah_c(u: Update, c):
     fn = u.effective_user.first_name
     text = up.text[6:].strip()
 
-    say = f"""
+    say = """
 <b>Select a surah from below:</b>
     """
     # Sends buttons with Surah names
@@ -477,10 +477,11 @@ async def handleMessage(u: Update, c):
     reply = await _giveValidReply(text)
     say = reply["text"]
     button = reply["button"]
+    webPreview = chat_id != user_id
 
     if not button and group:  # Means the reply is invalid
         return
-    await bot.sendMessage(chat_id, say, reply_to_message_id=up.message_id, reply_markup=button)
+    await bot.sendMessage(chat_id, say, reply_to_message_id=up.message_id, reply_markup=button, disable_web_page_preview=webPreview)
 
 
 async def checkSurah(u: Update, c):
