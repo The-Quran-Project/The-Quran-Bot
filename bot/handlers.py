@@ -369,10 +369,17 @@ async def surahCallback(u: Update, c):
     bot: Bot = c.bot
     up = u.effective_message
     chat_id = u.effective_chat.id
-    edit_text = up.edit_text
-
+    #edit_text = up.edit_text
     query = u.callback_query
     query_data = query.data
+    group = u.effective_chat.id != u.effective_user.id  # Checks if
+    
+    async def edit_text(*a, **k):
+        if "disable_web_page_preview" not in k:
+            k["disable_web_page_preview"] = group
+        await up.edit_text(*a, **k)
+    
+
     # print("Callback Data:", query_data)
 
     if query_data.startswith("surah"):
@@ -381,7 +388,7 @@ async def surahCallback(u: Update, c):
         surah = Quran.getSurahNameFromNumber(index)
         ans = f"You selected {surah}"
 
-        # await query.answer(ans)
+        await query.answer(ans)
         say = _make_ayah_reply(index, 1)
 
         button = _make_ayah_buttons(index, 1)

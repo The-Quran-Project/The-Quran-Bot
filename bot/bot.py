@@ -37,13 +37,32 @@ logging.basicConfig(
 # Flask app for keeping the bot running in hosted server.
 start = time.time()
 
+def secondsToTime(s):
+  m, s = divmod(s, 60)
+  h, m = divmod(m, 60)
+  d, h = divmod(h, 24)
+  m = int(m)
+  s = int(s)
+  h = int(m)
+  d = int(d)
+  
+  result = ""
+  if d > 0:
+    result += f"{d} day{'s' if d > 1 else ''}"
+  if h > 0:
+    result += f" {h} hour{'s' if h > 1 else ''}"
+  if m > 0:
+    result += f" {m} minute{'s' if m > 1 else ''}"
+  if not result:
+    result = "0 minutes"
+  return result.strip()
 
 def runFlask():
     app = flask.Flask("Quran Bot")
 
     @app.route('/')
     def index():
-        return f"<h1>Running for {(time.time()-start)/60:.2f} minutes</h1>"
+        return f"<h1>Running for {secondsToTime(time.time()-start)}</h1>"
 
     app.run("0.0.0.0", 8080)
 
