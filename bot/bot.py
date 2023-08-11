@@ -32,21 +32,15 @@ load_dotenv()
 
 
 # Environment Variables
-TOKEN = os.environ.get("TOKEN")
-IS_LOCAL = os.environ.get("LOCAL")
-
-if IS_LOCAL:
-    TOKEN = os.environ.get("TEST")
-    print("-" * 27)
-    print("Running on local test Bot")
-    print("-" * 27)
+LOCAL = os.environ.get("LOCAL")
+TOKEN = os.environ.get("TOKEN") if LOCAL else os.environ.get("TEST")
 
 
-def runBot():
+def runBot(token):
     df = Defaults(parse_mode=constants.ParseMode.HTML,
                   block=False, disable_web_page_preview=False)
 
-    bot = ApplicationBuilder().token(TOKEN).defaults(df).connection_pool_size(
+    bot = ApplicationBuilder().token(token).defaults(df).connection_pool_size(
         777).write_timeout(333).read_timeout(333).connect_timeout(333).build()
 
     commands = {
@@ -85,21 +79,26 @@ def runBot():
 
 
 def startBot():
+    if LOCAL:
+        print("-" * 27)
+        print("Running on local test Bot")
+        print("-" * 27)
+
     if not TOKEN:
         print("Please put your bot token in `.env` file")
         print()
-        exit()
+        return
     
-    # Stating logging
+
     startLogger(__name__)
 
     # only running flask app if it is in production
     # It's using `threading`. So won't block other tasks
-    if not IS_LOCAL:
+    if not LOCAL:
         runFlask()
     
-    # Finally, Running Bot
-    runBot()
+
+    runBot(TOKEN)
 
 
 
