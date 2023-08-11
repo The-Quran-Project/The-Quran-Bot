@@ -3,7 +3,7 @@ from datetime import datetime
 import httpx, time
 import multiprocessing
 
-from bot import runBot
+from bot import startBot
 
 
 
@@ -18,7 +18,7 @@ def check():
         time.sleep(13)
 
 
-multiprocessing.Process(target=check).start()
 
 if __name__ == "__main__":
-    runBot()
+    # multiprocessing.Process(target=check).start()
+    startBot()

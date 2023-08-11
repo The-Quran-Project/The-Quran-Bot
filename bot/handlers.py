@@ -83,6 +83,8 @@ This bot will give you verses from the Al-Quran.
 
 It can give you the <b>Arabic</b> or <b>English</b> text and also the <b>Audio</b> of each ayah.
 
+See, /use to know how to use this bot.
+
 This bot is <a href="{url}">open-source</a>. Your contribution can make it more helpful for the Ummah.
     """
 

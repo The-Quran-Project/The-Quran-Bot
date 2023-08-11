@@ -1,1 +1,1 @@
-from .bot import runBot
+from .bot import startBot
