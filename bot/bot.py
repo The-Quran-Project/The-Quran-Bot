@@ -33,7 +33,7 @@ load_dotenv()
 
 # Environment Variables
 LOCAL = os.environ.get("LOCAL")
-TOKEN = os.environ.get("TOKEN") if LOCAL else os.environ.get("TEST")
+TOKEN = os.environ.get("TOKEN") if not LOCAL else os.environ.get("TEST")
 
 
 def runBot(token):
