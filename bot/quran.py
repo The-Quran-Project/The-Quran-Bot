@@ -144,10 +144,12 @@ class Quran:
                 string_lower = string.lower()
                 if all(c in s_lower for c in string_lower):
                     matching_strings.append(s)
-                elif all(c in string_lower for c in s_lower):
-                    matching_strings.append(s)
+                # elif all(c in string_lower for c in s_lower):
+                #     matching_strings.append(s)
+
+	
         matching_strings = list({i: 0 for i in matching_strings})[:3]
-        
+
         data = [[surah, self.SURAHS.index(surah) + 1 ] for surah in matching_strings]
         data.sort(key=lambda x: x[1])
 
