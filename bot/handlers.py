@@ -74,7 +74,7 @@ async def start_c(u: Update, c):
     user_id = u.effective_user.id
     chat_id = u.effective_chat.id
     fn = u.effective_user.first_name
-    url = "https://github.com/Nusab19/TG-Quran-Bot"
+    url = "https://github.com/The-Quran-Project/TG-Quran-Bot"
 
     say = f"""
 Assalamu Alaikum <b>{esml(fn)}!</b>
