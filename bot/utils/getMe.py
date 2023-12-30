@@ -14,8 +14,7 @@ class Counter:
 def checkOnInterval(sec: int = 5):
     while 1:
         try:
-            r = httpx.get(renderUrl, timeout=None,
-                          follow_redirects=1).status_code
+            r = httpx.get(renderUrl, timeout=None, follow_redirects=1).status_code
         except:
             r = 404
 
