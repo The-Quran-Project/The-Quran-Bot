@@ -7,7 +7,6 @@ from .helpers import updateSettings
 async def middleware(u: Update, c):
     if u.inline_query:
         return
-
     userID = u.effective_user.id
     chatID = u.effective_chat.id
     isGroup = chatID != userID

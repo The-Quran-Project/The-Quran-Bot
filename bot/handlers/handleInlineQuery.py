@@ -10,12 +10,16 @@ from uuid import uuid4
 
 from . import Quran
 from .helpers import getAyahReply
-
+from .database import db
 
 async def handleInlineQuery(u: Update, c):
     query = u.inline_query.query
     inQuery = InlineQueryResultArticle
     userID = u.effective_user.id
+    user = db.getUser(userID)
+
+    if not user:
+        db.addUser(userID)
 
     if not query:
         return
@@ -104,14 +108,6 @@ async def handleInlineQuery(u: Update, c):
         await u.inline_query.answer(res)
         return
 
-    try:
-        ext: str = ext[0].strip().lower()
-        if ext == "1":
-            arabicStyle = 1
-
-    except IndexError:
-        arabicStyle = 2
-
     surahName = Quran.getSurahNameFromNumber(surahNo)
     reply = getAyahReply(userID, surahNo, ayahNo)
     buttons = InlineKeyboardMarkup(
@@ -126,7 +122,7 @@ async def handleInlineQuery(u: Update, c):
     )
     res = [
         inQuery(
-            id=f"{surahNo}:{ayahNo}",
+            id=uuid4(),
             title=surahName,
             input_message_content=InputTextMessageContent(
                 reply, disable_web_page_preview=True
@@ -137,4 +133,4 @@ async def handleInlineQuery(u: Update, c):
         )
     ]
 
-    await u.inline_query.answer(res)
+    await u.inline_query.answer(res, cache_time=1)
