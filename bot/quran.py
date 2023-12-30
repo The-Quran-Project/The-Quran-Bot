@@ -1,6 +1,6 @@
-# pylint:disable=W0105
 import os
 import json
+
 from .utils import AyahNumberInvalid, SurahNumberInvalid
 
 

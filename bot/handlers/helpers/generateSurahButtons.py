@@ -1,4 +1,5 @@
 from telegram import InlineKeyboardButton
+
 from ...quran import QuranClass
 
 
@@ -111,5 +112,5 @@ def generateSurahButtons(Quran: QuranClass):
         ]
         inlineButtons[-1] = splitListIntoChunks(inlineButtons[-1])
         inlineButtons[-1].append(navigationButtons)
-    
+
     return inlineButtons

@@ -1,6 +1,3 @@
-import os
-
-# --- PIP Packages ---
 from telegram import constants
 from telegram.ext import (
     filters,
@@ -13,7 +10,8 @@ from telegram.ext import (
 )
 from dotenv import load_dotenv
 
-# --- Local Packages ---
+import os
+
 from .utils.keep_alive import runFlask
 from .utils.log import startLogger
 from .handlers import (
@@ -21,8 +19,8 @@ from .handlers import (
     helpCommand,
     useCommand,
     surahCommand,
-    randomAyah,
-    surahCallback,
+    randomCommand,
+    handleButtonPress,
     handleInlineQuery,
     handleMessage,
     pingCommand,
@@ -60,23 +58,15 @@ def runBot(token):
         "ping": pingCommand,
         "info": infoCommand,
         "surah": surahCommand,
-        "random": randomAyah,
-        "rand": randomAyah,
+        "random": randomCommand,
+        "rand": handleButtonPress,
     }
-
-    # Inline Keyboard.onclick Handler
-    callbacks = (surahCallback,)
 
     for i, j in commands.items():
         bot.add_handler(CommandHandler(i, j))
 
-    for i in callbacks:
-        bot.add_handler(CallbackQueryHandler(i))
-
-    # inline use handler. eg.
-    #       @AlFurqanRobot 1:3
+    bot.add_handler(CallbackQueryHandler(handleButtonPress))
     bot.add_handler(InlineQueryHandler(handleInlineQuery))
-
     bot.add_handler(MessageHandler(filters.TEXT, handleMessage))
 
     bot.run_polling()
@@ -95,8 +85,7 @@ def startBot():
 
     startLogger(__name__)
 
-    # only running flask app if it is in production
-    # It's using `threading`. So won't block other tasks
+    # run Flask server in production only
     if not LOCAL:
         runFlask()
 

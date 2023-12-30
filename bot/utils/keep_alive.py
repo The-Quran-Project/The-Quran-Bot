@@ -1,7 +1,6 @@
-# Flask app for keeping the bot running in hosted server.
+import flask
 
 import time
-import flask
 import threading
 
 start = time.time()

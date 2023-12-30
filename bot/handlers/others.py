@@ -1,5 +1,6 @@
 from telegram import Update
-import time, html
+import time
+import html
 
 
 def escapeHTML(text: str):
@@ -25,7 +26,8 @@ async def infoCommand(u, c):
     fn = escapeHTML(u.effective_user.first_name)
     ln = escapeHTML(u.effective_user.last_name)
     un = u.effective_user.username
-    userLink = f"""<a href="{f'tg://user?id={userID}'if not un else f't.me/{un}'}">{fn}</a>""".strip()
+    userLink = f"""<a href="{
+        f'tg://user?id={userID}'if not un else f't.me/{un}'}">{fn}</a>""".strip()
 
     un = escapeHTML(un)
     date = escapeHTML(u.effective_message.date.strftime("%d-%m-%Y %H:%M:%S"))
