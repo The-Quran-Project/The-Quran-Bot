@@ -13,7 +13,7 @@ LOCAL = os.environ.get("LOCAL")
 
 
 if __name__ == "__main__":
-    if sys.version_info < (3, 13):
+    if sys.version_info < (3, 12):
         print("", "-" * 33, sep="\n")
         print(f"{'Warning':*^33}")
         print("-" * 33, "", sep="\n")
