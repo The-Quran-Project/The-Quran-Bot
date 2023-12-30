@@ -65,6 +65,18 @@ class Database:
         self.db.users.update_one({"_id": chatID}, {"$set": {"settings": settings}})
         return self.getUser(chatID)
 
+    def banUser(self, userID: str or int):
+        return self.db.users.update_one({"_id": userID}, {"$set": {"banned": True}})
+
+    def unbanUser(self, userID: str or int):
+        return self.db.users.update_one({"_id": userID}, {"$set": {"banned": False}})
+
+    def banChat(self, chatID: str or int):
+        return self.db.chats.update_one({"_id": chatID}, {"$set": {"banned": True}})
+
+    def unbanChat(self, chatID: str or int):
+        return self.db.chats.update_one({"_id": chatID}, {"$set": {"banned": False}})
+
     def deleteUser(self, chatID: str or int):
         return self.db.users.delete_one({"_id": chatID})
 
@@ -76,7 +88,7 @@ db = Database()
 
 
 def main():
-    print(db.getAllUsers())
+    print("Total Users:", len(db.getAllUsers()))
     print(db.updateUser(1, {"ayahMode": 3}))
     print(db.getUser(1))
 

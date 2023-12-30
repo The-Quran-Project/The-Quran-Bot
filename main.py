@@ -18,10 +18,9 @@ if __name__ == "__main__":
     multiprocessing.Process(target=checkOnInterval).start()
     if not LOCAL:
         runFlask()
-    
+
     checkVersion()
     startLogger(__name__)
-
 
     # Infinite loop to restart the bot in case of any errors
     while 1:

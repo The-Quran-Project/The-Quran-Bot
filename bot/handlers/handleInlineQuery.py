@@ -12,6 +12,7 @@ from . import Quran
 from .helpers import getAyahReply
 from .database import db
 
+
 async def handleInlineQuery(u: Update, c):
     """Handles the inline query"""
     query = u.inline_query.query

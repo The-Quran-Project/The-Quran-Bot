@@ -91,6 +91,7 @@ async def surahCommand(u: Update, c):
         chatID, reply, reply_to_message_id=message.message_id, reply_markup=button
     )
 
+
 # Command:  /random or /rand
 async def randomCommand(u: Update, c):
     """Sends a random Ayah to the user"""
