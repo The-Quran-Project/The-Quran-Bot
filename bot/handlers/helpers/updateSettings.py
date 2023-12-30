@@ -16,6 +16,7 @@ arabicStyles = {
 
 
 async def updateSettings(u: Update, c):
+    """Sends the settings message to change preferences"""
     bot: Bot = c.bot
     userID = u.effective_user.id
     chatID = u.effective_chat.id

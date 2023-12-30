@@ -2,6 +2,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 def getAyahButton(surahNo: int or str, ayahNo: int or str, arabicStyle: int = 2):
+    """Returns the button for the ayah"""
     button = InlineKeyboardMarkup(
         [
             [

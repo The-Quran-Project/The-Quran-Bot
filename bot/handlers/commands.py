@@ -4,7 +4,9 @@ from .helpers import getRandomAyah, getValidReply
 from . import Constants, replies
 
 
+# Command:  /start
 async def startCommand(u: Update, c):
+    """Sends a welcome message to the user and a link to the repo"""
     bot: Bot = c.bot
     chatID = u.effective_chat.id
     fn = u.effective_user.first_name
@@ -18,7 +20,9 @@ async def startCommand(u: Update, c):
     )
 
 
+# Command:  /help
 async def helpCommand(u: Update, c):
+    """Sends a help message to the user"""
     bot: Bot = c.bot
     chatID = u.effective_chat.id
     reply = replies.help
@@ -35,7 +39,9 @@ async def helpCommand(u: Update, c):
     await bot.sendMessage(chatID, reply, reply_markup=buttons)
 
 
+# Command:  /use
 async def useCommand(u: Update, c):
+    """Sends a message to the user on how to use the bot"""
     bot: Bot = c.bot
     chatID = u.effective_chat.id
     url = "https://telegra.ph/Al-Quran-05-29"
@@ -57,6 +63,7 @@ async def useCommand(u: Update, c):
 
 # Command:  /surah
 async def surahCommand(u: Update, c):
+    """Sends a list of all the Surahs to the user"""
     bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id
@@ -84,8 +91,9 @@ async def surahCommand(u: Update, c):
         chatID, reply, reply_to_message_id=message.message_id, reply_markup=button
     )
 
-
+# Command:  /random or /rand
 async def randomCommand(u: Update, c):
+    """Sends a random Ayah to the user"""
     bot: Bot = c.bot
     userID = u.effective_user.id
     chatID = u.effective_chat.id

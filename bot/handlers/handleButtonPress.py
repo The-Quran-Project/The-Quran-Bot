@@ -8,6 +8,7 @@ from .callbackQueryHandlers import handleSettingsButtonPress
 
 
 async def handleButtonPress(u: Update, c):
+    """Handles all the button presses / callback queries"""
     bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id

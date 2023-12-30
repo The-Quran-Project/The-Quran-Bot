@@ -59,7 +59,8 @@ class QuranClass:
         pass
 
     def getAyah(self, surahNo: int or str, ayahNo: int or str) -> objectify:
-        """Returns English and two versions of Arabic text
+        """
+        Returns Arabic, English and Tafsir of the specified ayah.
 
 
         Args:

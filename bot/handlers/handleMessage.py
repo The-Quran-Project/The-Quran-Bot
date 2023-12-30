@@ -12,6 +12,7 @@ def escapeHTML(text: str):
 
 
 async def handleMessage(u: Update, c):
+    """Handles all the messages sent to the bot"""
     bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id

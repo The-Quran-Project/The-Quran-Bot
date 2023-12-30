@@ -13,8 +13,7 @@ from dotenv import load_dotenv
 
 import os
 
-from .utils.keep_alive import runFlask
-from .utils.log import startLogger
+
 from .handlers import (
     middleware,
     startCommand,
@@ -90,12 +89,6 @@ def startBot():
         print("Please put your bot token in `.env` file")
         print()
         return
-
-    startLogger(__name__)
-
-    # run Flask server in production only
-    if not LOCAL:
-        runFlask()
 
     runBot(TOKEN)
 

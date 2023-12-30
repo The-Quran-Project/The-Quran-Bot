@@ -5,6 +5,7 @@ from .helpers import updateSettings
 
 
 async def middleware(u: Update, c):
+    """Works as a middleware to add/ban users and chats"""
     if u.inline_query:
         return
     userID = u.effective_user.id

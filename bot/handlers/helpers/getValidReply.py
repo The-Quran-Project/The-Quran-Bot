@@ -3,6 +3,7 @@ from . import getAyahReply, getAyahButton
 
 
 async def getValidReply(userID, text: str):
+    """Check the `text` and returns a valid reply"""
     sep = text.split(":")
     if len(sep) != 2:
         reply = """

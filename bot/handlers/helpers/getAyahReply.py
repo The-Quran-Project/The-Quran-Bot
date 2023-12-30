@@ -3,6 +3,7 @@ from ..database import db
 
 
 def getAyahReply(userID, surahNo: int or str, ayahNo: int or str):
+    """Returns the reply for the ayah"""
     surah = Quran.getSurahNameFromNumber(surahNo)
     ayah = Quran.getAyah(surahNo, ayahNo)
     totalAyah = Quran.getAyahNumberCount(surahNo)

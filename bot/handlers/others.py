@@ -21,6 +21,7 @@ async def pingCommand(u: Update, c):
 
 
 async def infoCommand(u, c):
+    """Get info about the user"""
     userID = u.effective_user.id
     chatID = u.effective_chat.id
     fn = escapeHTML(u.effective_user.first_name)
