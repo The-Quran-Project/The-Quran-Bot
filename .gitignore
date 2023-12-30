@@ -6,3 +6,4 @@ newfile.py
 benchmark.py
 bot/__pycache__/
 bot/utils/__pycache__/
+test*

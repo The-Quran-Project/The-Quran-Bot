@@ -1,9 +1,15 @@
 # Changes and Modifications
 **Newers are on top**
 
+
+## 5) 30th December, 2023
+- Refactored and restructured the code to make it more readable and maintainable.
+
+
+
 ## 4) 11th August, 2023
 - added `keep_alive` file to prevent bot from going to sleep in cloud providers
-- Started Organizing things
+- Refactored code to make it more readable
 
 
 ## 3) 4th July, 2023

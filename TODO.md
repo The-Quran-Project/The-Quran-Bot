@@ -1,8 +1,9 @@
 # What to do next?
 
-• A Command Named `/choice`
-- User will be able to set `Arabic Style`
-- User will be able to set whether they want the **Telegraph** page preview or not
+• A Command Named `/settings`
+- Able to set `Arabic Style`
+- Able to set whether they want Tafsir or not
+- Able to set whether they want only Arabic, only English or both
 
 
 • Pymongo Database Integration
