@@ -1,16 +1,21 @@
-from telegram import *
+from telegram import Update, Bot, InlineKeyboardMarkup
+
 from .helpers import getAyahReply, getAyahButton
 from . import Constants
 from . import Quran
+
+from .callbackQueryHandlers import handleSettingsButtonPress
 
 
 async def handleButtonPress(u: Update, c):
     bot: Bot = c.bot
     message = u.effective_message
+    userID = u.effective_user.id
     chatID = u.effective_chat.id
+
     query = u.callback_query
     query_data = query.data
-    group = u.effective_chat.id != u.effective_user.id  # Checks if
+    group = u.effective_chat.id != userID
 
     async def edit_text(*a, **k):
         if "disable_web_page_preview" not in k:
@@ -26,7 +31,7 @@ async def handleButtonPress(u: Update, c):
         ans = f"You selected {surah}"
 
         await query.answer(ans)
-        reply = getAyahReply(index, 1)
+        reply = getAyahReply(userID, index, 1)
 
         button = getAyahButton(index, 1)
 
@@ -59,7 +64,7 @@ async def handleButtonPress(u: Update, c):
         else:
             ayahNo -= 1
 
-        reply = getAyahReply(surahNo, ayahNo)
+        reply = getAyahReply(userID, surahNo, ayahNo)
 
         button = getAyahButton(surahNo, ayahNo)
 
@@ -78,23 +83,26 @@ async def handleButtonPress(u: Update, c):
         else:
             ayahNo += 1
 
-        reply = getAyahReply(surahNo, ayahNo)
+        reply = getAyahReply(userID, surahNo, ayahNo)
 
         button = getAyahButton(surahNo, ayahNo)
 
         await edit_text(reply, reply_markup=button)
 
     # Toggling the style of Arabic.
-    # Toggle between (with and without) harakat
+    # Toggle between Uthmani and Simple
     elif query_data.startswith("change-arabic"):
         surahNo, ayahNo, arabicStyle = map(int, query_data.split()[1:])
 
         surah = Quran.getSurahNameFromNumber(surahNo)
         toggle = {1: 2, 2: 1}
-        reply = getAyahReply(surahNo, ayahNo, arabicStyle)
+        reply = getAyahReply(userID, surahNo, ayahNo)
         await edit_text(
             reply, reply_markup=getAyahButton(surahNo, ayahNo, toggle[arabicStyle])
         )
+
+    elif query_data.startswith("settings"):
+        await handleSettingsButtonPress(u, c)
 
     elif query_data.startswith("audio"):
         surahNo, ayahNo = map(int, query_data.split()[1:])

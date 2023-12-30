@@ -26,7 +26,7 @@ async def handleMessage(u: Update, c):
     if ":" not in text and not group:
         return await checkSurah(u, c)
 
-    x = await getValidReply(text)
+    x = await getValidReply(userID, text)
     reply = x["text"]
     button = x["button"]
     webPreview = chatID != userID
@@ -45,6 +45,7 @@ async def handleMessage(u: Update, c):
 async def checkSurah(u: Update, c):
     bot: Bot = c.bot
     message = u.effective_message
+    userID = u.effective_user.id
     chatID = u.effective_chat.id
     text = message.text
 
@@ -57,7 +58,7 @@ async def checkSurah(u: Update, c):
 
         button = getAyahButton(surahNo, 1)
 
-        reply = getAyahReply(surahNo, 1)
+        reply = getAyahReply(userID, surahNo, 1)
         button = getAyahButton(surahNo, 1)
         await bot.sendMessage(
             chatID, reply, reply_to_message_id=message.message_id, reply_markup=button

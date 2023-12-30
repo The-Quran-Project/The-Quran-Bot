@@ -13,10 +13,10 @@ def getAyahButton(surahNo: int or str, ayahNo: int or str, arabicStyle: int = 2)
                 ),
             ],
             [
-                InlineKeyboardButton(
-                    "Change Arabic Style",
-                    callback_data=f"change-arabic  {surahNo} {ayahNo} {arabicStyle}",
-                ),
+                # InlineKeyboardButton(
+                #     "Change Arabic Style",
+                #     callback_data=f"change-arabic  {surahNo} {ayahNo} {arabicStyle}",
+                # ),
                 InlineKeyboardButton(
                     "Audio", callback_data=f"audio {surahNo} {ayahNo}"
                 ),

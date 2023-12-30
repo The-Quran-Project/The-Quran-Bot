@@ -15,6 +15,8 @@ from .helpers import getAyahReply
 async def handleInlineQuery(u: Update, c):
     query = u.inline_query.query
     inQuery = InlineQueryResultArticle
+    userID = u.effective_user.id
+
     if not query:
         return
 
@@ -111,7 +113,7 @@ async def handleInlineQuery(u: Update, c):
         arabicStyle = 2
 
     surahName = Quran.getSurahNameFromNumber(surahNo)
-    reply = getAyahReply(surahNo, ayahNo, arabicStyle)
+    reply = getAyahReply(userID, surahNo, ayahNo)
     buttons = InlineKeyboardMarkup(
         [
             [

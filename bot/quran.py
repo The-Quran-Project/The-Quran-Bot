@@ -28,10 +28,10 @@ Structure of json files in Data folder:
 
 class objectify:
     def __init__(self, entries):
-        self.english: str = ""
-        self.arabic: str = ""
-        self.arabic2: str = ""
-        self.tafsir: str = ""
+        self.english: str
+        self.arabic1: str
+        self.arabic2: str
+        self.tafsir: str
         self.__dict__.update(entries)
 
 
@@ -70,8 +70,8 @@ class QuranClass:
         Returns:
             - An objectify object that contains the following three keys:
             - `english`: the English translation of the ayah.
-            - `arabic`: the Arabic text of the ayah in the Uthmani script.
-            - `arabic_2`: the Arabic text of the ayah in the Simple script.
+            - `arabic1`: the Arabic text of the ayah in the Uthmani script.
+            - `arabic2`: the Arabic text of the ayah in the Simple script.
             - `tafsir`: The telegra.ph link of the tafsir of that verse.
 
         Raises:
@@ -101,7 +101,7 @@ class QuranClass:
 
         res = {
             "english": x[ayahNo - 1],
-            "arabic": z[0],
+            "arabic1": z[0],
             "arabic2": z[1],
             "tafsir": graph,
         }

@@ -40,16 +40,7 @@ Here, `1` means Surah-Fatiha and `3` means ayah 3</b>
 For more in depth usage, check the <a href="{telegraphURL}">Telegraph</a> link."""
 
 
-sendAyahFull = """
+sendAyah = """
 Surah : <b>{surahName} ({surahNo})</b>
 Ayah  : <b>{ayahNo} out of {totalAyah}</b>
-
-<u>Arabic</u>
-{arabic}
-
-<u>English</u>
-<b>{english}</b>
-
-<u>Tafsir</u>
-<b>Read Here: <a href="{tafsir}">Telegraph</a></b>
 """

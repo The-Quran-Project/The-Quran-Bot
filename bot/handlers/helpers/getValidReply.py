@@ -2,7 +2,7 @@ from .. import Quran
 from . import getAyahReply, getAyahButton
 
 
-async def getValidReply(text: str):
+async def getValidReply(userID, text: str):
     sep = text.split(":")
     if len(sep) != 2:
         reply = """
@@ -58,7 +58,7 @@ But you gave ayah no. {ayahNo}
         reply = {"text": reply, "button": None}
         return reply
 
-    reply = getAyahReply(surahNo, ayahNo)
+    reply = getAyahReply(userID, surahNo, ayahNo)
     button = getAyahButton(surahNo, ayahNo)
 
     return {"text": reply, "button": button}

@@ -1,10 +1,11 @@
-from telegram import constants
+from telegram import Update, constants
 from telegram.ext import (
     filters,
     Defaults,
     ApplicationBuilder,
     CommandHandler,
     MessageHandler,
+    TypeHandler,
     InlineQueryHandler,
     CallbackQueryHandler,
 )
@@ -15,6 +16,7 @@ import os
 from .utils.keep_alive import runFlask
 from .utils.log import startLogger
 from .handlers import (
+    middleware,
     startCommand,
     helpCommand,
     useCommand,
@@ -25,6 +27,7 @@ from .handlers import (
     handleMessage,
     pingCommand,
     infoCommand,
+    updateSettings,
 )
 
 load_dotenv()
@@ -59,8 +62,13 @@ def runBot(token):
         "info": infoCommand,
         "surah": surahCommand,
         "random": randomCommand,
-        "rand": handleButtonPress,
+        "rand": randomCommand,
+        "settings": updateSettings,
     }
+
+    bot.add_handler(
+        TypeHandler(Update, middleware), group=-1
+    )  # called in every update, then passed to other handlers
 
     for i, j in commands.items():
         bot.add_handler(CommandHandler(i, j))

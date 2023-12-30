@@ -87,10 +87,11 @@ async def surahCommand(u: Update, c):
 
 async def randomCommand(u: Update, c):
     bot: Bot = c.bot
+    userID = u.effective_user.id
     chatID = u.effective_chat.id
     mid = u.effective_message.message_id
 
-    x = getRandomAyah()
+    x = getRandomAyah(userID)
     reply = x["reply"]
     button = x["button"]
 
