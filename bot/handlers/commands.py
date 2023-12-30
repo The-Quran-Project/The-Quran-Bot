@@ -83,7 +83,7 @@ async def surahCommand(u: Update, c):
         )
         return
 
-    reply = await getValidReply(text)
+    reply = await getValidReply(userID, text)
     reply = reply["text"]
     button = reply["button"]
 
