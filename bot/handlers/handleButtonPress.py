@@ -90,18 +90,6 @@ async def handleButtonPress(u: Update, c):
 
         await edit_text(reply, reply_markup=button)
 
-    # Toggling the style of Arabic.
-    # Toggle between Uthmani and Simple
-    elif query_data.startswith("change-arabic"):
-        surahNo, ayahNo, arabicStyle = map(int, query_data.split()[1:])
-
-        surah = Quran.getSurahNameFromNumber(surahNo)
-        toggle = {1: 2, 2: 1}
-        reply = getAyahReply(userID, surahNo, ayahNo)
-        await edit_text(
-            reply, reply_markup=getAyahButton(surahNo, ayahNo, toggle[arabicStyle])
-        )
-
     elif query_data.startswith("settings"):
         await handleSettingsButtonPress(u, c)
 
