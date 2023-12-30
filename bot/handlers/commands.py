@@ -83,9 +83,9 @@ async def surahCommand(u: Update, c):
         )
         return
 
-    reply = await getValidReply(userID, text)
-    reply = reply["text"]
-    button = reply["button"]
+    x = await getValidReply(userID, text)
+    reply = x["text"]
+    button = x["button"]
 
     await bot.sendMessage(
         chatID, reply, reply_to_message_id=message.message_id, reply_markup=button
