@@ -1,6 +1,6 @@
-# pylint:disable=W0105
 import os
 import json
+
 from .utils import AyahNumberInvalid, SurahNumberInvalid
 
 
@@ -28,24 +28,27 @@ Structure of json files in Data folder:
 
 class objectify:
     def __init__(self, entries):
-        self.english: str = ""
-        self.arabic: str = ""
-        self.arabic2: str = ""
-        self.tafsir: str = ""
+        self.english: str
+        self.arabic1: str
+        self.arabic2: str
+        self.tafsir: str
         self.__dict__.update(entries)
 
 
-
 # Get the absolute path of the directory that contains this file
-DIR_PATH = os.path.dirname(os.path.abspath(__file__)).replace("\\", '/') + "/Data"  # root/Data
-class Quran:
-    with \
-            open(f"{DIR_PATH}/quran_en.json", "rb") as _f, \
-            open(f"{DIR_PATH}/quran_ar.json", "rb") as _g, \
-            open(f"{DIR_PATH}/surah.json", "rb") as _h, \
-            open(f"{DIR_PATH}/audio_file_ids.json", "rb") as _i, \
-            open(f"{DIR_PATH}/tafsirs.json", "rb") as _j:
+DIR_PATH = (
+    os.path.dirname(os.path.abspath(__file__)).replace("\\", "/") + "/Data"
+)  # root/Data
 
+
+class QuranClass:
+    with open(f"{DIR_PATH}/quran_en.json", "rb") as _f, open(
+        f"{DIR_PATH}/quran_ar.json", "rb"
+    ) as _g, open(f"{DIR_PATH}/surah.json", "rb") as _h, open(
+        f"{DIR_PATH}/audio_file_ids.json", "rb"
+    ) as _i, open(
+        f"{DIR_PATH}/tafsirs.json", "rb"
+    ) as _j:
         _AYAHS_en = json.load(_f)
         _AYAHS_ar = json.load(_g)
         SURAHS = json.load(_h)
@@ -56,24 +59,25 @@ class Quran:
         pass
 
     def getAyah(self, surahNo: int or str, ayahNo: int or str) -> objectify:
-        """Returns English and two versions of Arabic text
+        """
+        Returns Arabic, English and Tafsir of the specified ayah.
 
 
-    Args:
-        - `self`: the object instance of a Quran class.
-        - `surahNo` (int or str): the number or name of the surah to retrieve the ayah from.
-        - `ayahNo` (int or str): the number of the ayah to retrieve.
+        Args:
+            - `self`: the object instance of a Quran class.
+            - `surahNo` (int or str): the number or name of the surah to retrieve the ayah from.
+            - `ayahNo` (int or str): the number of the ayah to retrieve.
 
-    Returns:
-        - An objectify object that contains the following three keys:
-        - `english`: the English translation of the ayah.
-        - `arabic`: the Arabic text of the ayah in the Uthmani script.
-        - `arabic_2`: the Arabic text of the ayah in the Simple script.
-        - `tafsir`: The telegra.ph link of the tafsir of that verse.
+        Returns:
+            - An objectify object that contains the following three keys:
+            - `english`: the English translation of the ayah.
+            - `arabic1`: the Arabic text of the ayah in the Uthmani script.
+            - `arabic2`: the Arabic text of the ayah in the Simple script.
+            - `tafsir`: The telegra.ph link of the tafsir of that verse.
 
-    Raises:
-        - `SurahNumberInvalid`: if the `surahNo` is not a valid surah number (i.e. not between 1 and 114).
-        - `AyahNumberInvalid`: if the `ayahNo` is greater than the number of ayahs in the specified surah.
+        Raises:
+            - `SurahNumberInvalid`: if the `surahNo` is not a valid surah number (i.e. not between 1 and 114).
+            - `AyahNumberInvalid`: if the `ayahNo` is greater than the number of ayahs in the specified surah.
 
         """
 
@@ -82,7 +86,8 @@ class Quran:
 
         if surahNo <= 0 or surahNo > 114:
             raise SurahNumberInvalid(
-                f"Surah Number must be in between 1 to 114. `{surahNo}` is invalid.")
+                f"Surah Number must be in between 1 to 114. `{surahNo}` is invalid."
+            )
 
         surahNo = str(surahNo)
         x = self._AYAHS_en[surahNo]
@@ -95,10 +100,12 @@ class Quran:
 
         graph = f"https://telegra.ph/{self._TAFSIRS[f'{surahNo}_{ayahNo}']}"
 
-        res = {"english": x[ayahNo - 1],
-               "arabic": z[0],
-               "arabic2": z[1],
-               "tafsir": graph}
+        res = {
+            "english": x[ayahNo - 1],
+            "arabic1": z[0],
+            "arabic2": z[1],
+            "tafsir": graph,
+        }
 
         return objectify(res)
 
@@ -126,29 +133,29 @@ class Quran:
         string_list = sorted(self.SURAHS)
 
         for s in string_list:
-            a = s.split('-')[-1].lower()
+            a = s.split("-")[-1].lower()
             b = string.lower()
-            c = b.replace('k', 'q')
+            c = b.replace("k", "q")
             if b == a:
                 exact_match = True
                 matching_strings = [s]
                 break
-            elif a.replace("'", '').strip() in string.lower():
+            elif a.replace("'", "").strip() in string.lower():
                 matching_strings.append(s)
             elif c == a:
                 matching_strings.append(s)
 
         if not exact_match:
             for s in string_list:
-                s_lower = s.split('-')[-1].lower()
+                s_lower = s.split("-")[-1].lower()
                 string_lower = string.lower()
                 if all(c in s_lower for c in string_lower):
                     matching_strings.append(s)
                 elif all(c in string_lower for c in s_lower):
                     matching_strings.append(s)
         matching_strings = list({i: 0 for i in matching_strings})[:3]
-        
-        data = [[surah, self.SURAHS.index(surah) + 1 ] for surah in matching_strings]
+
+        data = [[surah, self.SURAHS.index(surah) + 1] for surah in matching_strings]
         data.sort(key=lambda x: x[1])
 
         return data

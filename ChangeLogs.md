@@ -1,9 +1,16 @@
 # Changes and Modifications
-**Newers are on top**
+**Latests are on top**
+
+
+## 5) 30th December, 2023
+- Integrated MongoDB to store user's data. Now, the bot will remember the user's preference. To change `/settings`
+- Refactored and restructured the code to make it more readable and maintainable.
+
+
 
 ## 4) 11th August, 2023
 - added `keep_alive` file to prevent bot from going to sleep in cloud providers
-- Started Organizing things
+- Refactored code to make it more readable
 
 
 ## 3) 4th July, 2023
