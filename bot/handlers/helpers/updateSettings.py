@@ -1,4 +1,4 @@
-from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 
 from ..database import db
 
@@ -17,7 +17,7 @@ arabicStyles = {
 
 async def updateSettings(u: Update, c):
     """Sends the settings message to change preferences"""
-    bot: Bot = c.bot
+    message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id
 
@@ -47,4 +47,4 @@ async def updateSettings(u: Update, c):
         ],
     ]
 
-    await bot.sendMessage(chatID, reply, reply_markup=InlineKeyboardMarkup(buttons))
+    await message.reply_html(reply, reply_markup=InlineKeyboardMarkup(buttons))

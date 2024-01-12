@@ -2,7 +2,9 @@ from .. import Quran
 from . import getAyahReply, getAyahButton
 
 
-def getValidReply(userID, text: str):
+def getValidReply(
+    userID: int, text: str, language: str = None
+) -> dict[str, str | None]:
     """Check the `text` and returns a valid reply"""
 
     if (
@@ -72,7 +74,7 @@ But you gave ayah no. {ayahNo}
         reply = {"text": reply, "button": None}
         return reply
 
-    reply = getAyahReply(userID, surahNo, ayahNo)
+    reply = getAyahReply(userID, surahNo, ayahNo, language)
     button = getAyahButton(surahNo, ayahNo)
 
     return {"text": reply, "button": button}

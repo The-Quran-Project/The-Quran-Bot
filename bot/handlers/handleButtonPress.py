@@ -9,10 +9,8 @@ from .callbackQueryHandlers import handleSettingsButtonPress
 
 async def handleButtonPress(u: Update, c):
     """Handles all the button presses / callback queries"""
-    bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id
-    chatID = u.effective_chat.id
 
     query = u.callback_query
     query_data = query.data
@@ -23,9 +21,16 @@ async def handleButtonPress(u: Update, c):
             k["disable_web_page_preview"] = group
         await message.edit_text(*a, **k)
 
-    # print("Callback Data:", query_data)
+    if query_data.startswith("settings"):
+        await handleSettingsButtonPress(u, c)
 
-    if query_data.startswith("surah"):
+    elif query_data.startswith("audio"):
+        surahNo, ayahNo = map(int, query_data.split()[1:])
+        file_id = Quran.getAudioFile(surahNo, ayahNo)
+        await message.reply_audio(file_id, quote=True)
+        await query.answer()
+
+    elif query_data.startswith("surah"):
         index = int(query_data.split()[1])
 
         surah = Quran.getSurahNameFromNumber(index)
@@ -89,12 +94,3 @@ async def handleButtonPress(u: Update, c):
         button = getAyahButton(surahNo, ayahNo)
 
         await edit_text(reply, reply_markup=button)
-
-    elif query_data.startswith("settings"):
-        await handleSettingsButtonPress(u, c)
-
-    elif query_data.startswith("audio"):
-        surahNo, ayahNo = map(int, query_data.split()[1:])
-        file_id = Quran.getAudioFile(surahNo, ayahNo)
-        await bot.sendAudio(chatID, file_id, reply_to_message_id=message.message_id)
-        await query.answer()

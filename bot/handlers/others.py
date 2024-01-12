@@ -9,19 +9,17 @@ def escapeHTML(text: str):
 
 async def pingCommand(u: Update, c):
     """Check the bot's ping"""
-    bot = c.bot
     message = u.effective_message
-    mid = message.message_id
-    chatID = u.effective_chat.id
     s = time.time()
-    sent = await bot.sendMessage(chatID, "<b>Checking...</b>", reply_to_message_id=mid)
+    sent = await message.reply_html("<b>Checking...</b>", quote=True)
     e = time.time()
 
     await sent.edit_text(f"<b>Took: {(e-s)*1000:.2f} ms</b>")
 
 
-async def infoCommand(u, c):
+async def infoCommand(u: Update, c):
     """Get info about the user"""
+    message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id
     fn = escapeHTML(u.effective_user.first_name)
@@ -49,9 +47,9 @@ Time Zone   : +00:00 UTC</b>
     pps = profile_photos["photos"]
 
     if pps != []:
-        one = pps[0][-1]["file_id"]
-        await c.bot.sendPhoto(
-            chatID, one, caption="👆🏻<u><b>Your Profile Photo</b></u> 👌🏻\n\n" + reply
+        photo = pps[0][-1]["file_id"]
+        await message.reply_photo(
+            photo, caption="👆🏻<u><b>Your Profile Photo</b></u> 👌🏻\n\n" + reply
         )
     else:
-        await c.bot.sendMessage(chatID)
+        await message.reply_html(reply)

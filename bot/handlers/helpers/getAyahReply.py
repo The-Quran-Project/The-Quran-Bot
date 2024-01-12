@@ -2,7 +2,7 @@ from .. import Quran, replies
 from ..database import db
 
 
-def getAyahReply(userID, surahNo: int or str, ayahNo: int or str):
+def getAyahReply(userID, surahNo: int or str, ayahNo: int or str, language: str = None):
     """Returns the reply for the ayah"""
     surah = Quran.getSurahNameFromNumber(surahNo)
     ayah = Quran.getAyah(surahNo, ayahNo)
@@ -36,7 +36,13 @@ def getAyahReply(userID, surahNo: int or str, ayahNo: int or str):
         totalAyah=totalAyah,
     )
 
-    if ayahMode == 1:
+    if language:
+        reply += {
+            "en": english,
+            "ar": arabic,
+        }[language]
+
+    elif ayahMode == 1:
         reply += arabic + english
     elif ayahMode == 2:
         reply += arabic

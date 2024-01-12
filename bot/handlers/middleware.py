@@ -30,9 +30,3 @@ async def middleware(u: Update, c):
 
     if isGroup and chat["banned"]:
         pass
-    message_thread_id = u.effective_message.message_thread_id
-
-    if message_thread_id:
-        bot.sendMessage(chat_id=chatID, text="Your message", message_thread_id=message_thread_id)
-    else:
-        bot.sendMessage(chat_id=chatID, text="Your message")

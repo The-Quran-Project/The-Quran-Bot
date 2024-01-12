@@ -36,7 +36,6 @@ settingsStateButtons = [
 
 async def handleSettingsButtonPress(u: Update, c):
     """Handles the settings button press"""
-    bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id
@@ -49,7 +48,17 @@ async def handleSettingsButtonPress(u: Update, c):
 
     query_data = query_data.split()[1:]
 
-    if query_data[0] == "set":
+    if query_data[0] == "home":
+        reply = settingsStateText.format(
+            ayahMode=ayahModes[str(user["settings"]["ayahMode"])],
+            arabicStyle=arabicStyles[str(user["settings"]["arabicStyle"])],
+            showTafsir=["No", "Yes"][user["settings"]["showTafsir"]],
+        )
+        await message.edit_text(
+            reply, reply_markup=InlineKeyboardMarkup(settingsStateButtons)
+        )
+
+    elif query_data[0] == "set":
         option, value = query_data[1:]
         newSettings = user["settings"]
 
@@ -62,15 +71,6 @@ async def handleSettingsButtonPress(u: Update, c):
 
         await query.answer("Settings Updated")
         db.updateUser(userID, newSettings)
-
-        reply = settingsStateText.format(
-            ayahMode=ayahModes[str(newSettings["ayahMode"])],
-            arabicStyle=arabicStyles[str(newSettings["arabicStyle"])],
-            showTafsir=["No", "Yes"][newSettings["showTafsir"]],
-        )
-        await message.edit_text(
-            reply, reply_markup=InlineKeyboardMarkup(settingsStateButtons)
-        )
 
     elif query_data[0] == "ayahMode":
         ayahMode = user["settings"]["ayahMode"]
@@ -99,6 +99,9 @@ async def handleSettingsButtonPress(u: Update, c):
                     "English Only", callback_data="settings set ayahMode 3"
                 ),
             ],
+            [
+                InlineKeyboardButton("Go Back", callback_data="settings home"),
+            ],
         ]
         await message.edit_text(reply, reply_markup=InlineKeyboardMarkup(buttons))
 
@@ -123,6 +126,9 @@ async def handleSettingsButtonPress(u: Update, c):
                     "Simple", callback_data="settings set arabicStyle 2"
                 ),
             ],
+            [
+                InlineKeyboardButton("Go Back", callback_data="settings home"),
+            ],
         ]
         await message.edit_text(reply, reply_markup=InlineKeyboardMarkup(buttons))
 
@@ -142,6 +148,9 @@ async def handleSettingsButtonPress(u: Update, c):
             [
                 InlineKeyboardButton("No", callback_data="settings set showTafsir 0"),
                 InlineKeyboardButton("Yes", callback_data="settings set showTafsir 1"),
+            ],
+            [
+                InlineKeyboardButton("Go Back", callback_data="settings home"),
             ],
         ]
         await message.edit_text(reply, reply_markup=InlineKeyboardMarkup(buttons))
