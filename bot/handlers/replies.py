@@ -7,7 +7,10 @@ It can give you the <b>Arabic</b> or <b>English</b> text and also the <b>Audio</
 
 See, /use to know how to use this bot.
 
-This bot is <a href="{repoURL}">open-source</a>. Your contribution can make it more helpful for the Ummah."""
+This bot is <a href="{repoURL}">open-source</a>. Your contribution can make it more helpful for the Ummah.
+
+The Arabic, English and Tafsir's were taken from quran.com
+"""
 
 help = """
 To know how to use the bot:
@@ -43,4 +46,16 @@ For more in depth usage, check the <a href="{telegraphURL}">Telegraph</a> link."
 sendAyah = """
 Surah : <b>{surahName} ({surahNo})</b>
 Ayah  : <b>{ayahNo} out of {totalAyah}</b>
+"""
+
+
+about = """
+Al Quran Bot is a bot that can give you verses from the Al-Quran. It is a non-profit project and is open-source.
+
+<u><b>Credits:</b></u>
+- The Arabic, English and Tafsir's were taken from quran.com
+- The recitations were taken from everyayah.com
+- The bot is hosted on Render
+- The bot is written in Python using the python-telegram-bot library
+- The bot is maintained by @Roboter403 and @Nusab19
 """
