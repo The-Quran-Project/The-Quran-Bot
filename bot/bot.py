@@ -7,7 +7,6 @@ import os
 from .handlers import *
 
 
-
 # Environment Variables
 load_dotenv()
 LOCAL = os.environ.get("LOCAL")
@@ -33,10 +32,14 @@ def runBot(token):
     commands = {
         "start": startCommand,
         "help": helpCommand,
+        "about": aboutCommand,
         "use": useCommand,
         "ping": pingCommand,
         "info": infoCommand,
         "surah": surahCommand,
+        "get": getCommand,
+        "audio": audioCommand,
+        "tafsir": tafsirCommand,
         "random": randomCommand,
         "rand": randomCommand,
         "settings": updateSettings,
@@ -51,6 +54,7 @@ def runBot(token):
 
     bot.add_handler(CallbackQueryHandler(handleButtonPress))
     bot.add_handler(InlineQueryHandler(handleInlineQuery))
+    bot.add_handler(MessageHandler(filters.Regex(r"/get[a-zA-Z]{2}"), getWithLanguage))
     bot.add_handler(MessageHandler(filters.TEXT, handleMessage))
 
     bot.run_polling()
