@@ -5,6 +5,8 @@ from . import Constants, replies
 from . import Quran
 
 # Command:  /start
+
+
 async def startCommand(u: Update, c):
     """Sends a welcome message to the user and a link to the repo"""
     message = u.effective_message
@@ -168,6 +170,8 @@ async def audioCommand(u: Update, c):
         await message.reply_html(x["text"], quote=True)
         return
 
+    if ':' not in text != 2:
+        text += ":1"
     surah, ayah = text.split(":")
     surah = surah.strip()
     ayah = ayah.strip()
@@ -189,6 +193,8 @@ async def tafsirCommand(u: Update, c):
         await message.reply_html(x["text"], quote=True)
         return
 
+    if ':' not in text != 2:
+        text += ":1"
     surah, ayah = text.split(":")
     surah = surah.strip()
     ayah = ayah.strip()
