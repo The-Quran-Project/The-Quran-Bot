@@ -16,7 +16,7 @@ async def startCommand(u: Update, c):
     buttons = InlineKeyboardMarkup([[InlineKeyboardButton("Github", url=url)]])
     x = await bot.sendSticker(chatID, Constants.salamSticker)
     await bot.sendMessage(
-        chatID, reply, reply_to_message_id=x.message_id, reply_markup=buttons
+        chatID, reply, reply_to_message_id=x.message_id, reply_markup=buttons, message_thread_id=u.effective_message.message_thread_id
     )
 
 
@@ -30,13 +30,15 @@ async def helpCommand(u: Update, c):
     buttons = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("Group", url="https://t.me/AlQuranDiscussion"),
-                InlineKeyboardButton("Channel", url="https://t.me/AlQuranUpdates"),
+                InlineKeyboardButton(
+                    "Group", url="https://t.me/AlQuranDiscussion"),
+                InlineKeyboardButton(
+                    "Channel", url="https://t.me/AlQuranUpdates"),
             ]
         ]
     )
 
-    await bot.sendMessage(chatID, reply, reply_markup=buttons)
+    await bot.sendMessage(chatID, reply, reply_markup=buttons, message_thread_id=u.effective_message.message_thread_id)
 
 
 # Command:  /use
@@ -58,7 +60,7 @@ async def useCommand(u: Update, c):
         ]
     )
 
-    await bot.sendMessage(chatID, reply, reply_markup=buttons)
+    await bot.sendMessage(chatID, reply, reply_markup=buttons, message_thread_id=u.effective_message.message_thread_id)
 
 
 # Command:  /surah
@@ -68,7 +70,6 @@ async def surahCommand(u: Update, c):
     message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id
-    fn = u.effective_user.first_name
     text = message.text[6:].strip()
 
     reply = """
@@ -79,16 +80,37 @@ async def surahCommand(u: Update, c):
         await bot.sendMessage(
             chatID,
             reply,
-            reply_markup=InlineKeyboardMarkup(Constants.allSurahInlineButtons[0]),
+            reply_markup=InlineKeyboardMarkup(
+                Constants.allSurahInlineButtons[0]),
+            message_thread_id=u.effective_message.message_thread_id
         )
         return
 
-    x = await getValidReply(userID, text)
+    x = getValidReply(userID, text)
     reply = x["text"]
     button = x["button"]
 
-    await bot.sendMessage(
-        chatID, reply, reply_to_message_id=message.message_id, reply_markup=button
+    x = await bot.sendMessage(
+        chatID, reply, reply_to_message_id=message.message_id, reply_markup=button, message_thread_id=u.effective_message.message_thread_id
+    )
+    await bot.sendMessage(chatID, "<b>Use of <code>/surah x:y</code> is deprecated and will be removed in 1st July, 2024</b>\n\nUse <code>/get x:y</code> instead", reply_to_message_id=x.message_id, message_thread_id=u.effective_message.message_thread_id)
+
+
+# Command:  /get
+async def get(u: Update, c):
+    """Sends the ayah to the user"""
+    bot: Bot = c.bot
+    message = u.effective_message
+    userID = u.effective_user.id
+    chatID = u.effective_chat.id
+    text = message.text[5:].strip()
+
+    x = getValidReply(userID, text)
+    reply = x["text"]
+    button = x["button"]
+
+    x = await bot.sendMessage(
+        chatID, reply, reply_to_message_id=message.message_id, reply_markup=button, message_thread_id=u.effective_message.message_thread_id
     )
 
 
@@ -104,4 +126,4 @@ async def randomCommand(u: Update, c):
     reply = x["reply"]
     button = x["button"]
 
-    await bot.sendMessage(chatID, reply, reply_markup=button, reply_to_message_id=mid)
+    await bot.sendMessage(chatID, reply, reply_markup=button, reply_to_message_id=mid, message_thread_id=u.effective_message.message_thread_id)
