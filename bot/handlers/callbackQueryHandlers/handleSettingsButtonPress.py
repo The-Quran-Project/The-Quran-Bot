@@ -23,16 +23,20 @@ settingsStateText = """
 <b>Ayah Mode</b>: {ayahMode}
 <b>Arabic Style</b>: {arabicStyle}
 <b>Show Tafsir</b>: {showTafsir}
+<b>Reciter</b>: {reciter}
 """
 
 
 settingsStateButtons = [
     [
         InlineKeyboardButton("Ayah Mode", callback_data="settings ayahMode"),
-        InlineKeyboardButton("Arabic Style", callback_data="settings arabicStyle"),
+        InlineKeyboardButton(
+            "Arabic Style", callback_data="settings arabicStyle"),
     ],
     [
-        InlineKeyboardButton("Show Tafsir", callback_data="settings showTafsir"),
+        InlineKeyboardButton(
+            "Show Tafsir", callback_data="settings showTafsir"),
+        InlineKeyboardButton("Reciter", callback_data="settings reciter"),
     ],
 ]
 
@@ -56,6 +60,7 @@ async def handleSettingsButtonPress(u: Update, c):
             ayahMode=ayahModes[str(user["settings"]["ayahMode"])],
             arabicStyle=arabicStyles[str(user["settings"]["arabicStyle"])],
             showTafsir=["No", "Yes"][user["settings"]["showTafsir"]],
+            reciter=reciterNames[str(user["settings"]["reciter"])],
         )
         await message.edit_text(
             reply, reply_markup=InlineKeyboardMarkup(settingsStateButtons)
@@ -73,6 +78,16 @@ async def handleSettingsButtonPress(u: Update, c):
             newSettings["showTafsir"] = bool(int(value))
         elif option == "reciter":
             newSettings["reciter"] = int(value)
+
+        reply = settingsStateText.format(
+            ayahMode=ayahModes[str(user["settings"]["ayahMode"])],
+            arabicStyle=arabicStyles[str(user["settings"]["arabicStyle"])],
+            showTafsir=["No", "Yes"][user["settings"]["showTafsir"]],
+            reciter=reciterNames[str(user["settings"]["reciter"])],
+        )
+        await message.edit_text(
+            reply, reply_markup=InlineKeyboardMarkup(settingsStateButtons)
+        )
 
         await query.answer("Settings Updated")
         db.updateUser(userID, newSettings)
@@ -151,8 +166,10 @@ async def handleSettingsButtonPress(u: Update, c):
 """
         buttons = [
             [
-                InlineKeyboardButton("No", callback_data="settings set showTafsir 0"),
-                InlineKeyboardButton("Yes", callback_data="settings set showTafsir 1"),
+                InlineKeyboardButton(
+                    "No", callback_data="settings set showTafsir 0"),
+                InlineKeyboardButton(
+                    "Yes", callback_data="settings set showTafsir 1"),
             ],
             [
                 InlineKeyboardButton("Go Back", callback_data="settings home"),
@@ -168,9 +185,9 @@ async def handleSettingsButtonPress(u: Update, c):
 
 <b>-------------------------</b>
 
-<b>1</b>: Recitation by Mishary Rashid Al-Afasy
+<b>1</b>: Mishary Rashid Al-Afasy
 
-<b>2</b>: Recitation by Abu Bakr Al-Shatri
+<b>2</b>: Abu Bakr Al-Shatri
 
 """
         buttons = [

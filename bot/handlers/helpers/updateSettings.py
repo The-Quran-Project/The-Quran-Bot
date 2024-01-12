@@ -14,6 +14,8 @@ arabicStyles = {
     "2": "Simple",
 }
 
+reciterNames = {"1": "Mishary Rashid Al-Afasy", "2": "Abu Bakr Al-Shatri"}
+
 
 async def updateSettings(u: Update, c):
     """Sends the settings message to change preferences"""
@@ -35,15 +37,19 @@ async def updateSettings(u: Update, c):
 <b>Ayah Mode</b>: {ayahModes[str(ayahMode)]}
 <b>Arabic Style</b>: {arabicStyles[str(arabicStyle)]}
 <b>Show Tafsir</b>: {["No", "Yes"][showTafsir]}
+<b>Reciter</b>: {reciterNames[str(user["settings"]["reciter"])]}
 """
 
     buttons = [
         [
-            InlineKeyboardButton("Ayah Mode", callback_data="settings ayahMode"),
-            InlineKeyboardButton("Arabic Style", callback_data="settings arabicStyle"),
+            InlineKeyboardButton(
+                "Ayah Mode", callback_data="settings ayahMode"),
+            InlineKeyboardButton(
+                "Arabic Style", callback_data="settings arabicStyle"),
         ],
         [
-            InlineKeyboardButton("Show Tafsir", callback_data="settings showTafsir"),
+            InlineKeyboardButton(
+                "Show Tafsir", callback_data="settings showTafsir"),
             InlineKeyboardButton("Reciter", callback_data="settings reciter")
         ],
     ]
