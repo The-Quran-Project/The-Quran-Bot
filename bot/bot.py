@@ -13,19 +13,20 @@ from dotenv import load_dotenv
 
 import os
 
-
-from .handlers import (
-    middleware,
+from .handlers.commands import (
     startCommand,
     helpCommand,
     useCommand,
+    pingCommand,
+    infoCommand,
     surahCommand,
     randomCommand,
+)
+from .handlers import (
+    middleware,
     handleButtonPress,
     handleInlineQuery,
     handleMessage,
-    pingCommand,
-    infoCommand,
     updateSettings,
 )
 
