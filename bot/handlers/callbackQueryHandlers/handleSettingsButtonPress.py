@@ -14,6 +14,9 @@ arabicStyles = {
     "2": "Simple",
 }
 
+reciterNames = {"1": "Mishary Rashid Al-Afasy", "2": "Abu Bakr Al-Shatri"}
+
+
 settingsStateText = """
 <u><b>Settings</b></u>
 
@@ -67,7 +70,9 @@ async def handleSettingsButtonPress(u: Update, c):
         elif option == "arabicStyle":
             newSettings["arabicStyle"] = int(value)
         elif option == "showTafsir":
-            newSettings["showTafsir"] = int(value)
+            newSettings["showTafsir"] = bool(int(value))
+        elif option == "reciter":
+            newSettings["reciter"] = int(value)
 
         await query.answer("Settings Updated")
         db.updateUser(userID, newSettings)
@@ -148,6 +153,34 @@ async def handleSettingsButtonPress(u: Update, c):
             [
                 InlineKeyboardButton("No", callback_data="settings set showTafsir 0"),
                 InlineKeyboardButton("Yes", callback_data="settings set showTafsir 1"),
+            ],
+            [
+                InlineKeyboardButton("Go Back", callback_data="settings home"),
+            ],
+        ]
+        await message.edit_text(reply, reply_markup=InlineKeyboardMarkup(buttons))
+
+    elif query_data[0] == "reciter":
+        reply = f"""
+<u><b>Change Reciter</b></u>
+
+<b>Reciter</b>: {reciterNames[str(user["settings"]["reciter"])]}
+
+<b>-------------------------</b>
+
+<b>1</b>: Recitation by Mishary Rashid Al-Afasy
+
+<b>2</b>: Recitation by Abu Bakr Al-Shatri
+
+"""
+        buttons = [
+            [
+                InlineKeyboardButton(
+                    "Mishary Rashid Al-Afasy", callback_data="settings set reciter 1"
+                ),
+                InlineKeyboardButton(
+                    "Abu Bakr Al-Shatri", callback_data="settings set reciter 2"
+                ),
             ],
             [
                 InlineKeyboardButton("Go Back", callback_data="settings home"),
