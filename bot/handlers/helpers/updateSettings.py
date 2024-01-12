@@ -44,6 +44,7 @@ async def updateSettings(u: Update, c):
         ],
         [
             InlineKeyboardButton("Show Tafsir", callback_data="settings showTafsir"),
+            InlineKeyboardButton("Reciter", callback_data="settings reciter")
         ],
     ]
 
