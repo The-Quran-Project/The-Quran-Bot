@@ -3,15 +3,6 @@ from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 from .helpers import getRandomAyah, getValidReply
 from . import Constants, replies
 
-# ---------------------------------------- #
-# ------------ Other Commands ------------ #
-from .others import (
-    pingCommand,
-    infoCommand,
-)
-# ---------------------------------------- #
-
-
 
 
 # Command:  /start

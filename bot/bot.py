@@ -1,39 +1,15 @@
 from telegram import Update, constants
-from telegram.ext import (
-    filters,
-    Defaults,
-    ApplicationBuilder,
-    CommandHandler,
-    MessageHandler,
-    TypeHandler,
-    InlineQueryHandler,
-    CallbackQueryHandler,
-)
+from telegram.ext import *
 from dotenv import load_dotenv
 
 import os
 
-from .handlers.commands import (
-    startCommand,
-    helpCommand,
-    useCommand,
-    pingCommand,
-    infoCommand,
-    surahCommand,
-    randomCommand,
-)
-from .handlers import (
-    middleware,
-    handleButtonPress,
-    handleInlineQuery,
-    handleMessage,
-    updateSettings,
-)
+from .handlers import *
 
-load_dotenv()
 
 
 # Environment Variables
+load_dotenv()
 LOCAL = os.environ.get("LOCAL")
 TOKEN = os.environ.get("TOKEN") if not LOCAL else os.environ.get("TEST")
 
