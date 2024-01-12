@@ -27,7 +27,7 @@ async def handleMessage(u: Update, c):
     if ":" not in text and not group:
         return await checkSurah(u, c)
 
-    x = await getValidReply(userID, text)
+    x = getValidReply(userID, text)
     reply = x["text"]
     button = x["button"]
     webPreview = chatID != userID
@@ -40,6 +40,7 @@ async def handleMessage(u: Update, c):
         reply_to_message_id=message.message_id,
         reply_markup=button,
         disable_web_page_preview=webPreview,
+        message_thread_id=u.effective_message.message_thread_id,
     )
 
 
@@ -54,7 +55,7 @@ async def checkSurah(u: Update, c):
         surahNo = int(text)
         if not 1 <= surahNo <= 114:
             reply = """Surah number must be between 1-114"""
-            await bot.sendMessage(chatID, reply, reply_to_message_id=message.message_id)
+            await bot.sendMessage(chatID, reply, reply_to_message_id=message.message_id, message_thread_id=u.effective_message.message_thread_id)
             return
 
         button = getAyahButton(surahNo, 1)
@@ -62,7 +63,7 @@ async def checkSurah(u: Update, c):
         reply = getAyahReply(userID, surahNo, 1)
         button = getAyahButton(surahNo, 1)
         await bot.sendMessage(
-            chatID, reply, reply_to_message_id=message.message_id, reply_markup=button
+            chatID, reply, reply_to_message_id=message.message_id, reply_markup=button, message_thread_id=u.effective_message.message_thread_id
         )
 
     for i in text.lower().replace(" ", ""):
@@ -78,7 +79,7 @@ Write something like:
 fatihah
 nas
 """
-        await bot.sendMessage(chatID, reply, reply_to_message_id=message.message_id)
+        await bot.sendMessage(chatID, reply, reply_to_message_id=message.message_id, message_thread_id=u.effective_message.message_thread_id)
         return False
 
     buttons = []
@@ -94,6 +95,7 @@ nas
         "These are the surah that matches the most with the text you sent:",
         reply_to_message_id=message.message_id,
         reply_markup=buttons,
+        message_thread_id=u.effective_message.message_thread_id,
     )
 
     return True
