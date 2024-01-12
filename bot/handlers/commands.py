@@ -28,10 +28,8 @@ async def helpCommand(u: Update, c):
     button = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton(
-                    "Group", url="https://t.me/AlQuranDiscussion"),
-                InlineKeyboardButton(
-                    "Channel", url="https://t.me/AlQuranUpdates"),
+                InlineKeyboardButton("Group", url="https://t.me/AlQuranDiscussion"),
+                InlineKeyboardButton("Channel", url="https://t.me/AlQuranUpdates"),
             ]
         ]
     )
@@ -170,7 +168,7 @@ async def audioCommand(u: Update, c):
         await message.reply_html(x["text"], quote=True)
         return
 
-    if ':' not in text != 2:
+    if ":" not in text != 2:
         text += ":1"
     surah, ayah = text.split(":")
     surah = surah.strip()
@@ -193,11 +191,13 @@ async def tafsirCommand(u: Update, c):
         await message.reply_html(x["text"], quote=True)
         return
 
-    if ':' not in text != 2:
+    if ":" not in text != 2:
         text += ":1"
     surah, ayah = text.split(":")
     surah = surah.strip()
     ayah = ayah.strip()
 
     tafsir = Quran.getAyah(surah, ayah).tafsir
-    await message.reply_html(f"<b>Tafsir:</b> <a href='{tafsir}'>Telegraph</a>", quote=True)
+    await message.reply_html(
+        f"<b>Tafsir:</b> <a href='{tafsir}'>Telegraph</a>", quote=True
+    )
