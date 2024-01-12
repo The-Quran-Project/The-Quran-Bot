@@ -2,6 +2,15 @@
 **Latests are on top**
 
 
+
+## 8) 13th January, 2024
+- Added `/get`, `/get<lang>`, `/audio`, `/tafsir` commands
+- Deprecate `/surah x:y` command. Now, you can use `/get x:y` instead.
+- New reciter added: `Abu Bakr Al-Shatri` [May Allah bless him]
+- Mention credits in `/about` command
+
+
+
 ## 5) 30th December, 2023
 - Integrated MongoDB to store user's data. Now, the bot will remember the user's preference. To change `/settings`
 - Refactored and restructured the code to make it more readable and maintainable.

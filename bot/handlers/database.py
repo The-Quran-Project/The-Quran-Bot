@@ -36,15 +36,15 @@ class Database:
     def getAllChat(self):
         return [i for i in self.db.chats.find({})]
 
-    def getUser(self, chatID: str or int):
-        return self.db.users.find_one({"_id": chatID})
+    def getUser(self, userID: str or int):
+        return self.db.users.find_one({"_id": userID})
 
     def getChat(self, chatID: str or int):
         return self.db.chats.find_one({"_id": chatID})
 
-    def addUser(self, chatID: str or int):
+    def addUser(self, userID: str or int):
         user = {
-            "_id": chatID,
+            "_id": userID,
             "settings": self.defaultSettings,
             "banned": False,
         }
@@ -62,14 +62,14 @@ class Database:
     def getChat(self, chatID: str or int):
         return self.db.chats.find_one({"_id": chatID})
 
-    def updateUser(self, chatID: str or int, settings: dict):
-        user = self.getUser(chatID)
+    def updateUser(self, userID: str or int, settings: dict):
+        user = self.getUser(userID)
         if not user:
-            user = self.addUser(chatID)
+            user = self.addUser(userID)
 
         settings = {**user["settings"], **settings}
-        self.db.users.update_one({"_id": chatID}, {"$set": {"settings": settings}})
-        return self.getUser(chatID)
+        self.db.users.update_one({"_id": userID}, {"$set": {"settings": settings}})
+        return self.getUser(userID)
 
     def banUser(self, userID: str or int):
         return self.db.users.update_one({"_id": userID}, {"$set": {"banned": True}})
@@ -83,11 +83,11 @@ class Database:
     def unBanChat(self, chatID: str or int):
         return self.db.chats.update_one({"_id": chatID}, {"$set": {"banned": False}})
 
-    def deleteUser(self, chatID: str or int):
-        return self.db.users.delete_one({"_id": chatID})
+    # def deleteUser(self, userID: str or int):
+    #     return self.db.users.delete_one({"_id": userID})
 
-    def deleteAllUsers(self):
-        return self.db.users.delete_many({})
+    # def deleteAllUsers(self):
+    #     return self.db.users.delete_many({})
 
 
 db = Database()
@@ -96,8 +96,6 @@ db = Database()
 def main():
     print("Total Users:", len(db.getAllUsers()))
     print("Total Chats:", len(db.getAllChat()))
-    print(db.updateUser(1, {"ayahMode": 3}))
-    print(db.getUser(1))
 
 
 if __name__ == "__main__":
