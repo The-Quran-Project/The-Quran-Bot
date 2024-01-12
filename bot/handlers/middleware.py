@@ -8,6 +8,7 @@ async def middleware(u: Update, c):
     """Works as a middleware to add/ban users and chats"""
     if u.inline_query:
         return
+
     userID = u.effective_user.id
     chatID = u.effective_chat.id
     isGroup = chatID != userID
@@ -29,3 +30,9 @@ async def middleware(u: Update, c):
 
     if isGroup and chat["banned"]:
         pass
+    message_thread_id = u.effective_message.message_thread_id
+
+    if message_thread_id:
+        bot.sendMessage(chat_id=chatID, text="Your message", message_thread_id=message_thread_id)
+    else:
+        bot.sendMessage(chat_id=chatID, text="Your message")
