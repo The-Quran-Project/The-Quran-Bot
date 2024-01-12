@@ -33,8 +33,14 @@ class Database:
     def getAllUsers(self):
         return [i for i in self.db.users.find({})]
 
+    def getAllChat(self):
+        return [i for i in self.db.chats.find({})]
+
     def getUser(self, chatID: str or int):
         return self.db.users.find_one({"_id": chatID})
+
+    def getChat(self, chatID: str or int):
+        return self.db.chats.find_one({"_id": chatID})
 
     def addUser(self, chatID: str or int):
         user = {
@@ -68,13 +74,13 @@ class Database:
     def banUser(self, userID: str or int):
         return self.db.users.update_one({"_id": userID}, {"$set": {"banned": True}})
 
-    def unbanUser(self, userID: str or int):
+    def unBanUser(self, userID: str or int):
         return self.db.users.update_one({"_id": userID}, {"$set": {"banned": False}})
 
     def banChat(self, chatID: str or int):
         return self.db.chats.update_one({"_id": chatID}, {"$set": {"banned": True}})
 
-    def unbanChat(self, chatID: str or int):
+    def unBanChat(self, chatID: str or int):
         return self.db.chats.update_one({"_id": chatID}, {"$set": {"banned": False}})
 
     def deleteUser(self, chatID: str or int):
@@ -89,6 +95,7 @@ db = Database()
 
 def main():
     print("Total Users:", len(db.getAllUsers()))
+    print("Total Chats:", len(db.getAllChat()))
     print(db.updateUser(1, {"ayahMode": 3}))
     print(db.getUser(1))
 

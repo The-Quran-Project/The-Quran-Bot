@@ -3,6 +3,16 @@ from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 from .helpers import getRandomAyah, getValidReply
 from . import Constants, replies
 
+# ---------------------------------------- #
+# ------------ Other Commands ------------ #
+from .others import (
+    pingCommand,
+    infoCommand,
+)
+# ---------------------------------------- #
+
+
+
 
 # Command:  /start
 async def startCommand(u: Update, c):
@@ -39,6 +49,16 @@ async def helpCommand(u: Update, c):
     )
 
     await bot.sendMessage(chatID, reply, reply_markup=buttons, message_thread_id=u.effective_message.message_thread_id)
+
+
+# Command:  /about
+async def aboutCommand(u: Update, c):
+    """Sends an about message to the user"""
+    bot: Bot = c.bot
+    chatID = u.effective_chat.id
+    reply = replies.about
+
+    await bot.sendMessage(chatID, reply, message_thread_id=u.effective_message.message_thread_id)
 
 
 # Command:  /use
@@ -99,6 +119,24 @@ async def surahCommand(u: Update, c):
 # Command:  /get
 async def get(u: Update, c):
     """Sends the ayah to the user"""
+    bot: Bot = c.bot
+    message = u.effective_message
+    userID = u.effective_user.id
+    chatID = u.effective_chat.id
+    text = message.text[5:].strip()
+
+    x = getValidReply(userID, text)
+    reply = x["text"]
+    button = x["button"]
+
+    x = await bot.sendMessage(
+        chatID, reply, reply_to_message_id=message.message_id, reply_markup=button, message_thread_id=u.effective_message.message_thread_id
+    )
+
+
+# Command: /get<language>
+async def getWithLanguage(u: Update, c):
+    """Sends the ayah to the user in the specified language"""
     bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id

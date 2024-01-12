@@ -23,21 +23,8 @@ class Constants:
 
 
 # --- Importing Handlers ---
-from .commands import (
-    startCommand,
-    helpCommand,
-    useCommand,
-    surahCommand,
-    surahCommand,
-    randomCommand,
-)
 from .handleMessage import handleMessage
-from .handleButtonPress import handleButtonPress
 from .handleButtonPress import handleButtonPress
 from .handleInlineQuery import handleInlineQuery
 from .helpers.updateSettings import updateSettings
 from .middleware import middleware
-from .others import (
-    pingCommand,
-    infoCommand,
-)
