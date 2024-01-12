@@ -1,34 +1,29 @@
-from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, Message, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
 from .helpers import getRandomAyah, getValidReply
 from . import Constants, replies
-
-
+from . import Quran
 
 # Command:  /start
 async def startCommand(u: Update, c):
     """Sends a welcome message to the user and a link to the repo"""
-    bot: Bot = c.bot
-    chatID = u.effective_chat.id
+    message = u.effective_message
     fn = u.effective_user.first_name
     url = "https://github.com/The-Quran-Project/TG-Quran-Bot"
     reply = replies.start.format(firstName=fn, repoURL=url)
 
-    buttons = InlineKeyboardMarkup([[InlineKeyboardButton("Github", url=url)]])
-    x = await bot.sendSticker(chatID, Constants.salamSticker)
-    await bot.sendMessage(
-        chatID, reply, reply_to_message_id=x.message_id, reply_markup=buttons, message_thread_id=u.effective_message.message_thread_id
-    )
+    button = InlineKeyboardMarkup([[InlineKeyboardButton("Github", url=url)]])
+    msg = await message.reply_sticker(Constants.salamSticker)
+    await msg.reply_html(reply, reply_markup=button)
 
 
 # Command:  /help
 async def helpCommand(u: Update, c):
     """Sends a help message to the user"""
-    bot: Bot = c.bot
-    chatID = u.effective_chat.id
+    message = u.effective_message
     reply = replies.help
 
-    buttons = InlineKeyboardMarkup(
+    button = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
@@ -39,28 +34,26 @@ async def helpCommand(u: Update, c):
         ]
     )
 
-    await bot.sendMessage(chatID, reply, reply_markup=buttons, message_thread_id=u.effective_message.message_thread_id)
+    await message.reply_html(reply, reply_markup=button)
 
 
 # Command:  /about
 async def aboutCommand(u: Update, c):
     """Sends an about message to the user"""
-    bot: Bot = c.bot
-    chatID = u.effective_chat.id
+    message = u.effective_message
     reply = replies.about
 
-    await bot.sendMessage(chatID, reply, message_thread_id=u.effective_message.message_thread_id)
+    await message.reply_html(reply)
 
 
 # Command:  /use
 async def useCommand(u: Update, c):
     """Sends a message to the user on how to use the bot"""
-    bot: Bot = c.bot
-    chatID = u.effective_chat.id
+    message = u.effective_message
     url = "https://telegra.ph/Al-Quran-05-29"
     reply = replies.howToUse.format(telegraphURL=url)
 
-    buttons = InlineKeyboardMarkup(
+    button = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton("Telegraph", url=url),
@@ -71,88 +64,134 @@ async def useCommand(u: Update, c):
         ]
     )
 
-    await bot.sendMessage(chatID, reply, reply_markup=buttons, message_thread_id=u.effective_message.message_thread_id)
+    await message.reply_html(reply, reply_markup=button, quote=True)
 
 
 # Command:  /surah
 async def surahCommand(u: Update, c):
     """Sends a list of all the Surahs to the user"""
-    bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id
-    chatID = u.effective_chat.id
-    text = message.text[6:].strip()
+    text = message.text[6:].strip()  # 6 is the length of "/surah"
 
     reply = """
 <b>Select a surah from below:</b>
     """
     # Sends buttons with Surah names
     if not text:
-        await bot.sendMessage(
-            chatID,
-            reply,
-            reply_markup=InlineKeyboardMarkup(
-                Constants.allSurahInlineButtons[0]),
-            message_thread_id=u.effective_message.message_thread_id
-        )
+        await message.reply_html(reply, reply_markup=Constants.allSurahButtons[0])
         return
 
     x = getValidReply(userID, text)
     reply = x["text"]
     button = x["button"]
 
-    x = await bot.sendMessage(
-        chatID, reply, reply_to_message_id=message.message_id, reply_markup=button, message_thread_id=u.effective_message.message_thread_id
+    msg: Message = await message.reply_html(reply, reply_markup=button, quote=True)
+
+    await msg.reply_html(
+        "<b>Use of <code>/surah x:y</code> is deprecated and will be removed in/after 1st July, 2024</b>\n\nUse <code>/get x:y</code> instead",
+        quote=True,
     )
-    await bot.sendMessage(chatID, "<b>Use of <code>/surah x:y</code> is deprecated and will be removed in 1st July, 2024</b>\n\nUse <code>/get x:y</code> instead", reply_to_message_id=x.message_id, message_thread_id=u.effective_message.message_thread_id)
 
 
 # Command:  /get
-async def get(u: Update, c):
+async def getCommand(u: Update, c):
     """Sends the ayah to the user"""
-    bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id
-    text = message.text[5:].strip()
+    text = message.text[4:].strip()  # 4 is the length of "/get"
 
     x = getValidReply(userID, text)
     reply = x["text"]
     button = x["button"]
 
-    x = await bot.sendMessage(
-        chatID, reply, reply_to_message_id=message.message_id, reply_markup=button, message_thread_id=u.effective_message.message_thread_id
-    )
+    await message.reply_html(reply, reply_markup=button, quote=True)
 
 
 # Command: /get<language>
 async def getWithLanguage(u: Update, c):
     """Sends the ayah to the user in the specified language"""
-    bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id
-    chatID = u.effective_chat.id
-    text = message.text[5:].strip()
+    # 4 to 6 will be the language code (e.g. /getar)
+    language = message.text[4:6].lower()
+    text = message.text[6:].strip()  # 6 is the length of "/get<language>"
 
-    x = getValidReply(userID, text)
+    if language not in Constants.languages:
+        reply = f"""
+<b>Language code is not valid</b>
+
+Use one of the following:
+{"-\n".join(Constants.languages)}
+
+Give such as:
+<pre>
+/getar 1:3
+/geten 3:5
+</pre>
+"""
+        await message.reply_html(reply)
+        return
+
+    x = getValidReply(userID, text, language)
     reply = x["text"]
     button = x["button"]
 
-    x = await bot.sendMessage(
-        chatID, reply, reply_to_message_id=message.message_id, reply_markup=button, message_thread_id=u.effective_message.message_thread_id
-    )
+    await message.reply_html(reply, reply_markup=button)
 
 
 # Command:  /random or /rand
 async def randomCommand(u: Update, c):
     """Sends a random Ayah to the user"""
-    bot: Bot = c.bot
     userID = u.effective_user.id
-    chatID = u.effective_chat.id
-    mid = u.effective_message.message_id
+    message = u.effective_message
 
     x = getRandomAyah(userID)
     reply = x["reply"]
     button = x["button"]
 
-    await bot.sendMessage(chatID, reply, reply_markup=button, reply_to_message_id=mid, message_thread_id=u.effective_message.message_thread_id)
+    await message.reply_html(reply, reply_markup=button, quote=True)
+
+
+# Command:  /audio
+async def audioCommand(u: Update, c):
+    """Sends the audio of the ayah to the user"""
+    message = u.effective_message
+    userID = u.effective_user.id
+    text = message.text[6:].strip()  # 6 is the length of "/audio"
+
+    x = getValidReply(userID, text)
+    button = x["button"]
+
+    if not button:
+        await message.reply_html(x["text"], quote=True)
+        return
+
+    surah, ayah = text.split(":")
+    surah = surah.strip()
+    ayah = ayah.strip()
+
+    await message.reply_audio(f"https://quranaudio.pages.dev/1/{surah}_{ayah}.mp3")
+
+
+# Command:  /tafsir
+async def tafsirCommand(u: Update, c):
+    """Sends the tafsir of the ayah to the user"""
+    message = u.effective_message
+    userID = u.effective_user.id
+    text = message.text[7:].strip()  # 7 is the length of "/tafsir"
+
+    x = getValidReply(userID, text)
+    button = x["button"]
+
+    if not button:
+        await message.reply_html(x["text"], quote=True)
+        return
+
+    surah, ayah = text.split(":")
+    surah = surah.strip()
+    ayah = ayah.strip()
+
+    tafsir = Quran.getAyah(surah, ayah).tafsir
+    await message.reply_html(f"<b>Tafsir:</b> <a href='{tafsir}'>Telegraph</a>", quote=True)
