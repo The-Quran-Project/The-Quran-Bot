@@ -3,6 +3,7 @@ from telegram import Update, Bot, InlineKeyboardMarkup
 from .helpers import getAyahReply, getAyahButton
 from . import Constants
 from . import Quran
+from .database import db
 
 from .callbackQueryHandlers import handleSettingsButtonPress
 
