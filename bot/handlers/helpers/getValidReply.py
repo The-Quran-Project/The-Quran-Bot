@@ -2,8 +2,21 @@ from .. import Quran
 from . import getAyahReply, getAyahButton
 
 
-async def getValidReply(userID, text: str):
+def getValidReply(userID, text: str):
     """Check the `text` and returns a valid reply"""
+
+    if (
+        text.strip().isdigit() and 1 <= int(text.strip()) <= 114
+    ):  # Only surah number is given
+        surahNo = int(text.strip())
+        ayahNo = 1
+        surah = Quran.getSurahNameFromNumber(surahNo)
+        ayahCount = Quran.getAyahNumberCount(surahNo)
+        reply = getAyahReply(userID, surahNo, ayahNo)
+        button = getAyahButton(surahNo, ayahNo)
+
+        return {"text": reply, "button": button}
+
     sep = text.split(":")
     if len(sep) != 2:
         reply = """
