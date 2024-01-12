@@ -3,6 +3,8 @@ from telegram import Update, Message, Bot, InlineKeyboardButton, InlineKeyboardM
 from .helpers import getRandomAyah, getValidReply
 from . import Constants, replies
 from . import Quran
+from .database import db
+
 
 # Command:  /start
 
@@ -172,8 +174,9 @@ async def audioCommand(u: Update, c):
     surah, ayah = text.split(":")
     surah = surah.strip()
     ayah = ayah.strip()
+    
 
-    await message.reply_audio(f"https://quranaudio.pages.dev/1/{surah}_{ayah}.mp3")
+    await message.reply_audio(f"https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{surah}_{ayah}.mp3", quote=True)
 
 
 # Command:  /tafsir
