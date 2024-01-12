@@ -59,9 +59,9 @@ about = """
 Al Quran Bot is a bot that can give you verses from the Al-Quran. It is a non-profit project and is open-source.
 
 <u><b>Credits:</b></u>
-- The Arabic, English and Tafsir's were taken from [quran.com](https://quran.com)
-- The recitations were taken from [everyayah.com](https://everyayah.com)
-- The bot is hosted on [Render](https://render.com)
-- The bot is written in Python3 using the [python-telegram-bot](https://t.me/pythontelegrambotgroup) library
+- The Arabic, English and Tafsir's were taken from <a href="https://quran.com">quran.com</a>
+- The recitations were taken from <a href="https://everyayah.com">everyayah.com</a>
+- The bot is hosted on <a href="https://render.com">Render</a>
+- The bot is written in Python3 using the <a href="https://t.me/pythontelegrambotgroup">python-telegram-bot</a> library
 - The bot is maintained by @Roboter403 and @Nusab19
 """
