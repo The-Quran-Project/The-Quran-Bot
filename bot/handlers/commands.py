@@ -99,7 +99,6 @@ async def getCommand(u: Update, c):
     """Sends the ayah to the user"""
     message = u.effective_message
     userID = u.effective_user.id
-    chatID = u.effective_chat.id
     text = message.text[4:].strip()  # 4 is the length of "/get"
 
     x = getValidReply(userID, text)
