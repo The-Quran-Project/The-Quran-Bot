@@ -85,7 +85,6 @@ baqarah
 
     await message.reply_html(
         "These are the surah that matches the most with the text you sent:",
-        reply_markup=button,
         quote=True,
     )
 
