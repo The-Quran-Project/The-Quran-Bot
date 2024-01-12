@@ -14,7 +14,7 @@ def getValidReply(
         ayahNo = 1
         surah = Quran.getSurahNameFromNumber(surahNo)
         ayahCount = Quran.getAyahNumberCount(surahNo)
-        reply = getAyahReply(userID, surahNo, ayahNo)
+        reply = getAyahReply(userID, surahNo, ayahNo, language)
         button = getAyahButton(surahNo, ayahNo)
 
         return {"text": reply, "button": button}
