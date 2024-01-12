@@ -30,6 +30,7 @@ howToUse = """
 /use - This message
 /info - Details of the current chat
 /ping - Check server's ping
+/settings - Change your settings
 
 <u>Usage of Bot:</u>
 /surah - The list of all the Surahs
