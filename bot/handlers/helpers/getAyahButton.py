@@ -21,6 +21,10 @@ def getAyahButton(surahNo: int or str, ayahNo: int or str, arabicStyle: int = 2)
                 InlineKeyboardButton(
                     "Audio", callback_data=f"audio {surahNo} {ayahNo}"
                 ),
+                InlineKeyboardButton(
+                    "Open in Quran.com",
+                    url=f"https://quran.com/{surahNo}:{ayahNo}",
+                ),
             ],
         ]
     )
