@@ -81,7 +81,7 @@ async def surahCommand(u: Update, c):
     """
     # Sends buttons with Surah names
     if not text:
-        await message.reply_html(reply, reply_markup=Constants.allSurahButtons[0])
+        await message.reply_html(reply, reply_markup=Constants.allSurahInlineButtons[0])
         return
 
     x = getValidReply(userID, text)
@@ -118,13 +118,13 @@ async def getWithLanguage(u: Update, c):
     # 4 to 6 will be the language code (e.g. /getar)
     language = message.text[4:6].lower()
     text = message.text[6:].strip()  # 6 is the length of "/get<language>"
-
+    newLine = "\n"
     if language not in Constants.languages:
         reply = f"""
 <b>Language code is not valid</b>
 
 Use one of the following:
-{"-\n".join(Constants.languages)}
+{"-"+newLine.join(Constants.languages)}
 
 Give such as:
 <pre>
@@ -176,7 +176,7 @@ async def audioCommand(u: Update, c):
     ayah = ayah.strip()
     
 
-    await message.reply_audio(f"https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{surah}_{ayah}.mp3", quote=True)
+    await message.reply_audio(f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{surah}_{ayah}.mp3""", quote=True)
 
 
 # Command:  /tafsir
