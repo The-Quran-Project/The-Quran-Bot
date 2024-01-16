@@ -81,7 +81,8 @@ async def surahCommand(u: Update, c):
     """
     # Sends buttons with Surah names
     if not text:
-        await message.reply_html(reply, reply_markup=Constants.allSurahInlineButtons[0])
+        button = Constants.allSurahInlineButtons[0]
+        await message.reply_html(reply, reply_markup=InlineKeyboardMarkup(button))
         return
 
     x = getValidReply(userID, text)
