@@ -7,8 +7,6 @@ from .database import db
 
 
 # Command:  /start
-
-
 async def startCommand(u: Update, c):
     """Sends a welcome message to the user and a link to the repo"""
     message = u.effective_message

@@ -24,6 +24,7 @@ async def updateSettings(u: Update, c):
     chatID = u.effective_chat.id
 
     if userID != chatID:  # if not private chat
+        await message.reply_html("<b>Only works in private chat!</b>")
         return
 
     user = db.getUser(userID)
