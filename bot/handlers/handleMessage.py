@@ -44,7 +44,7 @@ async def checkSurah(u: Update, c):
     chatID = u.effective_chat.id
     text = message.text
 
-    if userID != chatID: # Means it's a group
+    if userID != chatID:  # Means it's a group
         return
 
     if text.isdigit():

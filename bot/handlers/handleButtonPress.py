@@ -29,7 +29,10 @@ async def handleButtonPress(u: Update, c):
         surahNo, ayahNo = map(int, query_data.split()[1:])
         # file_id = Quran.getAudioFile(surahNo, ayahNo)
         # await message.reply_audio(file_id, quote=True)
-        await message.reply_audio(f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{surahNo}_{ayahNo}.mp3""", quote=True)
+        await message.reply_audio(
+            f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{surahNo}_{ayahNo}.mp3""",
+            quote=True,
+        )
         await query.answer()
 
     elif query_data.startswith("surah"):

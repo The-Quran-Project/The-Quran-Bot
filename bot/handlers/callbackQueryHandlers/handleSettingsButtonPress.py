@@ -30,12 +30,10 @@ settingsStateText = """
 settingsStateButtons = [
     [
         InlineKeyboardButton("Ayah Mode", callback_data="settings ayahMode"),
-        InlineKeyboardButton(
-            "Arabic Style", callback_data="settings arabicStyle"),
+        InlineKeyboardButton("Arabic Style", callback_data="settings arabicStyle"),
     ],
     [
-        InlineKeyboardButton(
-            "Show Tafsir", callback_data="settings showTafsir"),
+        InlineKeyboardButton("Show Tafsir", callback_data="settings showTafsir"),
         InlineKeyboardButton("Reciter", callback_data="settings reciter"),
     ],
 ]
@@ -166,10 +164,8 @@ async def handleSettingsButtonPress(u: Update, c):
 """
         buttons = [
             [
-                InlineKeyboardButton(
-                    "No", callback_data="settings set showTafsir 0"),
-                InlineKeyboardButton(
-                    "Yes", callback_data="settings set showTafsir 1"),
+                InlineKeyboardButton("No", callback_data="settings set showTafsir 0"),
+                InlineKeyboardButton("Yes", callback_data="settings set showTafsir 1"),
             ],
             [
                 InlineKeyboardButton("Go Back", callback_data="settings home"),

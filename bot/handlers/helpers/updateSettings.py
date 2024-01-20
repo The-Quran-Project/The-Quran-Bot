@@ -43,15 +43,12 @@ async def updateSettings(u: Update, c):
 
     buttons = [
         [
-            InlineKeyboardButton(
-                "Ayah Mode", callback_data="settings ayahMode"),
-            InlineKeyboardButton(
-                "Arabic Style", callback_data="settings arabicStyle"),
+            InlineKeyboardButton("Ayah Mode", callback_data="settings ayahMode"),
+            InlineKeyboardButton("Arabic Style", callback_data="settings arabicStyle"),
         ],
         [
-            InlineKeyboardButton(
-                "Show Tafsir", callback_data="settings showTafsir"),
-            InlineKeyboardButton("Reciter", callback_data="settings reciter")
+            InlineKeyboardButton("Show Tafsir", callback_data="settings showTafsir"),
+            InlineKeyboardButton("Reciter", callback_data="settings reciter"),
         ],
     ]
 

@@ -173,9 +173,11 @@ async def audioCommand(u: Update, c):
     surah, ayah = text.split(":")
     surah = surah.strip()
     ayah = ayah.strip()
-    
 
-    await message.reply_audio(f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{surah}_{ayah}.mp3""", quote=True)
+    await message.reply_audio(
+        f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{surah}_{ayah}.mp3""",
+        quote=True,
+    )
 
 
 # Command:  /tafsir
