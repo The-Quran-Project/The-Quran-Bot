@@ -20,6 +20,8 @@ async def handleMessage(u: Update, c):
     button = None
     group = u.effective_chat.id != u.effective_user.id
 
+    if group:return 
+    
     if u.effective_message.via_bot:
         return
 
