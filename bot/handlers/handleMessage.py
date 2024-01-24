@@ -23,7 +23,8 @@ async def handleMessage(u: Update, c):
     if u.effective_message.via_bot:
         return
 
-    if ":" not in text and not group:
+    if ":" not in text:
+        return
         return await checkSurah(u, c)
 
     x = getValidReply(userID, text)
