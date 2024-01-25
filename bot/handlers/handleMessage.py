@@ -1,4 +1,4 @@
-from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 
 import html
 import string
@@ -18,68 +18,48 @@ async def handleMessage(u: Update, c):
     chatID = u.effective_chat.id
     text = message.text
     button = None
-    group = u.effective_chat.id != u.effective_user.id
 
-    if group:return 
-    
     if u.effective_message.via_bot:
         return
 
-    if ":" not in text:
+    searchedSurah = checkSurah(u, c)
+
+    if searchedSurah["button"]:
+        reply = searchedSurah["reply"]
+        button = searchedSurah["button"]
+    else:
+        x = getValidReply(userID, text)
+        reply = x["text"]
+        button = x["button"]
+
+    if not button:  # Means the reply is invalid
+        await message.reply_html(searchedSurah["reply"], quote=True)
         return
-        return await checkSurah(u, c)
-
-    x = getValidReply(userID, text)
-    reply = x["text"]
-    button = x["button"]
-    webPreview = chatID != userID
-
-    if not button and group:  # Means the reply is invalid
-        return
-    await message.reply_html(
-        reply, reply_markup=button, quote=True, disable_web_page_preview=webPreview
-    )
+    await message.reply_html(reply, reply_markup=button, quote=True)
 
 
-async def checkSurah(u: Update, c):
+def checkSurah(u: Update, c):
     message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id
     text = message.text
 
-    if userID != chatID:  # Means it's a group
-        return
+    defaultReply = f"""
+Couldn't find a Surah matching the text <b>{escapeHTML(text)}</b>
 
-    if text.isdigit():
-        surahNo = int(text)
-        if not 1 <= surahNo <= 114:
-            reply = """Surah number must be between 1-114"""
-            await message.reply_html(reply, reply_markup=button, quote=True)
-            return
-
-        button = getAyahButton(surahNo, 1)
-
-        reply = getAyahReply(userID, surahNo, 1)
-        button = getAyahButton(surahNo, 1)
-        await message.reply_html(reply, reply_markup=button, quote=True)
-        return
+<b>Write something like:
+fatihah
+nas
+baqarah</b>
+"""
 
     for i in text.lower().replace(" ", ""):
         if i not in string.ascii_lowercase:
-            return False
+            return {"reply": defaultReply, "button": None}
 
     res: list = Quran.searchSurah(text)
     if not res:
-        reply = f"""
-Couldn't find a Surah matching the text <b>{escapeHTML(text)}</b>
-
-Write something like:
-fatihah
-nas
-baqarah
-"""
-        await message.reply_html(reply, reply_markup=button, quote=True)
-        return False
+        return {"reply": defaultReply, "button": None}
 
     buttons = []
     for surah, number in res:
@@ -89,9 +69,7 @@ baqarah
 
     buttons = InlineKeyboardMarkup([buttons])
 
-    await message.reply_html(
-        "These are the surah that matches the most with the text you sent:",
-        quote=True,
-    )
-
-    return True
+    return {
+        "reply": "These are the surah that matches the most with the text you sent:",
+        "button": buttons,
+    }

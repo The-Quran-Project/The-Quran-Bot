@@ -7,7 +7,7 @@ import os
 from .handlers import *
 
 
-# Environment Variables
+# Load Environment Variables
 load_dotenv()
 LOCAL = os.environ.get("LOCAL")
 TOKEN = os.environ.get("TOKEN") if not LOCAL else os.environ.get("TEST")
@@ -49,13 +49,15 @@ def runBot(token):
         TypeHandler(Update, middleware), group=-1
     )  # called in every update, then passed to other handlers
 
-    for i, j in commands.items():
-        bot.add_handler(CommandHandler(i, j))
+    for cmd, handler in commands.items():
+        bot.add_handler(CommandHandler(cmd, handler))
 
     bot.add_handler(CallbackQueryHandler(handleButtonPress))
     bot.add_handler(InlineQueryHandler(handleInlineQuery))
     bot.add_handler(MessageHandler(filters.Regex(r"/get[a-zA-Z]{2}"), getWithLanguage))
-    bot.add_handler(MessageHandler(filters.TEXT, handleMessage))
+    bot.add_handler(
+        MessageHandler(filters.TEXT & filters.ChatType.PRIVATE, handleMessage)
+    )  # for private chats
 
     bot.run_polling()
 
