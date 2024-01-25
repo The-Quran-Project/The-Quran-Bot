@@ -18,15 +18,9 @@ async def middleware(u: Update, c):
 
     if not user:
         user = db.addUser(userID)
-        # If user is new, send update settings message
-        await updateSettings(u, c)
+        # If user is new & in private chat, send update settings message
+        if not isGroup:
+            await updateSettings(u, c)
 
     if isGroup and not chat:  # for groups
         chat = db.addChat(chatID)
-
-    if user["banned"]:
-        # TODO: ban user
-        pass
-
-    if isGroup and chat["banned"]:
-        pass
