@@ -53,7 +53,7 @@ async def handleButtonPress(u: Update, c):
         await query.answer(ans)
         reply = getAyahReply(userID, index, 1)
 
-        button = getAyahButton(index, 1)
+        button = getAyahButton(index, 1, userID)
 
         await edit_text(reply, reply_markup=button)
 
