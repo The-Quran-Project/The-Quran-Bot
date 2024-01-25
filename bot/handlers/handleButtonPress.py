@@ -1,4 +1,4 @@
-from telegram import Update, Bot, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardMarkup
 
 from .helpers import getAyahReply, getAyahButton
 from . import Constants
@@ -12,31 +12,37 @@ async def handleButtonPress(u: Update, c):
     """Handles all the button presses / callback queries"""
     message = u.effective_message
     userID = u.effective_user.id
+    chatID = u.effective_chat.id
 
     query = u.callback_query
-    query_data = query.data
-    group = u.effective_chat.id != userID
+    queryData = query.data
+    isGroup = chatID != userID
 
     async def edit_text(*a, **k):
-        if "disable_web_page_preview" not in k:
-            k["disable_web_page_preview"] = group
         await message.edit_text(*a, **k)
 
-    if query_data.startswith("settings"):
+    messageOwnerID = queryData.split()[-1]
+
+    if isGroup and str(userID) != messageOwnerID:
+        await query.answer("Only the message owner can use this button")
+        return
+
+    if queryData.startswith("settings"):
         await handleSettingsButtonPress(u, c)
 
-    elif query_data.startswith("audio"):
-        surahNo, ayahNo = map(int, query_data.split()[1:])
+    elif queryData.startswith("audio"):
+        surahNo, ayahNo = map(int, queryData.split()[1:])
         # file_id = Quran.getAudioFile(surahNo, ayahNo)
         # await message.reply_audio(file_id, quote=True)
         await message.reply_audio(
-            f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{surahNo}_{ayahNo}.mp3""",
+            f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{
+                surahNo}_{ayahNo}.mp3""",
             quote=True,
         )
         await query.answer()
 
-    elif query_data.startswith("surah"):
-        index = int(query_data.split()[1])
+    elif queryData.startswith("surah"):
+        index = int(queryData.split()[1])
 
         surah = Quran.getSurahNameFromNumber(index)
         ans = f"You selected {surah}"
@@ -48,9 +54,9 @@ async def handleButtonPress(u: Update, c):
 
         await edit_text(reply, reply_markup=button)
 
-    elif query_data.startswith(("prev", "next")):
-        index = int(query_data.split()[1])
-        if query_data.split()[0] == "prev":
+    elif queryData.startswith(("prev", "next")):
+        index = int(queryData.split()[1])
+        if queryData.split()[0] == "prev":
             index -= 1
         else:
             index += 1
@@ -62,8 +68,8 @@ async def handleButtonPress(u: Update, c):
 
         await message.edit_reply_markup(button)
 
-    elif query_data.startswith("goback"):
-        surahNo, ayahNo = map(int, query_data.split()[1:])
+    elif queryData.startswith("goback"):
+        surahNo, ayahNo = map(int, queryData.split()[1:-1])
 
         if surahNo == ayahNo == 1:
             surahNo = 114
@@ -77,12 +83,12 @@ async def handleButtonPress(u: Update, c):
 
         reply = getAyahReply(userID, surahNo, ayahNo)
 
-        button = getAyahButton(surahNo, ayahNo)
+        button = getAyahButton(surahNo, ayahNo, userID)
 
         await edit_text(reply, reply_markup=button)
 
-    elif query_data.startswith("goforward"):
-        surahNo, ayahNo = map(int, query_data.split()[1:])
+    elif queryData.startswith("goforward"):
+        surahNo, ayahNo = map(int, queryData.split()[1:-1])
 
         if surahNo == 114 and ayahNo == 6:
             surahNo = 1
@@ -96,6 +102,6 @@ async def handleButtonPress(u: Update, c):
 
         reply = getAyahReply(userID, surahNo, ayahNo)
 
-        button = getAyahButton(surahNo, ayahNo)
+        button = getAyahButton(surahNo, ayahNo, userID)
 
         await edit_text(reply, reply_markup=button)
