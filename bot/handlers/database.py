@@ -37,6 +37,9 @@ class Database:
     def getAllChat(self):
         return [i for i in self.db.chats.find({})]
 
+    def getAllAdmins(self):
+        return [i for i in self.db.users.find({"is_admin": True})]
+
     def getUser(self, userID: str or int):
         return self.db.users.find_one({"_id": userID})
 
@@ -44,19 +47,12 @@ class Database:
         return self.db.chats.find_one({"_id": chatID})
 
     def addUser(self, userID: str or int):
-        user = {
-            "_id": userID,
-            "settings": self.defaultSettings,
-            "banned": False,
-        }
+        user = {"_id": userID, "settings": self.defaultSettings}
         self.db.users.insert_one(user)
         return user
 
     def addChat(self, chatID: str or int):
-        chat = {
-            "_id": chatID,
-            "banned": False,
-        }
+        chat = {"_id": chatID}
         self.db.chats.insert_one(chat)
         return chat
 
@@ -69,20 +65,11 @@ class Database:
             user = self.addUser(userID)
 
         settings = {**user["settings"], **settings}
+
         self.db.users.update_one({"_id": userID}, {"$set": {"settings": settings}})
+
         return self.getUser(userID)
 
-    def banUser(self, userID: str or int):
-        return self.db.users.update_one({"_id": userID}, {"$set": {"banned": True}})
-
-    def unBanUser(self, userID: str or int):
-        return self.db.users.update_one({"_id": userID}, {"$set": {"banned": False}})
-
-    def banChat(self, chatID: str or int):
-        return self.db.chats.update_one({"_id": chatID}, {"$set": {"banned": True}})
-
-    def unBanChat(self, chatID: str or int):
-        return self.db.chats.update_one({"_id": chatID}, {"$set": {"banned": False}})
 
     # def deleteUser(self, userID: str or int):
     #     return self.db.users.delete_one({"_id": userID})
@@ -95,9 +82,11 @@ db = Database()
 
 
 def main():
-    print("Total Users:", len(db.getAllUsers()))
-    print("Total Chats:", len(db.getAllChat()))
-
+    users = db.getAllUsers()
+    chats = db.getAllChat()
+    print("Total Users:", len(users))
+    print("Total Chats:", len(chats))
+    
 
 if __name__ == "__main__":
     main()

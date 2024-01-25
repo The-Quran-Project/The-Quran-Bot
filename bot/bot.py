@@ -52,6 +52,9 @@ def runBot(token):
     for cmd, handler in commands.items():
         bot.add_handler(CommandHandler(cmd, handler))
 
+    bot.add_handler(CommandHandler("admin", adminCommand, filters.ChatType.PRIVATE))
+
+
     bot.add_handler(CallbackQueryHandler(handleButtonPress))
     bot.add_handler(InlineQueryHandler(handleInlineQuery))
     bot.add_handler(MessageHandler(filters.Regex(r"/get[a-zA-Z]{2}"), getWithLanguage))

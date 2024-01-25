@@ -45,3 +45,4 @@ from .handleButtonPress import handleButtonPress
 from .handleInlineQuery import handleInlineQuery
 from .helpers.updateSettings import updateSettings
 from .middleware import middleware
+from .adminCommand import adminCommand

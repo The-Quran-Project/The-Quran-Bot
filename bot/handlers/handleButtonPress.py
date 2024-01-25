@@ -5,7 +5,7 @@ from . import Constants
 from . import Quran
 from .database import db
 
-from .callbackQueryHandlers import handleSettingsButtonPress
+from .callbackQueryHandlers import handleSettingsButtonPress, handleAdminButtonPress
 
 
 async def handleButtonPress(u: Update, c):
@@ -29,6 +29,9 @@ async def handleButtonPress(u: Update, c):
 
     if queryData.startswith("settings"):
         await handleSettingsButtonPress(u, c)
+    
+    elif queryData.startswith("admin"):
+        await handleAdminButtonPress(u, c)
 
     elif queryData.startswith("audio"):
         surahNo, ayahNo = map(int, queryData.split()[1:])
