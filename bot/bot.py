@@ -54,13 +54,13 @@ def runBot(token):
 
     bot.add_handler(CommandHandler("admin", adminCommand, filters.ChatType.PRIVATE))
 
-
     bot.add_handler(CallbackQueryHandler(handleButtonPress))
     bot.add_handler(InlineQueryHandler(handleInlineQuery))
     bot.add_handler(MessageHandler(filters.Regex(r"/get[a-zA-Z]{2}"), getWithLanguage))
     bot.add_handler(
         MessageHandler(filters.TEXT & filters.ChatType.PRIVATE, handleMessage)
     )  # for private chats
+    bot.add_error_handler(handleErrors)
 
     bot.run_polling()
 
