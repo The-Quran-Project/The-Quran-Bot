@@ -29,9 +29,13 @@ async def updateSettings(u: Update, c):
         return
 
     user = db.getUser(userID)
-    ayahMode = user["settings"]["ayahMode"]
-    arabicStyle = user["settings"]["arabicStyle"]
-    showTafsir = user["settings"]["showTafsir"]
+    print(user)
+    settings = user["settings"]
+    ayahMode = settings["ayahMode"]
+    arabicStyle = settings["arabicStyle"]
+    showTafsir = settings["showTafsir"]
+    reciter = settings["reciter"]
+    
 
     reply = f"""
 <u><b>Settings</b></u>
@@ -39,7 +43,7 @@ async def updateSettings(u: Update, c):
 <b>Ayah Mode</b>: {ayahModes[str(ayahMode)]}
 <b>Arabic Style</b>: {arabicStyles[str(arabicStyle)]}
 <b>Show Tafsir</b>: {["No", "Yes"][showTafsir]}
-<b>Reciter</b>: {reciterNames[str(user["settings"]["reciter"])]}
+<b>Reciter</b>: {reciterNames[str(reciter)]}
 """
 
     buttons = [

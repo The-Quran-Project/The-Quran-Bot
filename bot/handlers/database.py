@@ -29,6 +29,7 @@ class Database:
             "ayahMode": 1,
             "arabicStyle": 1,
             "showTafsir": True,
+            "reciter": 1,
         }
 
     def getAllUsers(self):
