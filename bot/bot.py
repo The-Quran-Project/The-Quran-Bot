@@ -18,7 +18,7 @@ def runBot(token):
         parse_mode=constants.ParseMode.HTML, block=False, disable_web_page_preview=False
     )
 
-    bot = (
+    app = (
         ApplicationBuilder()
         .token(token)
         .defaults(df)
@@ -28,6 +28,9 @@ def runBot(token):
         .connect_timeout(333)
         .build()
     )
+    app.add_handler(
+        TypeHandler(Update, middleware), group=-1
+    )  # called in every update, then passed to other handlers
 
     commands = {
         "start": startCommand,
@@ -44,25 +47,27 @@ def runBot(token):
         "rand": randomCommand,
         "settings": updateSettings,
     }
-
-    bot.add_handler(
-        TypeHandler(Update, middleware), group=-1
-    )  # called in every update, then passed to other handlers
+    adminCommands = {
+        "admin": adminCommand,
+        "forward": forwardMessage,
+        "getUser": getUser,
+    }
 
     for cmd, handler in commands.items():
-        bot.add_handler(CommandHandler(cmd, handler))
+        app.add_handler(CommandHandler(cmd, handler))
 
-    bot.add_handler(CommandHandler("admin", adminCommand, filters.ChatType.PRIVATE))
+    for cmd, handler in adminCommands.items():
+        app.add_handler(CommandHandler(cmd, handler, filters.ChatType.PRIVATE))
 
-    bot.add_handler(CallbackQueryHandler(handleButtonPress))
-    bot.add_handler(InlineQueryHandler(handleInlineQuery))
-    bot.add_handler(MessageHandler(filters.Regex(r"/get[a-zA-Z]{2}"), getWithLanguage))
-    bot.add_handler(
+    app.add_handler(CallbackQueryHandler(handleButtonPress))
+    app.add_handler(InlineQueryHandler(handleInlineQuery))
+    app.add_handler(MessageHandler(filters.Regex(r"/get[a-zA-Z]{2}"), getWithLanguage))
+    app.add_handler(
         MessageHandler(filters.TEXT & filters.ChatType.PRIVATE, handleMessage)
     )  # for private chats
-    bot.add_error_handler(handleErrors)
+    app.add_error_handler(handleErrors)
 
-    bot.run_polling()
+    app.run_polling()
 
 
 def startBot():
