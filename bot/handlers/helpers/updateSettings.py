@@ -29,7 +29,7 @@ async def updateSettings(u: Update, c):
         return
 
     user = db.getUser(userID)
-    print(user)
+
     settings = user["settings"]
     ayahMode = settings["ayahMode"]
     arabicStyle = settings["arabicStyle"]

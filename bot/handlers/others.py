@@ -46,7 +46,7 @@ Time Zone   : +00:00 UTC</b>
     """
     pps = profile_photos["photos"]
 
-    if pps != []:
+    if pps:
         photo = pps[0][-1]["file_id"]
         await message.reply_photo(
             photo, caption="👆🏻<u><b>Your Profile Photo</b></u> 👌🏻\n\n" + reply
