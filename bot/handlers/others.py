@@ -20,11 +20,16 @@ async def pingCommand(u: Update, c):
 async def infoCommand(u: Update, c):
     """Get info about the user"""
     message = u.effective_message
-    userID = u.effective_user.id
+    if message.reply_to_message:
+        user = message.reply_to_message.from_user
+    else:
+        user = message.from_user
+    
     chatID = u.effective_chat.id
-    fn = escapeHTML(u.effective_user.first_name)
-    ln = escapeHTML(u.effective_user.last_name)
-    un = u.effective_user.username
+    userID = user.id
+    fn = escapeHTML(user.first_name)
+    ln = escapeHTML(user.last_name)
+    un = user.username
     userLink = f"""<a href="{
         f'tg://user?id={userID}'if not un else f't.me/{un}'}">{fn}</a>""".strip()
 
