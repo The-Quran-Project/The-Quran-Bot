@@ -18,7 +18,9 @@ async def handleErrors(u: Update, c: CallbackContext):
     tbString = "".join(tbList)
     print(tbString)
 
-    await u.message.reply_html("<b>An error occurred. Report sent to admins</b>", quote=True)
+    await u.message.reply_html(
+        "<b>An error occurred. Report sent to admins</b>", quote=True
+    )
 
     caption = f"""
 <b><u>Error</u></b>
@@ -39,7 +41,7 @@ async def handleErrors(u: Update, c: CallbackContext):
         chatID = admin["_id"]
         try:
             # forward the message the user sent
-            m:Message = await bot.forwardMessage(
+            m: Message = await bot.forwardMessage(
                 chatID,
                 u.effective_chat.id,
                 u.effective_message.message_id,

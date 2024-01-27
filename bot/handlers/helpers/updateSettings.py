@@ -35,7 +35,6 @@ async def updateSettings(u: Update, c):
     arabicStyle = settings["arabicStyle"]
     showTafsir = settings["showTafsir"]
     reciter = settings["reciter"]
-    
 
     reply = f"""
 <u><b>Settings</b></u>

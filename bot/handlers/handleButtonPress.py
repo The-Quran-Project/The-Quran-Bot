@@ -29,7 +29,7 @@ async def handleButtonPress(u: Update, c):
 
     if queryData.startswith("settings"):
         await handleSettingsButtonPress(u, c)
-    
+
     elif queryData.startswith("admin"):
         await handleAdminButtonPress(u, c)
 

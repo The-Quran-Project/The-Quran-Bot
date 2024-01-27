@@ -71,7 +71,6 @@ class Database:
 
         return self.getUser(userID)
 
-
     # def deleteUser(self, userID: str or int):
     #     return self.db.users.delete_one({"_id": userID})
 
@@ -87,7 +86,7 @@ def main():
     chats = db.getAllChat()
     print("Total Users:", len(users))
     print("Total Chats:", len(chats))
-    
+
 
 if __name__ == "__main__":
     main()
