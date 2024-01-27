@@ -4,7 +4,7 @@ import html
 
 
 def escapeHTML(text: str):
-    return html.escape(text)
+    return html.escape(str(text))
 
 
 async def pingCommand(u: Update, c):
