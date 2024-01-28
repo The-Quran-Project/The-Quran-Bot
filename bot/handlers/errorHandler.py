@@ -13,6 +13,9 @@ async def handleErrors(u: Update, c: CallbackContext):
     """Handles all the errors raised in the bot"""
 
     bot: Bot = c.bot
+    from pprint import pprint
+
+    pprint(u.to_dict())
     if not u:
         return
     print("--- Error Occurred ---")
@@ -20,9 +23,12 @@ async def handleErrors(u: Update, c: CallbackContext):
     tbString = "".join(tbList)
     print(tbString)
 
-    await u.message.reply_html(
-        "<b>An error occurred. Report sent to admins</b>"
-        f"\n<b>Error:</b>\n{escape(str(c.error))}",
+    await u.effective_message.reply_html(
+        """
+<b>An error occurred. Report sent to admins</b>
+
+<b>Error:</b>
+<code>{escape(str(c.error))}</code>""",
         quote=True,
     )
 
