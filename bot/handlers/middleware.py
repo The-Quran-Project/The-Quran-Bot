@@ -14,7 +14,7 @@ async def middleware(u: Update, c):
     isGroup = chatID != userID
 
     user = db.getUser(userID)
-    
+
     if not user:
         user = db.addUser(userID)
         # If user is new & in private chat, send update settings message

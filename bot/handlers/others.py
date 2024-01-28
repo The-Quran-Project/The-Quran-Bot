@@ -24,7 +24,7 @@ async def infoCommand(u: Update, c):
         user = message.reply_to_message.from_user
     else:
         user = message.from_user
-    
+
     chatID = u.effective_chat.id
     userID = user.id
     fn = escapeHTML(user.first_name)
