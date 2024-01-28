@@ -2,7 +2,6 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from dotenv import load_dotenv
 
-
 import os
 
 
@@ -18,6 +17,14 @@ load_dotenv()
     },
     "banned": False,
 }
+
+
+if os.environ.get("LOCAL"):
+    # For `pymongo.errors.ConfigurationError: cannot open /etc/resolv.conf`
+    import dns.resolver
+    dns.resolver.default_resolver=dns.resolver.Resolver(configure=False)
+    dns.resolver.default_resolver.nameservers=['8.8.8.8']
+
 
 
 class Database:
