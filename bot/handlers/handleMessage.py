@@ -45,7 +45,7 @@ def checkSurah(u: Update, c):
     text = message.text
 
     defaultReply = f"""
-Couldn't find a Surah matching the text <b>{escapeHTML(text)}</b>
+Couldn't find a Surah matching the text <b>{escapeHTML(text)[:33]}{'...'if len(text)>=33 else ''}</b>
 
 <b>Write something like:
 fatihah

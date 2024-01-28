@@ -20,7 +20,8 @@ async def handleErrors(u: Update, c: CallbackContext):
     print(tbString)
 
     await u.message.reply_html(
-        "<b>An error occurred. Report sent to admins</b>", quote=True
+        "<b>An error occurred. Report sent to admins</b>"
+        f"\n<b>Error:</b>\n{escape(str(c.error))}", quote=True
     )
 
     caption = f"""
