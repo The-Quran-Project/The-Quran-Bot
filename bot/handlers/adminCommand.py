@@ -121,13 +121,30 @@ async def getUser(u: Update, c):
     if not chatID[1:].isdigit():
         await message.reply_html("<b>Invalid chatID</b>")
         return
-
+    
+    
     user = await bot.getChat(chatID)
+    if chatID[0]=="-":
+        chat = user
+        perm = chat.permissions
+        permText = "\n".join(f"<b>{i.replace('_',' ').title()}:</b> {j}" for i,j in perm.items())
+        
+        reply = f"""
+ID: <code>{user.id}</code>
+Type: <b>{chat.type}</b>
+Title: <b>{user.title}</b>
+Username: <b>@{user.username}</b>
+Description:
+<b>{escapeHtml(chat.description)}</b>
+"""
 
     reply = f"""
+ID: <code>{user.id}</code>
+Type: <b>{chat.type}</b>
 First Name: <b>{user.first_name}</b>
 Last Name: <b>{user.last_name}</b>
 Username: <b>@{user.username}</b>
-ID: <code>{user.id}</code>
+Bio:
+<b>{escapeHtml(user.bio)}</b>
 """
     await message.reply_html(reply, quote=True)
