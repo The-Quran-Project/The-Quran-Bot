@@ -126,8 +126,8 @@ async def getUser(u: Update, c):
     user = await bot.getChat(chatID)
     if chatID[0]=="-":
         chat = user
-        perm = chat.permissions
-        permText = "\n".join(f"<b>{i.replace('_',' ').title()}:</b> {j}" for i,j in perm.items())
+        perms = chat.permissions
+        permText = "\n".join(f"<b>{i.replace('_',' ').title()}:</b> {j}" for i,j in perms)
         
         reply = f"""
 ID: <code>{user.id}</code>
