@@ -34,7 +34,7 @@ async def handleButtonPress(u: Update, c):
         await handleAdminButtonPress(u, c)
 
     elif queryData.startswith("audio"):
-        surahNo, ayahNo = map(int, queryData.split()[1:])
+        surahNo, ayahNo = map(int, queryData.split()[1:-1])
         # file_id = Quran.getAudioFile(surahNo, ayahNo)
         # await message.reply_audio(file_id, quote=True)
         await message.reply_audio(
