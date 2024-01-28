@@ -89,7 +89,7 @@ async def surahCommand(u: Update, c):
 
     msg: Message = await message.reply_html(reply, reply_markup=button, quote=True)
 
-    await msg.reply_html(
+    #await msg.reply_html(
         "<b>Use of <code>/surah x:y</code> is deprecated and will be removed in/after 1st July, 2024</b>\n\nUse <code>/get x:y</code> instead",
         quote=True,
     )
