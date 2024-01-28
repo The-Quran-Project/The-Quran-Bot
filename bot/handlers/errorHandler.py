@@ -13,7 +13,8 @@ async def handleErrors(u: Update, c: CallbackContext):
     """Handles all the errors raised in the bot"""
 
     bot: Bot = c.bot
-    if not u:return
+    if not u:
+        return
     print("--- Error Occurred ---")
     tbList = traceback.format_exception(None, c.error, c.error.__traceback__)
     tbString = "".join(tbList)
@@ -21,7 +22,8 @@ async def handleErrors(u: Update, c: CallbackContext):
 
     await u.message.reply_html(
         "<b>An error occurred. Report sent to admins</b>"
-        f"\n<b>Error:</b>\n{escape(str(c.error))}", quote=True
+        f"\n<b>Error:</b>\n{escape(str(c.error))}",
+        quote=True,
     )
 
     caption = f"""

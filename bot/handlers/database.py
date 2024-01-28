@@ -22,9 +22,9 @@ load_dotenv()
 if os.environ.get("LOCAL"):
     # For `pymongo.errors.ConfigurationError: cannot open /etc/resolv.conf`
     import dns.resolver
-    dns.resolver.default_resolver=dns.resolver.Resolver(configure=False)
-    dns.resolver.default_resolver.nameservers=['8.8.8.8']
 
+    dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)
+    dns.resolver.default_resolver.nameservers = ["8.8.8.8"]
 
 
 class Database:
