@@ -19,19 +19,24 @@ async def handleErrors(u: Update, c: CallbackContext):
     print("--- Error Occurred ---")
     tbList = traceback.format_exception(None, c.error, c.error.__traceback__)
     tbString = "".join(tbList)
+
     print(tbString)
 
-    await u.effective_message.reply_html(
-        """
+    messageSendingError = ""
+    try:
+        await u.effective_message.reply_html(
+            """
 <b>An error occurred. Report sent to admins</b>
 
 <b>Error:</b>
 <code>{escape(str(c.error))}</code>""",
-        quote=True,
-    )
+            quote=True,
+        )
+    except Exception as e:
+        messageSendingError = str(e)
 
     caption = f"""
-<b><u>Error</u></b>
+<b><u>Error {'❎' if messageSendingError else ''}</u></b>
 
 <b>Chat ID:</b> <code>{u.effective_chat.id}</code>
 <b>User ID:</b> <code>{u.effective_user.id}</code>
@@ -41,9 +46,10 @@ async def handleErrors(u: Update, c: CallbackContext):
 
     admins = db.getAllAdmins()
     data = {
-        "update": u.to_dict(),
-        "error": tbString,
         "error_message": str(c.error),
+        "error": tbString,
+        "update": u.to_dict(),
+        "sendingError": messageSendingError,
     }
     for admin in admins:
         chatID = admin["_id"]
