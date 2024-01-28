@@ -118,7 +118,7 @@ async def getUser(u: Update, c):
         return
 
     chatID = message.text.split()[1]
-    if not chatID.isdigit():
+    if not chatID[1:].isdigit():
         await message.reply_html("<b>Invalid chatID</b>")
         return
 
