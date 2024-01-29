@@ -23,7 +23,7 @@ async def handleButtonPress(u: Update, c):
 
     messageOwnerID = queryData.split()[-1]
 
-    if isGroup and str(userID) != messageOwnerID:
+    if isGroup and str(userID) != messageOwnerID and queryData.split()[0] not in "surahName prev next".split():
         await query.answer("Only the message owner can use this button")
         return
 
@@ -36,7 +36,7 @@ async def handleButtonPress(u: Update, c):
     elif queryData.startswith("audio"):
         surahNo, ayahNo = map(int, queryData.split()[1:-1])
         # file_id = Quran.getAudioFile(surahNo, ayahNo)
-        # await message.reply_audio(file_id, quote=True)
+        # await message.reply_audio(file_id)
         await message.reply_audio(
             f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{
                 surahNo}_{ayahNo}.mp3""",
@@ -58,6 +58,7 @@ async def handleButtonPress(u: Update, c):
         await edit_text(reply, reply_markup=button)
 
     elif queryData.startswith(("prev", "next")):
+        # Going between Surah Name Pages
         index = int(queryData.split()[1])
         if queryData.split()[0] == "prev":
             index -= 1
@@ -71,7 +72,9 @@ async def handleButtonPress(u: Update, c):
 
         await message.edit_reply_markup(button)
 
+
     elif queryData.startswith("goback"):
+        # Previous Ayah
         surahNo, ayahNo = map(int, queryData.split()[1:-1])
 
         if surahNo == ayahNo == 1:
@@ -90,7 +93,9 @@ async def handleButtonPress(u: Update, c):
 
         await edit_text(reply, reply_markup=button)
 
+
     elif queryData.startswith("goforward"):
+        # Next Ayah
         surahNo, ayahNo = map(int, queryData.split()[1:-1])
 
         if surahNo == 114 and ayahNo == 6:

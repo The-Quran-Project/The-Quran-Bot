@@ -64,7 +64,7 @@ async def useCommand(u: Update, c):
         ]
     )
 
-    await message.reply_html(reply, reply_markup=button, quote=True)
+    await message.reply_html(reply, reply_markup=button)
 
 
 # Command:  /surah
@@ -87,7 +87,7 @@ async def surahCommand(u: Update, c):
     reply = x["text"]
     button = x["button"]
 
-    msg: Message = await message.reply_html(reply, reply_markup=button, quote=True)
+    msg: Message = await message.reply_html(reply, reply_markup=button)
 
     # await msg.reply_html(
 
@@ -108,7 +108,7 @@ async def getCommand(u: Update, c):
     reply = x["text"]
     button = x["button"]
 
-    await message.reply_html(reply, reply_markup=button, quote=True)
+    await message.reply_html(reply, reply_markup=button)
 
 
 # Command: /get<language>
@@ -153,7 +153,7 @@ async def randomCommand(u: Update, c):
     reply = x["reply"]
     button = x["button"]
 
-    await message.reply_html(reply, reply_markup=button, quote=True)
+    await message.reply_html(reply, reply_markup=button)
 
 
 # Command:  /audio
@@ -167,7 +167,7 @@ async def audioCommand(u: Update, c):
     button = x["button"]
 
     if not button:
-        await message.reply_html(x["text"], quote=True)
+        await message.reply_html(x["text"])
         return
 
     if ":" not in text != 2:
@@ -193,7 +193,7 @@ async def tafsirCommand(u: Update, c):
     button = x["button"]
 
     if not button:
-        await message.reply_html(x["text"], quote=True)
+        await message.reply_html(x["text"])
         return
 
     if ":" not in text != 2:
