@@ -23,7 +23,12 @@ async def handleButtonPress(u: Update, c):
 
     messageOwnerID = queryData.split()[-1]
 
-    if isGroup and str(userID) != messageOwnerID and queryData.split()[0] not in "surahName prev next".split():
+    if (
+        len(messageOwnerID) >= 9  # naive way to check if it's a valid id
+        and isGroup
+        and str(userID) != messageOwnerID
+        and queryData.split()[0] not in "surahName prev next".split()
+    ):
         await query.answer("Only the message owner can use this button")
         return
 
@@ -72,11 +77,12 @@ async def handleButtonPress(u: Update, c):
 
         await message.edit_reply_markup(button)
 
-
     elif queryData.startswith("goback"):
         # Previous Ayah
-        surahNo, ayahNo = map(int, queryData.split()[1:-1])
-
+        try:
+            surahNo, ayahNo = map(int, queryData.split()[1:-1])
+        except ValueError:
+            surahNo, ayahNo = map(int, queryData.split()[1:])
         if surahNo == ayahNo == 1:
             surahNo = 114
             ayahNo = 6
@@ -93,10 +99,12 @@ async def handleButtonPress(u: Update, c):
 
         await edit_text(reply, reply_markup=button)
 
-
     elif queryData.startswith("goforward"):
         # Next Ayah
-        surahNo, ayahNo = map(int, queryData.split()[1:-1])
+        try:
+            surahNo, ayahNo = map(int, queryData.split()[1:-1])
+        except ValueError:
+            surahNo, ayahNo = map(int, queryData.split()[1:])
 
         if surahNo == 114 and ayahNo == 6:
             surahNo = 1
