@@ -23,7 +23,11 @@ async def handleButtonPress(u: Update, c):
 
     messageOwnerID = queryData.split()[-1]
 
-    if isGroup and str(userID) != messageOwnerID and queryData.split()[0] not in "surahName prev next".split():
+    if (
+        isGroup
+        and str(userID) != messageOwnerID
+        and queryData.split()[0] not in "surahName prev next".split()
+    ):
         await query.answer("Only the message owner can use this button")
         return
 
@@ -72,7 +76,6 @@ async def handleButtonPress(u: Update, c):
 
         await message.edit_reply_markup(button)
 
-
     elif queryData.startswith("goback"):
         # Previous Ayah
         surahNo, ayahNo = map(int, queryData.split()[1:-1])
@@ -92,7 +95,6 @@ async def handleButtonPress(u: Update, c):
         button = getAyahButton(surahNo, ayahNo, userID)
 
         await edit_text(reply, reply_markup=button)
-
 
     elif queryData.startswith("goforward"):
         # Next Ayah

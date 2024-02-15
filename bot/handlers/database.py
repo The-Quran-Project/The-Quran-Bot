@@ -31,12 +31,14 @@ class Database:
     def __init__(self) -> None:
         uri = os.environ.get("MONGODB_URI")
         self.client = MongoClient(uri, server_api=ServerApi("1"))
-        self.db = self.client.quranbot
+        self.db = self.client.quranbot_test  # TODO: Change this to quranbot
         self.defaultSettings = {
-            "ayahMode": 1,
-            "arabicStyle": 1,
+            "font": 1,
             "showTafsir": True,
             "reciter": 1,
+            "primary": "ar",
+            "secondary": "en",
+            "other": "bn",
         }
 
     def getAllUsers(self):
@@ -48,37 +50,38 @@ class Database:
     def getAllAdmins(self):
         return [i for i in self.db.users.find({"is_admin": True})]
 
-    def getUser(self, userID: str or int):
+    def getUser(self, userID: int):
         return self.db.users.find_one({"_id": userID})
 
-    def getChat(self, chatID: str or int):
+    def getChat(self, chatID: int):
         return self.db.chats.find_one({"_id": chatID})
 
-    def addUser(self, userID: str or int):
+    def addUser(self, userID: int):
         user = {"_id": userID, "settings": self.defaultSettings}
         self.db.users.insert_one(user)
         return user
 
-    def addChat(self, chatID: str or int):
+    def addChat(self, chatID: int):
         chat = {"_id": chatID}
         self.db.chats.insert_one(chat)
         return chat
 
-    def getChat(self, chatID: str or int):
+    def getChat(self, chatID: int):
         return self.db.chats.find_one({"_id": chatID})
 
-    def updateUser(self, userID: str or int, settings: dict):
+    def updateUser(self, userID: int, settings: dict):
         user = self.getUser(userID)
         if not user:
             user = self.addUser(userID)
 
         settings = {**user["settings"], **settings}
 
-        self.db.users.update_one({"_id": userID}, {"$set": {"settings": settings}})
+        self.db.users.update_one(
+            {"_id": userID}, {"$set": {"settings": settings}})
 
         return self.getUser(userID)
 
-    # def deleteUser(self, userID: str or int):
+    # def deleteUser(self, userID: int):
     #     return self.db.users.delete_one({"_id": userID})
 
     # def deleteAllUsers(self):

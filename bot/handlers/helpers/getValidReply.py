@@ -1,5 +1,5 @@
 from .. import Quran
-from . import getAyahReply, getAyahButton
+from . import getAyahReplyFromPreference, getAyahButton
 
 
 validFormat = """
@@ -11,19 +11,14 @@ surahNo : ayahNo
 </pre>"""
 
 
-def getValidReply(
-    userID: int, text: str, language: str = None
-) -> dict[str, str | None]:
-    """Check the `text` and returns a valid reply"""
-
-    if (
-        text.strip().isdigit() and 1 <= int(text.strip()) <= 114
-    ):  # if only surah number is given
-        surahNo = int(text.strip())
+def getValidReply(userID, text, language=None):
+    text = text.strip()
+    if text.isdigit() and 1 <= int(text) <= 114:  # if only surah number is given
+        surahNo = int(text)
         ayahNo = 1
         surah = Quran.getSurahNameFromNumber(surahNo)
         ayahCount = Quran.getAyahNumberCount(surahNo)
-        reply = getAyahReply(userID, surahNo, ayahNo, language)
+        reply = getAyahReplyFromPreference(userID, surahNo, ayahNo, language)
         button = getAyahButton(surahNo, ayahNo, userID)
 
         return {"text": reply, "button": button}

@@ -2,7 +2,7 @@ from .. import Quran, replies
 from ..database import db
 
 
-def getAyahReply(userID, surahNo: int or str, ayahNo: int or str, language: str = None):
+def getAyahReplyFromPreference(userID, surahNo, ayahNo, language=None):
     """Returns the reply for the ayah"""
     surah = Quran.getSurahNameFromNumber(surahNo)
     ayah = Quran.getAyah(surahNo, ayahNo)
@@ -10,7 +10,9 @@ def getAyahReply(userID, surahNo: int or str, ayahNo: int or str, language: str 
 
     user = db.getUser(userID)
     settings = user["settings"]
-    ayahMode = settings["ayahMode"]
+    primaryLanguage = settings["primary"]
+    secondaryLanguage = settings["secondary"]
+    otherLanguage = settings["other"]
     arabicStyle = settings["arabicStyle"]
     showTafsir = settings["showTafsir"]
 
@@ -36,6 +38,8 @@ def getAyahReply(userID, surahNo: int or str, ayahNo: int or str, language: str 
         totalAyah=totalAyah,
     )
 
+    return "Hello From Preference"
+
     if language:
         reply += {
             "en": english,
@@ -53,3 +57,20 @@ def getAyahReply(userID, surahNo: int or str, ayahNo: int or str, language: str 
         reply += tafsir
 
     return reply
+
+
+def getAyahReply(surahNo, ayahNo, language):
+    """Returns the reply for the ayah"""
+    surah = Quran.getSurahNameFromNumber(surahNo)
+    ayah = Quran.getAyah(surahNo, ayahNo)
+    totalAyah = Quran.getAyahNumberCount(surahNo)
+
+    reply = replies.sendAyah.format(
+        surahName=surah,
+        surahNo=surahNo,
+        ayahNo=ayahNo,
+        totalAyah=totalAyah,
+    )
+    ayah = Quran.getAyah(surahNo, ayahNo)
+    print(ayah)
+    return "Hello From getAyahReply"

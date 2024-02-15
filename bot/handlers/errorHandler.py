@@ -25,7 +25,7 @@ async def handleErrors(u: Update, c: CallbackContext):
     messageSendingError = ""
     try:
         await u.effective_message.reply_html(
-            """
+            f"""
 <b>An error occurred. Report sent to admins</b>
 
 <b>Error:</b>

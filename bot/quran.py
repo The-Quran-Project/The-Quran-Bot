@@ -1,36 +1,35 @@
 import os
 import json
 
-from .utils import AyahNumberInvalid, SurahNumberInvalid
-
 
 """
 Structure of json files in Data folder:
-	quran_en:
-		{
-		  "1":[ayah1, ayah2, ...],		  	"2":[ayah1, ...]
-			}
+	english:
+		[ [ayah1, ayah2, ...], [ayah1, ayah2, ...] ]
 
 
-	quran_ar:
-		{
-		  "1":[[ayah1-with-harakat, ayah1-without-harakat], [ayah2, ayah2], ...]
-			}
+	arabic:
+		[ [[ayah1-uthmani, ayah1-simple], [ayah2, ayah2], ...] ]
 
 
-	surah:
+	surahNames:
 		["Al-Fatihah", "Al-Baqarah", "Ali 'Imran", ...]
-
-
 
 """
 
 
 class objectify:
     def __init__(self, entries):
-        self.english: str
+        self.english1: str
+        self.english2: str
         self.arabic1: str
         self.arabic2: str
+        self.bengali: str
+        self.urdu: str
+        self.hindi: str
+        self.german: str
+        self.kurdish: str
+        self.persian: str
         self.tafsir: str
         self.__dict__.update(entries)
 
@@ -42,95 +41,85 @@ DIR_PATH = (
 
 
 class QuranClass:
-    with open(f"{DIR_PATH}/quran_en.json", "rb") as _f, open(
-        f"{DIR_PATH}/quran_ar.json", "rb"
-    ) as _g, open(f"{DIR_PATH}/surah.json", "rb") as _h, open(
-        f"{DIR_PATH}/audio_file_ids.json", "rb"
-    ) as _i, open(
-        f"{DIR_PATH}/tafsirs.json", "rb"
-    ) as _j:
-        _AYAHS_en = json.load(_f)
-        _AYAHS_ar = json.load(_g)
-        SURAHS = json.load(_h)
-        _FILE_ids = json.load(_i)
-        _TAFSIRS = json.load(_j)
+    languages = (
+        "arabic english_1 english_2 bengali urdu hindi german kurdish persian".split()
+    )
+    DATA = {}
+    for lang in languages:
+        with open(f"{DIR_PATH}/quran_{lang}.json", "rb") as f:
+            DATA[lang] = json.load(f)
+
+    with open(f"{DIR_PATH}/tafsirs.json", "rb") as f:
+        TAFSIRS = json.load(f)
+
+    with open(f"{DIR_PATH}/surahNames.json", "rb") as f:
+        SURAH_NAMES = json.load(f)
 
     def __init__(self):
         pass
 
-    def getAyah(self, surahNo: int or str, ayahNo: int or str) -> objectify:
+    def getAyah(self, surahNo: int, ayahNo: int) -> objectify:
         """
         Returns Arabic, English and Tafsir of the specified ayah.
 
 
         Args:
             - `self`: the object instance of a Quran class.
-            - `surahNo` (int or str): the number or name of the surah to retrieve the ayah from.
-            - `ayahNo` (int or str): the number of the ayah to retrieve.
+            - `surahNo` (int): the number or name of the surah to retrieve the ayah from.
+            - `ayahNo` (int): the number of the ayah to retrieve.
 
         Returns:
             - An objectify object that contains the following three keys:
-            - `english`: the English translation of the ayah.
+            - `english1`: the English translation of the ayah.
+            - `english2`: the English translation of the ayah by Mufti Taqi Usmani.
             - `arabic1`: the Arabic text of the ayah in the Uthmani script.
             - `arabic2`: the Arabic text of the ayah in the Simple script.
+            - `bengali`: the Bengali translation of the ayah.
+            - `urdu`: the Urdu translation of the ayah.
+            - `hindi`: the Hindi translation of the ayah.
+            - `german`: the German translation
+            - `kurdish`: the Kurdish translation
+            - `persian`: the Persian translation
             - `tafsir`: The telegra.ph link of the tafsir of that verse.
-
-        Raises:
-            - `SurahNumberInvalid`: if the `surahNo` is not a valid surah number (i.e. not between 1 and 114).
-            - `AyahNumberInvalid`: if the `ayahNo` is greater than the number of ayahs in the specified surah.
-
         """
 
         surahNo = int(surahNo)
         ayahNo = int(ayahNo)
-
-        if surahNo <= 0 or surahNo > 114:
-            raise SurahNumberInvalid(
-                f"Surah Number must be in between 1 to 114. `{surahNo}` is invalid."
-            )
-
         surahNo = str(surahNo)
-        x = self._AYAHS_en[surahNo]
-        y = len(x)
+        result = {}
 
-        if ayahNo > y:
-            raise AyahNumberInvalid(f"Surah {surahNo} has `{y}` ayahs only.")
+        for lang in self.languages:
+            result[lang] = self.DATA[lang][surahNo][ayahNo - 1]
 
-        z = self._AYAHS_ar[surahNo][ayahNo - 1]
+        z = result["arabic"][surahNo][ayahNo - 1]
 
+        del result["arabic"]
         graph = f"https://telegra.ph/{self._TAFSIRS[f'{surahNo}_{ayahNo}']}"
 
         res = {
-            "english": x[ayahNo - 1],
             "arabic1": z[0],
             "arabic2": z[1],
+            **result,
             "tafsir": graph,
         }
 
         return objectify(res)
 
-    def getSurahNameFromNumber(self, ayahNumber: str or int):
+    def getSurahNameFromNumber(self, ayahNumber: int):
         ayahNumber = int(ayahNumber) - 1
 
-        name = self.SURAHS[ayahNumber]
+        name = self.SURAH_NAMES[ayahNumber]
 
         return name
 
-    def getAyahNumberCount(self, surahNo: int or str):
+    def getAyahNumberCount(self, surahNo: int):
         surahNo = int(surahNo)
-
-        if not 1 <= surahNo <= 114:
-            return 0
-
-        return len(self._AYAHS_en[str(surahNo)])
-
-    def getAudioFile(self, surahNo: int or str, ayahNo: int or str):
-        return self._FILE_ids.get(f"{surahNo}_{ayahNo}")
+        return len(self.DATA["english_2"][surahNo - 1])
 
     def searchSurah(self, string):
         matching_strings = []
         exact_match = False
-        string_list = sorted(self.SURAHS)
+        string_list = sorted(self.SURAH_NAMES)
 
         for s in string_list:
             a = s.split("-")[-1].lower()
@@ -155,7 +144,9 @@ class QuranClass:
                     matching_strings.append(s)
         matching_strings = list({i: 0 for i in matching_strings})[:3]
 
-        data = [[surah, self.SURAHS.index(surah) + 1] for surah in matching_strings]
+        data = [
+            [surah, self.SURAH_NAMES.index(surah) + 1] for surah in matching_strings
+        ]
         data.sort(key=lambda x: x[1])
 
         return data
