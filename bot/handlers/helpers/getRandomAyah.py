@@ -15,5 +15,5 @@ def getRandomAyah(userID):
 
     return {
         "reply": getAyahReply(userID, randSurah, randAyah),
-        "button": getAyahButton(randSurah, randAyah),
+        "buttons": getAyahButton(randSurah, randAyah),
     }

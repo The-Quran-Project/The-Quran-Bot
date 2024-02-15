@@ -76,8 +76,7 @@ class Database:
 
         settings = {**user["settings"], **settings}
 
-        self.db.users.update_one(
-            {"_id": userID}, {"$set": {"settings": settings}})
+        self.db.users.update_one({"_id": userID}, {"$set": {"settings": settings}})
 
         return self.getUser(userID)
 

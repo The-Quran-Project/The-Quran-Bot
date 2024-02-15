@@ -70,31 +70,31 @@ class QuranClass:
 
         Returns:
             - An objectify object that contains the following three keys:
-            - `english1`: the English translation of the ayah.
-            - `english2`: the English translation of the ayah by Mufti Taqi Usmani.
-            - `arabic1`: the Arabic text of the ayah in the Uthmani script.
-            - `arabic2`: the Arabic text of the ayah in the Simple script.
-            - `bengali`: the Bengali translation of the ayah.
-            - `urdu`: the Urdu translation of the ayah.
-            - `hindi`: the Hindi translation of the ayah.
-            - `german`: the German translation
-            - `kurdish`: the Kurdish translation
-            - `persian`: the Persian translation
-            - `tafsir`: The telegra.ph link of the tafsir of that verse.
+            - `english1`: The English translation of the ayah.
+            - `english2`: The English translation of the ayah by Mufti Taqi Usmani.
+            - `arabic1` : The Arabic text of the ayah in the Uthmani script.
+            - `arabic2` : The Arabic text of the ayah in the Simple script.
+            - `bengali` : The Bengali translation of the ayah.
+            - `urdu`    : The Urdu translation of the ayah.
+            - `hindi`   : The Hindi translation of the ayah.
+            - `german`  : The German translation
+            - `kurdish` : The Kurdish translation
+            - `persian` : The Persian translation
+            - `tafsir`  : The telegra.ph link of the tafsir of that verse.
         """
 
         surahNo = int(surahNo)
         ayahNo = int(ayahNo)
-        surahNo = str(surahNo)
+        surahNo = int(surahNo)
         result = {}
 
         for lang in self.languages:
-            result[lang] = self.DATA[lang][surahNo][ayahNo - 1]
+            result[lang] = self.DATA[lang][surahNo - 1][ayahNo - 1]
 
-        z = result["arabic"][surahNo][ayahNo - 1]
+        z = result["arabic"]
 
         del result["arabic"]
-        graph = f"https://telegra.ph/{self._TAFSIRS[f'{surahNo}_{ayahNo}']}"
+        graph = f"https://telegra.ph/{self.TAFSIRS[f'{surahNo}_{ayahNo}']}"
 
         res = {
             "arabic1": z[0],
@@ -150,3 +150,10 @@ class QuranClass:
         data.sort(key=lambda x: x[1])
 
         return data
+
+    def detectLanguage(self, text: str):
+        text = text.lower()
+        for lang in self.languages:
+            if lang.startswith(text):
+                return lang
+        return None

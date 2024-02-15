@@ -17,25 +17,25 @@ async def handleMessage(u: Update, c):
     userID = u.effective_user.id
     chatID = u.effective_chat.id
     text = message.text
-    button = None
+    buttons = None
 
     if u.effective_message.via_bot:
         return
 
     searchedSurah = checkSurah(u, c)
 
-    if searchedSurah["button"]:
+    if searchedSurah["buttons"]:
         reply = searchedSurah["reply"]
-        button = searchedSurah["button"]
+        buttons = searchedSurah["buttons"]
     else:
         x = getValidReply(userID, text)
         reply = x["text"]
-        button = x["button"]
+        buttons = x["buttons"]
 
-    if not button:  # Means the reply is invalid
+    if not buttons:  # Means the reply is invalid
         await message.reply_html(searchedSurah["reply"], quote=True)
         return
-    await message.reply_html(reply, reply_markup=button, quote=True)
+    await message.reply_html(reply, reply_markup=buttons, quote=True)
 
 
 def checkSurah(u: Update, c):
@@ -55,11 +55,11 @@ baqarah</b>
 
     for i in text.lower().replace(" ", ""):
         if i not in string.ascii_lowercase:
-            return {"reply": defaultReply, "button": None}
+            return {"reply": defaultReply, "buttons": None}
 
     res: list = Quran.searchSurah(text)
     if not res:
-        return {"reply": defaultReply, "button": None}
+        return {"reply": defaultReply, "buttons": None}
 
     buttons = []
     for surah, number in res:
@@ -71,5 +71,5 @@ baqarah</b>
 
     return {
         "reply": "These are the surah that matches the most with the text you sent:",
-        "button": buttons,
+        "buttons": buttons,
     }

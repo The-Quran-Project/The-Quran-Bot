@@ -14,9 +14,9 @@ async def startCommand(u: Update, c):
     url = "https://github.com/The-Quran-Project/TG-Quran-Bot"
     reply = replies.start.format(firstName=fn, repoURL=url)
 
-    button = InlineKeyboardMarkup([[InlineKeyboardButton("Github", url=url)]])
+    buttons = InlineKeyboardMarkup([[InlineKeyboardButton("Github", url=url)]])
     msg = await message.reply_sticker(Constants.salamSticker)
-    await msg.reply_html(reply, reply_markup=button)
+    await msg.reply_html(reply, reply_markup=buttons)
 
 
 # Command:  /help
@@ -25,16 +25,18 @@ async def helpCommand(u: Update, c):
     message = u.effective_message
     reply = replies.help
 
-    button = InlineKeyboardMarkup(
+    buttons = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("Group", url="https://t.me/AlQuranDiscussion"),
-                InlineKeyboardButton("Channel", url="https://t.me/AlQuranUpdates"),
+                InlineKeyboardButton(
+                    "Group", url="https://t.me/AlQuranDiscussion"),
+                InlineKeyboardButton(
+                    "Channel", url="https://t.me/AlQuranUpdates"),
             ]
         ]
     )
 
-    await message.reply_html(reply, reply_markup=button)
+    await message.reply_html(reply, reply_markup=buttons)
 
 
 # Command:  /about
@@ -53,7 +55,7 @@ async def useCommand(u: Update, c):
     url = "https://telegra.ph/Al-Quran-05-29"
     reply = replies.howToUse.format(telegraphURL=url)
 
-    button = InlineKeyboardMarkup(
+    buttons = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton("Telegraph", url=url),
@@ -64,7 +66,7 @@ async def useCommand(u: Update, c):
         ]
     )
 
-    await message.reply_html(reply, reply_markup=button)
+    await message.reply_html(reply, reply_markup=buttons)
 
 
 # Command:  /surah
@@ -79,15 +81,15 @@ async def surahCommand(u: Update, c):
     """
     # Sends buttons with Surah names
     if not text:
-        button = Constants.allSurahInlineButtons[0]
-        await message.reply_html(reply, reply_markup=InlineKeyboardMarkup(button))
+        buttons = Constants.allSurahInlineButtons[0]
+        await message.reply_html(reply, reply_markup=InlineKeyboardMarkup(buttons))
         return
 
     x = getValidReply(userID, text)
     reply = x["text"]
-    button = x["button"]
+    buttons = x["buttons"]
 
-    msg: Message = await message.reply_html(reply, reply_markup=button)
+    msg: Message = await message.reply_html(reply, reply_markup=buttons)
 
     # await msg.reply_html(
 
@@ -106,9 +108,9 @@ async def getCommand(u: Update, c):
 
     x = getValidReply(userID, text)
     reply = x["text"]
-    button = x["button"]
+    buttons = x["buttons"]
 
-    await message.reply_html(reply, reply_markup=button)
+    await message.reply_html(reply, reply_markup=buttons)
 
 
 # Command: /get<language>
@@ -138,9 +140,9 @@ Give such as:
 
     x = getValidReply(userID, text, language)
     reply = x["text"]
-    button = x["button"]
+    buttons = x["buttons"]
 
-    await message.reply_html(reply, reply_markup=button)
+    await message.reply_html(reply, reply_markup=buttons)
 
 
 # Command:  /random or /rand
@@ -151,9 +153,9 @@ async def randomCommand(u: Update, c):
 
     x = getRandomAyah(userID)
     reply = x["reply"]
-    button = x["button"]
+    buttons = x["buttons"]
 
-    await message.reply_html(reply, reply_markup=button)
+    await message.reply_html(reply, reply_markup=buttons)
 
 
 # Command:  /audio
@@ -164,9 +166,9 @@ async def audioCommand(u: Update, c):
     text = message.text[6:].strip()  # 6 is the length of "/audio"
 
     x = getValidReply(userID, text)
-    button = x["button"]
+    buttons = x["buttons"]
 
-    if not button:
+    if not buttons:
         await message.reply_html(x["text"])
         return
 
@@ -177,7 +179,8 @@ async def audioCommand(u: Update, c):
     ayah = ayah.strip()
 
     await message.reply_audio(
-        f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{surah}_{ayah}.mp3""",
+        f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{
+            surah}_{ayah}.mp3""",
         quote=True,
     )
 
@@ -190,9 +193,9 @@ async def tafsirCommand(u: Update, c):
     text = message.text[7:].strip()  # 7 is the length of "/tafsir"
 
     x = getValidReply(userID, text)
-    button = x["button"]
+    buttons = x["buttons"]
 
-    if not button:
+    if not buttons:
         await message.reply_html(x["text"])
         return
 

@@ -72,5 +72,4 @@ def getAyahReply(surahNo, ayahNo, language):
         totalAyah=totalAyah,
     )
     ayah = Quran.getAyah(surahNo, ayahNo)
-    print(ayah)
-    return "Hello From getAyahReply"
+    print(language)

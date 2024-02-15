@@ -40,7 +40,7 @@ settingsStateButtons = [
 
 
 async def handleSettingsButtonPress(u: Update, c):
-    """Handles the settings button press"""
+    """Handles the settings buttons press"""
     message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id

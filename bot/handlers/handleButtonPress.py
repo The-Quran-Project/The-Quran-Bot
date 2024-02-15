@@ -9,7 +9,7 @@ from .callbackQueryHandlers import handleSettingsButtonPress, handleAdminButtonP
 
 
 async def handleButtonPress(u: Update, c):
-    """Handles all the button presses / callback queries"""
+    """Handles all the buttons presses / callback queries"""
     message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id
@@ -24,13 +24,12 @@ async def handleButtonPress(u: Update, c):
     messageOwnerID = queryData.split()[-1]
 
     if (
-    len(messageOwnerID) >= 9 # naive way to check if it's a valid id
-        and
-        isGroup
+        len(messageOwnerID) >= 9  # naive way to check if it's a valid id
+        and isGroup
         and str(userID) != messageOwnerID
         and queryData.split()[0] not in "surahName prev next".split()
     ):
-        await query.answer("Only the message owner can use this button")
+        await query.answer("Only the message owner can use this buttons")
         return
 
     if queryData.startswith("settings"):
@@ -62,9 +61,9 @@ async def handleButtonPress(u: Update, c):
         await query.answer(ans)
         reply = getAyahReply(userID, index, 1)
 
-        button = getAyahButton(index, 1, userID)
+        buttons = getAyahButton(index, 1, userID)
 
-        await edit_text(reply, reply_markup=button)
+        await edit_text(reply, reply_markup=buttons)
 
     elif queryData.startswith(("prev", "next")):
         # Going between Surah Name Pages
@@ -77,11 +76,11 @@ async def handleButtonPress(u: Update, c):
         if index >= len(Constants.allSurahInlineButtons):
             index = 0
 
-        button = InlineKeyboardMarkup(Constants.allSurahInlineButtons[index])
+        buttons = InlineKeyboardMarkup(Constants.allSurahInlineButtons[index])
 
-        await message.edit_reply_markup(button)
+        await message.edit_reply_markup(buttons)
 
-    elif queryData.startswith("goback"):
+    elif queryData.startswith("prev_ayah"):
         # Previous Ayah
         try:
             surahNo, ayahNo = map(int, queryData.split()[1:-1])
@@ -99,17 +98,17 @@ async def handleButtonPress(u: Update, c):
 
         reply = getAyahReply(userID, surahNo, ayahNo)
 
-        button = getAyahButton(surahNo, ayahNo, userID)
+        buttons = getAyahButton(surahNo, ayahNo, userID)
 
-        await edit_text(reply, reply_markup=button)
+        await edit_text(reply, reply_markup=buttons)
 
-    elif queryData.startswith("goforward"):
+    elif queryData.startswith("next_ayah"):
         # Next Ayah
         try:
             surahNo, ayahNo = map(int, queryData.split()[1:-1])
         except ValueError:
             surahNo, ayahNo = map(int, queryData.split()[1:])
-         
+
         if surahNo == 114 and ayahNo == 6:
             surahNo = 1
             ayahNo = 1
@@ -122,6 +121,6 @@ async def handleButtonPress(u: Update, c):
 
         reply = getAyahReply(userID, surahNo, ayahNo)
 
-        button = getAyahButton(surahNo, ayahNo, userID)
+        buttons = getAyahButton(surahNo, ayahNo, userID)
 
-        await edit_text(reply, reply_markup=button)
+        await edit_text(reply, reply_markup=buttons)

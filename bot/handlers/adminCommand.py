@@ -42,9 +42,9 @@ async def adminCommand(u: Update, c):
 /forward <code>chatID</code> [ Reply to a message ]
 /get <code>chatID</code> [ Reply to a message ]
 """
-    button = InlineKeyboardMarkup(buttons)
+    buttons = InlineKeyboardMarkup(buttons)
 
-    await message.reply_html(reply, reply_markup=button, quote=True)
+    await message.reply_html(reply, reply_markup=buttons, quote=True)
 
 
 async def forwardMessage(u: Update, c):

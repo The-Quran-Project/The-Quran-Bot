@@ -1,5 +1,5 @@
 from .. import Quran
-from . import getAyahReplyFromPreference, getAyahButton
+from . import getAyahReply, getAyahButton, getAyahReplyFromPreference
 
 
 validFormat = """
@@ -19,14 +19,14 @@ def getValidReply(userID, text, language=None):
         surah = Quran.getSurahNameFromNumber(surahNo)
         ayahCount = Quran.getAyahNumberCount(surahNo)
         reply = getAyahReplyFromPreference(userID, surahNo, ayahNo, language)
-        button = getAyahButton(surahNo, ayahNo, userID)
+        buttons = getAyahButton(surahNo, ayahNo, userID)
 
-        return {"text": reply, "button": button}
+        return {"text": reply, "buttons": buttons}
 
     sep = text.split(":")
     if len(sep) != 2:
         reply = "<b>Your format is not correct.</b>" + validFormat
-        reply = {"text": reply, "button": None}
+        reply = {"text": reply, "buttons": None}
         return reply
 
     surahNo, ayahNo = sep
@@ -36,13 +36,13 @@ def getValidReply(userID, text, language=None):
     if not (surahNo.isdecimal() and ayahNo.isdecimal()):
         reply = "<b>Surah and Ayah number must be integers</b>" + validFormat
 
-        return {"text": reply, "button": None}
+        return {"text": reply, "buttons": None}
 
     surahNo = int(surahNo)
 
     if not 1 <= surahNo <= 114:
         reply = "<b>Surah number needs to be between <i>1</i> to <i>114</i>.</b>"
-        return {"text": reply, "button": None}
+        return {"text": reply, "buttons": None}
 
     surah = Quran.getSurahNameFromNumber(surahNo)
     ayahCount = Quran.getAyahNumberCount(surahNo)
@@ -55,9 +55,13 @@ def getValidReply(userID, text, language=None):
 But you gave ayah no. {ayahNo}
 """
 
-        return {"text": reply, "button": None}
+        return {"text": reply, "buttons": None}
 
-    reply = getAyahReply(userID, surahNo, ayahNo, language)
-    button = getAyahButton(surahNo, ayahNo, userID)
+    if language:
+        reply = getAyahReply(surahNo, ayahNo, language)
+        buttons = getAyahButton(surahNo, ayahNo, userID)
+    else:
+        reply = getAyahReplyFromPreference(userID, surahNo, ayahNo, language)
+        buttons = getAyahButton(surahNo, ayahNo, userID)
 
-    return {"text": reply, "button": button}
+    return {"text": reply, "buttons": buttons}

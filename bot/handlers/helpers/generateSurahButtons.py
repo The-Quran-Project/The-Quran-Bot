@@ -87,14 +87,14 @@ def generateSurahButtons(Quran: QuranClass):
     totalButtonsPerPage = 33  # 33 buttons per page, means 11 rows per page
 
     for surahNumber, surahName in enumerate(allSurahNames, start=1):
-        button = InlineKeyboardButton(
+        buttons = InlineKeyboardButton(
             f"{surahNumber} {surahName}", callback_data=f"surahName {surahNumber}"
         )
         buttonsCount = len(inlineButtons[-1])
         pageCount = len(inlineButtons)
 
         if buttonsCount < totalButtonsPerPage:
-            inlineButtons[-1].append(button)
+            inlineButtons[-1].append(buttons)
         else:
             navigationButtons = [
                 InlineKeyboardButton("Previous", callback_data=f"prev {pageCount-1}"),
@@ -103,7 +103,7 @@ def generateSurahButtons(Quran: QuranClass):
             inlineButtons[-1] = splitListIntoChunks(inlineButtons[-1])
             inlineButtons[-1].append(navigationButtons)
 
-            inlineButtons.append([button])
+            inlineButtons.append([buttons])
 
     if inlineButtons[-1]:
         navigationButtons = [
