@@ -28,10 +28,8 @@ async def helpCommand(u: Update, c):
     buttons = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton(
-                    "Group", url="https://t.me/AlQuranDiscussion"),
-                InlineKeyboardButton(
-                    "Channel", url="https://t.me/AlQuranUpdates"),
+                InlineKeyboardButton("Group", url="https://t.me/AlQuranDiscussion"),
+                InlineKeyboardButton("Channel", url="https://t.me/AlQuranUpdates"),
             ]
         ]
     )

@@ -33,12 +33,12 @@ class Database:
         self.client = MongoClient(uri, server_api=ServerApi("1"))
         self.db = self.client.quranbot_test  # TODO: Change this to quranbot
         self.defaultSettings = {
-            "font": 1,
+            "font": 1,  # 1 -> Uthmani, 2 -> Simple
             "showTafsir": True,
-            "reciter": 1,
+            "reciter": 1,  # 1 -> Mishary Rashid Al-Afasy, 2 -> Abu Bakr Al-Shatri
             "primary": "ar",
             "secondary": "en",
-            "other": "bn",
+            "other": None,
         }
 
     def getAllUsers(self):
@@ -76,7 +76,8 @@ class Database:
 
         settings = {**user["settings"], **settings}
 
-        self.db.users.update_one({"_id": userID}, {"$set": {"settings": settings}})
+        self.db.users.update_one(
+            {"_id": userID}, {"$set": {"settings": settings}})
 
         return self.getUser(userID)
 
