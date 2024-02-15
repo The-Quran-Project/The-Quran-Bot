@@ -22,6 +22,9 @@ async def handleMessage(u: Update, c):
     if u.effective_message.via_bot:
         return
 
+    if text.startswith("/"):
+        return  # Ignore commands
+
     searchedSurah = checkSurah(u, c)
 
     if searchedSurah["buttons"]:
@@ -45,7 +48,7 @@ def checkSurah(u: Update, c):
     text = message.text
 
     defaultReply = f"""
-Couldn't find a Surah matching the text <b>{escapeHTML(text)[:33]}{'...'if len(text)>=33 else ''}</b>
+Couldn't find a Surah matching the text <b>{escapeHTML(text)[:33]}{'...'if len(text) >= 33 else ''}</b>
 
 <b>Write something like:
 fatihah
@@ -64,7 +67,8 @@ baqarah</b>
     buttons = []
     for surah, number in res:
         buttons.append(
-            InlineKeyboardButton(f"{number} {surah}", callback_data=f"surah {number}")
+            InlineKeyboardButton(f"{number} {surah}",
+                                 callback_data=f"surah {number}")
         )
 
     buttons = InlineKeyboardMarkup([buttons])
