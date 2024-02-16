@@ -36,11 +36,13 @@ async def replyToErrorMessage(u: Update, c: CallbackContext):
 
 {htmlText}
 """
-    
+
     try:
         await bot.sendMessage(userID, reply)
-        await message.reply_html("<b>Sent the message to the user</b>", quote=True)
+        await message.reply_html("<b>Sent the message to the user</b>")
     except Exception as e:
         await message.reply_html(
-            f"Error sending message:\n<code>{html.escape(str(e))}</code>", quote=True
+            f"Error sending message:\n<code>{html.escape(str(e))}</code>"
         )
+
+    return True

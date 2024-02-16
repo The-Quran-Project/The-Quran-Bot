@@ -16,7 +16,7 @@ async def handleErrors(u: Update, c: CallbackContext):
 
     if not u:
         return
-    print(u)
+
     print("--- Error Occurred ---")
     tbList = traceback.format_exception(None, c.error, c.error.__traceback__)
     tbString = "".join(tbList)
@@ -30,8 +30,7 @@ async def handleErrors(u: Update, c: CallbackContext):
 <b>An error occurred. Report sent to admins</b>
 
 <b>Error:</b>
-<code>{escape(str(c.error))}</code>""",
-            quote=True,
+<code>{escape(str(c.error))}</code>"""
         )
     except Exception as e:
         messageSendingError = str(e)
@@ -60,12 +59,14 @@ async def handleErrors(u: Update, c: CallbackContext):
             # forward the message the user sent
             msgID = None
             if u.effective_chat:
-                msgID: Message = (await bot.forwardMessage(
-                    chatID,
-                    u.effective_chat.id,
-                    u.effective_message.message_id,
-                )).message_id
-                
+                msgID: Message = (
+                    await bot.forwardMessage(
+                        chatID,
+                        u.effective_chat.id,
+                        u.effective_message.message_id,
+                    )
+                ).message_id
+
             await bot.sendDocument(
                 chatID,
                 BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),

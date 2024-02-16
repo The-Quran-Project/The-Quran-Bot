@@ -40,9 +40,7 @@ async def adminCommand(u: Update, c):
 /getUser <code>chatID</code> [ Reply to a message ]
 """
 
-    await message.reply_html(
-        reply, reply_markup=InlineKeyboardMarkup(buttons), quote=True
-    )
+    await message.reply_html(reply, reply_markup=InlineKeyboardMarkup(buttons))
 
 
 async def forwardMessage(u: Update, c):
@@ -60,12 +58,12 @@ async def forwardMessage(u: Update, c):
         return
 
     chatID = message.text.split()[1]
-    if chatID[1:].isdigit(): # ignore the '-' if it's a group
+    if chatID[1:].isdigit():  # ignore the '-' if it's a group
         try:
             await message.reply_to_message.forward(chatID)
             await message.reply_html("<b>Message forwarded</b>")
         except Exception as e:
-            await message.reply_html(f"<b>Error:</b> <code>{e}</code>", quote=True)
+            await message.reply_html(f"<b>Error:</b> <code>{e}</code>")
 
         return
 
@@ -152,4 +150,4 @@ Username: <b>@{user.username}</b>
 Bio:
 <b>{escapeHtml(user.bio)}</b>
 """
-    await message.reply_html(reply, quote=True)
+    await message.reply_html(reply)

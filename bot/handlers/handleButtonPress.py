@@ -73,8 +73,7 @@ async def handleButtonPress(u: Update, c):
 
         await message.reply_audio(
             f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{
-                surahNo}_{ayahNo}.mp3""",
-            quote=True,
+                surahNo}_{ayahNo}.mp3"""
         )
         return await query.answer()
 
@@ -182,5 +181,5 @@ async def handleButtonPress(u: Update, c):
         return await query.answer("Maybe it was an old message?", show_alert=True)
 
     await message.edit_text(
-        reply, reply_markup=buttons, disable_web_page_preview=1 - previewLink
+        reply, reply_markup=buttons, disable_web_page_preview=bool(1 - previewLink)
     )

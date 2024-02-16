@@ -37,7 +37,7 @@ async def handleAdminButtonPress(u: Update, c):
             file = BytesIO(json.dumps(allUsers).encode())
             file.name = "users.json"
             await query.message.reply_document(
-                file, quote=True, caption=f"Total Users: {len(allUsers)}"
+                file, caption=f"Total Users: {len(allUsers)}"
             )
 
     elif data[1] == "chats":
@@ -51,7 +51,7 @@ async def handleAdminButtonPress(u: Update, c):
             file = BytesIO(json.dumps(allChats).encode())
             file.name = "chats.json"
             await query.message.reply_document(
-                file, quote=True, caption=f"Total Chats: {len(allChats)}"
+                file, caption=f"Total Chats: {len(allChats)}"
             )
 
     elif data[1] == "admins":
@@ -63,7 +63,7 @@ async def handleAdminButtonPress(u: Update, c):
             file = BytesIO(str(allAdmins).encode())
             file.name = "admins.json"
             await query.message.reply_document(
-                file, quote=True, caption=f"Total Admins: {len(allAdmins)}"
+                file, caption=f"Total Admins: {len(allAdmins)}"
             )
 
     # elif data[1] == "broadcast":

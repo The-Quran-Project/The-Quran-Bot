@@ -35,7 +35,8 @@ howToUse = """
 <u>Usage of Bot:</u>
 /surah - The list of all the Surahs
 /get x:y - Get the ayah x from Surah y
-/geten x:y - Get the English translation of ayah x from Surah y
+/<lang> x:y - Get the ayah x from Surah y in the language <lang>
+/translations - Get the list of all the available translations
 /tafsir x:y - Get the Tafsir of ayah x from Surah y
 /audio x:y - Get the audio of ayah x from Surah y
 
@@ -59,7 +60,7 @@ about = """
 Al Quran Bot is a bot that can give you verses from the Al-Quran. It is a non-profit project and is open-source.
 
 <u><b>Credits:</b></u>
-- The Arabic, English and Tafsir's were taken from <a href="https://quran.com">quran.com</a>
+- The Translations and Tafsirs were taken from <a href="https://quran.com">quran.com</a>
 - The recitations were taken from <a href="https://everyayah.com">everyayah.com</a>
 - The bot is hosted on <a href="https://render.com">Render</a>
 - The bot is written in Python3 using the <a href="https://t.me/pythontelegrambotgroup">python-telegram-bot</a> library

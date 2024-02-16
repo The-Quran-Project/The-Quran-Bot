@@ -26,7 +26,9 @@ async def handleMessage(u: Update, c):
     buttons = None
 
     if userID in ADMINS and chatID == userID:
-        return await replyToErrorMessage(u, c)
+        res = await replyToErrorMessage(u, c)
+        if res:
+            return
 
     if u.effective_message.via_bot:
         return
@@ -46,8 +48,7 @@ async def handleMessage(u: Update, c):
             await message.reply_html(
                 reply,
                 reply_markup=buttons,
-                quote=True,
-                disable_web_page_preview=1 - previewLink,
+                disable_web_page_preview=bool(1 - previewLink),
             )
         return  # Don't send the message to the group unless settings are enabled
 
@@ -56,11 +57,11 @@ async def handleMessage(u: Update, c):
     ):  # If the message is not valid and no buttons are there
         searchedSurah = checkSurah(userID, text)
         await message.reply_html(
-            searchedSurah["reply"], reply_markup=searchedSurah["buttons"], quote=True
+            searchedSurah["reply"], reply_markup=searchedSurah["buttons"]
         )
         return
 
-    await message.reply_html(reply, reply_markup=buttons, quote=True)
+    await message.reply_html(reply, reply_markup=buttons)
 
 
 def checkSurah(userID, text: str):
