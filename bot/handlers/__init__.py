@@ -30,7 +30,7 @@ from .commands import (
     useCommand,
     surahCommand,
     getCommand,
-    getWithLanguage,
+    getTranslationCommand,
     audioCommand,
     tafsirCommand,
     randomCommand,

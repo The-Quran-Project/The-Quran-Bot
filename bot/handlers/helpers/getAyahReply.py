@@ -71,9 +71,15 @@ def getAyahReply(surahNo, ayahNo, language):
     )
     if language:
         lang = Quran.detectLanguage(language)
+    
+    languageTitle = Quran.getTitleLanguageFromAbbr(Quran.getAbbr(lang))
     ayah = Quran.getAyah(surahNo, ayahNo)[lang]
     reply = f"""
-<u><b>{language}</b></u>
-{ayah}
+Surah : <b>{surah} ({surahNo})</b>
+Ayah  : <b>{ayahNo} out of {totalAyah}</b>
+
+<u><b>{languageTitle}</b></u>
+<blockquote>{ayah}</blockquote>
 """
+    
     return reply

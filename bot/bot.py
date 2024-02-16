@@ -61,7 +61,12 @@ def runBot(token):
 
     app.add_handler(CallbackQueryHandler(handleButtonPress))
     app.add_handler(InlineQueryHandler(handleInlineQuery))
-    app.add_handler(MessageHandler(filters.Regex(r"/get[a-zA-Z]{2}"), getWithLanguage))
+    app.add_handler(
+        MessageHandler(
+            filters.Regex(r"^\/([A-Za-z]{1,10})\s(\d+)\s?:\s?(\d+)$"), # match: /<lang> <surah>:<ayah>
+            getTranslationCommand,
+        )
+    )
     app.add_handler(
         MessageHandler(filters.TEXT & ~filters.ChatType.CHANNEL, handleMessage)
     )  # for private chats

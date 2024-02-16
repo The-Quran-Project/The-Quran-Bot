@@ -24,7 +24,7 @@ def getValidReply(userID, text, language=None):
         else:
             reply = getAyahReplyFromPreference(surahNo, ayahNo, userID)
 
-        buttons = getAyahButton(surahNo, ayahNo, userID)
+        buttons = getAyahButton(surahNo, ayahNo, userID, language)
 
         return {"text": reply, "buttons": buttons}
 
@@ -67,6 +67,6 @@ But you gave ayah no. {ayahNo}
     else:
         reply = getAyahReplyFromPreference(surahNo, ayahNo, userID)
 
-    buttons = getAyahButton(surahNo, ayahNo, userID)
+    buttons = getAyahButton(surahNo, ayahNo, userID, language)
 
     return {"text": reply, "buttons": buttons}

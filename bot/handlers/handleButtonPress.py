@@ -134,9 +134,13 @@ async def handleButtonPress(u: Update, c):
         if len(values) == 2:
             surahNo, ayahNo = map(int, values)
             language = None
+
         elif len(values) == 3:
             # language is the abbreviation of the language
-            surahNo, ayahNo, language = map(int, values)
+            surahNo, ayahNo, language = values
+            surahNo = int(surahNo)
+            ayahNo = int(ayahNo)
+
 
         if surahNo == 114 and ayahNo == 6:
             surahNo = 1
@@ -150,6 +154,7 @@ async def handleButtonPress(u: Update, c):
 
         if language:
             reply = getAyahReply(surahNo, ayahNo, language)
+            buttons = getAyahButton(surahNo, ayahNo, userID, language) # language is the abbr
         else:
             reply = getAyahReplyFromPreference(surahNo, ayahNo, userID)
             buttons = getAyahButton(surahNo, ayahNo, userID)

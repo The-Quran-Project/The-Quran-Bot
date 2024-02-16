@@ -17,9 +17,9 @@ async def startCommand(u: Update, c):
     reply = replies.start.format(firstName=fn, repoURL=url)
 
     buttons = InlineKeyboardMarkup([[InlineKeyboardButton("Github", url=url)]])
-    
+
     msg: Message = message
-    if chatID == userID: # Send sticker only if it's a private chat
+    if chatID == userID:  # Send sticker only if it's a private chat
         msg = await message.reply_sticker(Constants.salamSticker)
 
     await msg.reply_html(reply, reply_markup=buttons)
@@ -97,7 +97,6 @@ async def surahCommand(u: Update, c):
     await message.reply_html(reply, reply_markup=buttons)
 
 
-
 # Command:  /get
 async def getCommand(u: Update, c):
     """Sends the ayah to the user"""
@@ -110,6 +109,39 @@ async def getCommand(u: Update, c):
     buttons = x["buttons"]
 
     await message.reply_html(reply, reply_markup=buttons)
+
+
+# Command:  /<lang> x:y
+async def getTranslationCommand(u: Update, c):
+    """Sends the ayah in the specified language to the user"""
+    message = u.effective_message
+    userID = u.effective_user.id
+    text = message.text[1:].strip()  # 1 is the length of "/"
+
+    lang, text = text.split(" ", 1)
+    language = Quran.detectLanguage(lang)
+
+    if not language:
+        availableLanguages = [i[1] for i in Quran.getLanguages()]
+        reply = f"""
+<b>❌ Invalid Language ❌</b>
+
+If you want to suggest a language, please say it in the <a href="https://t.me/AlQuranDiscussion">discussion group</a>.
+
+Available languages are:
+<blockquote>\
+{', '.join(availableLanguages)}
+</blockquote>
+"""
+        await message.reply_html(reply, quote=True)
+        return
+
+    x = getValidReply(userID, text, language)
+    reply = x["text"]
+    buttons = x["buttons"]
+
+    await message.reply_html(reply, reply_markup=buttons, quote=True)
+
 
 # Command:  /random or /rand
 async def randomCommand(u: Update, c):
