@@ -3,15 +3,22 @@
 **Latests are on top**
 
 ## 11) 16rd February, 2024
-- ...
 
-
+- Added 7 new translations of the Quran. Now, the bot supports 8 languages.
+- Get your specific translation by `/<lang> x:y` command. Example: `/ben 1:2` (lang will be auto completed)
+- `/settings` command for group admins to change the bot's settings in the group.
+- Alert the user if bot doesn't have permission to send audio files in the group.
+- `/start` command will only send the salam sticker in private chats, not in groups.
+- `/info` command will only send the text in groups. In private chats, it'll send the text and the user's profile photo.
+- Verses are given in quoted formatting.
+- Refactored the code to make it more readable and maintainable.
 
 ## 10) 27th January, 2024
+
 - Bug Fix: `/settings` command was not working properly. Now, it's fixed.
 
-
 ## 9) 25th January, 2024
+
 - Fix: Bot replies wrong messages when someone joins a group [1]
 - Fix: Bot replies with ayah if user types x:y or just x in group [1]
 - Only who sent /get x:y can interact with the message buttons
