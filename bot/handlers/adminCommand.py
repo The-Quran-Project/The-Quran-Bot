@@ -60,7 +60,7 @@ async def forwardMessage(u: Update, c):
         return
 
     chatID = message.text.split()[1]
-    if chatID.isdigit():
+    if chatID[1:].isdigit(): # ignore the '-' if it's a group
         try:
             await message.reply_to_message.forward(chatID)
             await message.reply_html("<b>Message forwarded</b>")
