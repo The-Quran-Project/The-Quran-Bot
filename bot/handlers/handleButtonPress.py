@@ -17,6 +17,7 @@ async def handleButtonPress(u: Update, c):
     query = u.callback_query
     queryData = query.data
     method = queryData.split()[0]
+    reply = buttons = None
 
     isGroup = chatID != userID
     previewLink = False
