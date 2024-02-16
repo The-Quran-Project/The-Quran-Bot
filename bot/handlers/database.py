@@ -9,17 +9,6 @@ from pymongo.mongo_client import MongoClient
 
 load_dotenv()
 
-# base structure
-{
-    "_id": 1,
-    "settings": {
-        "ayahMode": 1,  # 1 -> Full Ayah, 2 -> Only Arabic, 3 -> Only Translation
-        "arabicStyle": 1,  # 1 -> Uthmani, 2 -> Simple
-        "showTafsir": True,
-    },
-    "banned": False,
-}
-
 
 if os.environ.get("LOCAL"):
     # For `pymongo.errors.ConfigurationError: cannot open /etc/resolv.conf`
@@ -47,6 +36,7 @@ class Database:
             "allowAudio": True, # Allow sending audio recitations
             "previewLink": False, # Show preview of the Tafsir link
         }
+        self.admins = [i["_id"] for i in self.getAllAdmins()]
 
     def getAllUsers(self):
         return [i for i in self.db.users.find({})]
@@ -96,6 +86,7 @@ class Database:
         self.db.chats.update_one({"_id": chatID}, {"$set": {"settings": settings}})
 
         return None # self.getChat(chatID)
+
 
     # def deleteUser(self, userID: int):
     #     return self.db.users.delete_one({"_id": userID})

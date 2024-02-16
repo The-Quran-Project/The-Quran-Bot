@@ -5,7 +5,11 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 
 from . import Quran
 from .database import db
-from .helpers import getValidReply, getAyahReply, getAyahButton
+from .helpers import getValidReply
+from .replyToErrorMessage import replyToErrorMessage
+
+
+ADMINS = db.admins
 
 
 def escapeHTML(text: str):
@@ -20,6 +24,9 @@ async def handleMessage(u: Update, c):
     chatID = u.effective_chat.id
     text = message.text
     buttons = None
+
+    if userID in ADMINS and chatID == userID:
+        return await replyToErrorMessage(u, c)
 
     if u.effective_message.via_bot:
         return
@@ -42,9 +49,11 @@ async def handleMessage(u: Update, c):
                 quote=True,
                 disable_web_page_preview=1 - previewLink,
             )
-        return # Don't send the message to the group unless settings are enabled
+        return  # Don't send the message to the group unless settings are enabled
 
-    if not x.get("send") and not buttons:  # If the message is not valid and no buttons are there
+    if (
+        not x.get("send") and not buttons
+    ):  # If the message is not valid and no buttons are there
         searchedSurah = checkSurah(userID, text)
         await message.reply_html(
             searchedSurah["reply"], reply_markup=searchedSurah["buttons"], quote=True
@@ -78,7 +87,9 @@ baqarah
     buttons = []
     for surah, number in res:
         buttons.append(
-            InlineKeyboardButton(f"{number} {surah}", callback_data=f"selectedSurah {number}")
+            InlineKeyboardButton(
+                f"{number} {surah}", callback_data=f"selectedSurah {number}"
+            )
         )
 
     buttons = InlineKeyboardMarkup([buttons])
