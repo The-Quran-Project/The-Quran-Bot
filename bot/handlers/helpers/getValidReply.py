@@ -18,7 +18,12 @@ def getValidReply(userID, text, language=None):
         ayahNo = 1
         surah = Quran.getSurahNameFromNumber(surahNo)
         ayahCount = Quran.getAyahNumberCount(surahNo)
-        reply = getAyahReplyFromPreference(userID, surahNo, ayahNo, language)
+
+        if language:
+            reply = getAyahReply(surahNo, ayahNo, language)
+        else:
+            reply = getAyahReplyFromPreference(surahNo, ayahNo, userID)
+
         buttons = getAyahButton(surahNo, ayahNo, userID)
 
         return {"text": reply, "buttons": buttons}
@@ -36,13 +41,13 @@ def getValidReply(userID, text, language=None):
     if not (surahNo.isdecimal() and ayahNo.isdecimal()):
         reply = "<b>Surah and Ayah number must be integers</b>" + validFormat
 
-        return {"text": reply, "buttons": None}
+        return {"text": reply, "buttons": None, "send": True}
 
     surahNo = int(surahNo)
 
     if not 1 <= surahNo <= 114:
         reply = "<b>Surah number needs to be between <i>1</i> to <i>114</i>.</b>"
-        return {"text": reply, "buttons": None}
+        return {"text": reply, "buttons": None, "send": True}
 
     surah = Quran.getSurahNameFromNumber(surahNo)
     ayahCount = Quran.getAyahNumberCount(surahNo)
@@ -55,13 +60,13 @@ def getValidReply(userID, text, language=None):
 But you gave ayah no. {ayahNo}
 """
 
-        return {"text": reply, "buttons": None}
+        return {"text": reply, "buttons": None, "send": True}
 
     if language:
         reply = getAyahReply(surahNo, ayahNo, language)
-        buttons = getAyahButton(surahNo, ayahNo, userID)
     else:
-        reply = getAyahReplyFromPreference(userID, surahNo, ayahNo, language)
-        buttons = getAyahButton(surahNo, ayahNo, userID)
+        reply = getAyahReplyFromPreference(surahNo, ayahNo, userID)
+
+    buttons = getAyahButton(surahNo, ayahNo, userID)
 
     return {"text": reply, "buttons": buttons}

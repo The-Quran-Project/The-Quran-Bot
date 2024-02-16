@@ -1,6 +1,6 @@
 from telegram import Update, InlineKeyboardMarkup
 
-from .helpers import getAyahReply, getAyahButton
+from .helpers import getAyahReply, getAyahReplyFromPreference, getAyahButton
 from . import Constants
 from . import Quran
 from .database import db
@@ -16,78 +16,102 @@ async def handleButtonPress(u: Update, c):
 
     query = u.callback_query
     queryData = query.data
-    isGroup = chatID != userID
+    method = queryData.split()[0]
 
-    async def edit_text(*a, **k):
-        await message.edit_text(*a, **k)
+    isGroup = chatID != userID
+    previewLink = False
+    if isGroup:
+        chat = db.getChat(chatID)
+        previewLink = chat["settings"]["previewLink"]
 
     messageOwnerID = queryData.split()[-1]
 
     if (
-        len(messageOwnerID) >= 9  # naive way to check if it's a valid id
-        and isGroup
+        isGroup
+        # naive way to check if it's a valid id ( Change it later )
+        and messageOwnerID.isdigit()
+        and len(messageOwnerID) >= 9
         and str(userID) != messageOwnerID
         and queryData.split()[0] not in "surahName prev next".split()
     ):
-        await query.answer("Only the message owner can use this buttons")
-        return
+        return await query.answer(
+            "Only the message owner can use this buttons", show_alert=True
+        )
 
-    if queryData.startswith("settings"):
-        await handleSettingsButtonPress(u, c)
+    if method == "settings":
+        return await handleSettingsButtonPress(u, c)
 
-    elif queryData.startswith("admin"):
-        await handleAdminButtonPress(u, c)
+    elif method == "admin":
+        return await handleAdminButtonPress(u, c)
 
-    elif queryData.startswith("audio"):
+    elif method == "close":
+        return await message.delete()
+
+    elif method == "audio":
         try:
             surahNo, ayahNo = map(int, queryData.split()[1:-1])
         except ValueError:
             surahNo, ayahNo = map(int, queryData.split()[1:])
-        # file_id = Quran.getAudioFile(surahNo, ayahNo)
-        # await message.reply_audio(file_id)
+
         await message.reply_audio(
             f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{
                 surahNo}_{ayahNo}.mp3""",
             quote=True,
         )
-        await query.answer()
+        return await query.answer()
 
-    elif queryData.startswith("surah"):
+    elif method == "selectedSurah":
+        surahNo = int(queryData.split()[1])
+
+        entities = message.entities
+        
+        if len(entities) < 2: # When selected from searched surahs
+            messageOwnerID = int(entities[0].url.split("/")[-1])
+        else: # When selected from surahNames
+            messageOwnerID = int(entities[1].url.split("/")[-1])
+        
+        if messageOwnerID != userID:
+            return await query.answer(
+                "Only the message owner can use this buttons", show_alert=True
+            )
+
+        surah = Quran.getSurahNameFromNumber(surahNo)
+        await query.answer(f"You selected {surah}")
+
+        reply = getAyahReplyFromPreference(surahNo, 1, userID)
+        buttons = getAyahButton(surahNo, 1, userID)
+
+    elif method in ("prev_page", "next_page"):
+        # Going between surahNames Pages
         index = int(queryData.split()[1])
+        if index > len(Constants.allSurahInlineButtons):
+            index = 1
 
-        surah = Quran.getSurahNameFromNumber(index)
-        ans = f"You selected {surah}"
+        url = message.entities
+        messageOwnerID = int(url[1].url.split("/")[-1])
+        if messageOwnerID != userID:
+            return await query.answer(
+                "Only the message owner can use this buttons", show_alert=True
+            )
 
-        await query.answer(ans)
-        reply = getAyahReply(userID, index, 1)
+        reply = message.text_html
+        buttons = InlineKeyboardMarkup(Constants.allSurahInlineButtons[index - 1])
 
-        buttons = getAyahButton(index, 1, userID)
+    elif method == "prev_ayah":
+        # Go to Previous Ayah
+        values = queryData.split()[1:-1]
 
-        await edit_text(reply, reply_markup=buttons)
+        if len(values) == 2:
+            surahNo, ayahNo = map(int, values)
+            language = None
+        elif len(values) == 3:
+            # language is the abbreviation of the language
+            surahNo, ayahNo, language = map(int, values)
 
-    elif queryData.startswith(("prev", "next")):
-        # Going between Surah Name Pages
-        index = int(queryData.split()[1])
-        if queryData.split()[0] == "prev":
-            index -= 1
-        else:
-            index += 1
-
-        if index >= len(Constants.allSurahInlineButtons):
-            index = 0
-
-        buttons = InlineKeyboardMarkup(Constants.allSurahInlineButtons[index])
-
-        await message.edit_reply_markup(buttons)
-
-    elif queryData.startswith("prev_ayah"):
-        # Previous Ayah
-        try:
-            surahNo, ayahNo = map(int, queryData.split()[1:-1])
-        except ValueError:
-            surahNo, ayahNo = map(int, queryData.split()[1:])
-        if surahNo == ayahNo == 1:
-            surahNo = 114
+        if (
+            surahNo == ayahNo == 1
+        ):  # If the user is at the first ayah of the first surah
+            surahNo = 114  # Go to the last surah
             ayahNo = 6
 
         elif ayahNo == 1:
@@ -96,18 +120,23 @@ async def handleButtonPress(u: Update, c):
         else:
             ayahNo -= 1
 
-        reply = getAyahReply(userID, surahNo, ayahNo)
+        if language:
+            reply = getAyahReply(surahNo, ayahNo, language)
+        else:
+            reply = getAyahReplyFromPreference(surahNo, ayahNo, userID)
 
         buttons = getAyahButton(surahNo, ayahNo, userID)
 
-        await edit_text(reply, reply_markup=buttons)
+    elif method == "next_ayah":
+        # Go to Next Ayah
+        values = queryData.split()[1:-1]
 
-    elif queryData.startswith("next_ayah"):
-        # Next Ayah
-        try:
-            surahNo, ayahNo = map(int, queryData.split()[1:-1])
-        except ValueError:
-            surahNo, ayahNo = map(int, queryData.split()[1:])
+        if len(values) == 2:
+            surahNo, ayahNo = map(int, values)
+            language = None
+        elif len(values) == 3:
+            # language is the abbreviation of the language
+            surahNo, ayahNo, language = map(int, values)
 
         if surahNo == 114 and ayahNo == 6:
             surahNo = 1
@@ -119,8 +148,12 @@ async def handleButtonPress(u: Update, c):
         else:
             ayahNo += 1
 
-        reply = getAyahReply(userID, surahNo, ayahNo)
+        if language:
+            reply = getAyahReply(surahNo, ayahNo, language)
+        else:
+            reply = getAyahReplyFromPreference(surahNo, ayahNo, userID)
+            buttons = getAyahButton(surahNo, ayahNo, userID)
 
-        buttons = getAyahButton(surahNo, ayahNo, userID)
-
-        await edit_text(reply, reply_markup=buttons)
+    await message.edit_text(
+        reply, reply_markup=buttons, disable_web_page_preview=1 - previewLink
+    )

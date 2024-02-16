@@ -20,7 +20,6 @@ class Constants:
         "CAACAgUAAxkBAAIBEmOtH-No3_xEGMh2YpM6ErBQ2BHHAAK4AwAC8Yq5VFbQH8fyZNceLAQ"
     )
     allSurahInlineButtons = generateSurahButtons(Quran)
-    languages = ("ar", "en")
 
 
 # --- Importing Handlers ---

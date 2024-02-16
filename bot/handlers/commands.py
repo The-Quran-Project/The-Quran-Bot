@@ -10,12 +10,18 @@ from .database import db
 async def startCommand(u: Update, c):
     """Sends a welcome message to the user and a link to the repo"""
     message = u.effective_message
+    chatID = u.effective_chat.id
+    userID = u.effective_user.id
     fn = u.effective_user.first_name
     url = "https://github.com/The-Quran-Project/TG-Quran-Bot"
     reply = replies.start.format(firstName=fn, repoURL=url)
 
     buttons = InlineKeyboardMarkup([[InlineKeyboardButton("Github", url=url)]])
-    msg = await message.reply_sticker(Constants.salamSticker)
+    
+    msg: Message = message
+    if chatID == userID: # Send sticker only if it's a private chat
+        msg = await message.reply_sticker(Constants.salamSticker)
+
     await msg.reply_html(reply, reply_markup=buttons)
 
 
@@ -73,9 +79,10 @@ async def surahCommand(u: Update, c):
     message = u.effective_message
     userID = u.effective_user.id
     text = message.text[6:].strip()  # 6 is the length of "/surah"
+    attachedUserID = f'<a href="https://xyz.co/{userID}"> </a>'  # Later used to check the message owner
 
-    reply = """
-<b>Select a surah from below:</b>
+    reply = f"""
+<b>Select a surah{attachedUserID}from below:</b>
     """
     # Sends buttons with Surah names
     if not text:
@@ -87,14 +94,8 @@ async def surahCommand(u: Update, c):
     reply = x["text"]
     buttons = x["buttons"]
 
-    msg: Message = await message.reply_html(reply, reply_markup=buttons)
+    await message.reply_html(reply, reply_markup=buttons)
 
-    # await msg.reply_html(
-
-
-#        "<b>Use of <code>/surah x:y</code> is deprecated and will be removed in/after 1st July, 2024</b>\n\nUse <code>/get x:y</code> instead",
-#        quote=True,
-#    )
 
 
 # Command:  /get
@@ -109,39 +110,6 @@ async def getCommand(u: Update, c):
     buttons = x["buttons"]
 
     await message.reply_html(reply, reply_markup=buttons)
-
-
-# Command: /get<language>
-async def getWithLanguage(u: Update, c):
-    """Sends the ayah to the user in the specified language"""
-    message = u.effective_message
-    userID = u.effective_user.id
-    # 4 to 6 will be the language code (e.g. /getar)
-    language = message.text[4:6].lower()
-    text = message.text[6:].strip()  # 6 is the length of "/get<language>"
-    newLine = "\n"
-    if language not in Constants.languages:
-        reply = f"""
-<b>Language code is not valid</b>
-
-Use one of the following:
-{"-"+newLine.join(Constants.languages)}
-
-Give such as:
-<pre>
-/getar 1:3
-/geten 3:5
-</pre>
-"""
-        await message.reply_html(reply)
-        return
-
-    x = getValidReply(userID, text, language)
-    reply = x["text"]
-    buttons = x["buttons"]
-
-    await message.reply_html(reply, reply_markup=buttons)
-
 
 # Command:  /random or /rand
 async def randomCommand(u: Update, c):

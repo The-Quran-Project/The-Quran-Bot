@@ -88,17 +88,19 @@ def generateSurahButtons(Quran: QuranClass):
 
     for surahNumber, surahName in enumerate(allSurahNames, start=1):
         buttons = InlineKeyboardButton(
-            f"{surahNumber} {surahName}", callback_data=f"surahName {surahNumber}"
+            f"{surahNumber} {surahName}", callback_data=f"selectedSurah {surahNumber}"
         )
         buttonsCount = len(inlineButtons[-1])
-        pageCount = len(inlineButtons)
+        pagesCount = len(inlineButtons)
 
         if buttonsCount < totalButtonsPerPage:
             inlineButtons[-1].append(buttons)
         else:
             navigationButtons = [
-                InlineKeyboardButton("Previous", callback_data=f"prev {pageCount-1}"),
-                InlineKeyboardButton("Next", callback_data=f"next {pageCount-1}"),
+                InlineKeyboardButton(
+                    "Previous", callback_data=f"prev_page {pagesCount-1}"
+                ),
+                InlineKeyboardButton("Next", callback_data=f"next_page {pagesCount+1}"),
             ]
             inlineButtons[-1] = splitListIntoChunks(inlineButtons[-1])
             inlineButtons[-1].append(navigationButtons)
@@ -107,8 +109,8 @@ def generateSurahButtons(Quran: QuranClass):
 
     if inlineButtons[-1]:
         navigationButtons = [
-            InlineKeyboardButton("Previous", callback_data=f"prev {pageCount-1}"),
-            InlineKeyboardButton("Next", callback_data=f"next {pageCount-1}"),
+            InlineKeyboardButton("Previous", callback_data=f"next_page {pagesCount-1}"),
+            InlineKeyboardButton("Next", callback_data=f"prev_page {pagesCount+1}"),
         ]
         inlineButtons[-1] = splitListIntoChunks(inlineButtons[-1])
         inlineButtons[-1].append(navigationButtons)

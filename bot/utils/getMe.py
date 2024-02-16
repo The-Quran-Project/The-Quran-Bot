@@ -19,7 +19,7 @@ def checkOnInterval(sec: int = 5):
             r = 404
 
         if Counter.count % 10 == 0:
-            print(f"\nStatus Code: {r} @ {datetime.now()}\n")
+            print(f"\nStatus Code: {r} @ {datetime.now():%d-%m-%y %H:%M:%S}\n")
 
         Counter.count += 1
         time.sleep(sec)

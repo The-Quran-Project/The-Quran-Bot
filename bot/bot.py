@@ -63,7 +63,7 @@ def runBot(token):
     app.add_handler(InlineQueryHandler(handleInlineQuery))
     app.add_handler(MessageHandler(filters.Regex(r"/get[a-zA-Z]{2}"), getWithLanguage))
     app.add_handler(
-        MessageHandler(filters.TEXT & filters.ChatType.PRIVATE, handleMessage)
+        MessageHandler(filters.TEXT & ~filters.ChatType.CHANNEL, handleMessage)
     )  # for private chats
     app.add_error_handler(handleErrors)
 

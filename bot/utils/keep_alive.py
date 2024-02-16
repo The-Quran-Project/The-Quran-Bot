@@ -13,6 +13,7 @@ def secondsToTime(s):
     d = int(d)
     h = int(h)
     m = int(m)
+    s = int(s)
 
     result = ""
     if d > 0:

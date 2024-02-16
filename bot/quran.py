@@ -135,11 +135,9 @@ class QuranClass:
     def getSurahNames(self):
         return self.SURAH_NAMES
 
-    def getSurahNameFromNumber(self, ayahNumber: int):
-        ayahNumber = int(ayahNumber) - 1
-
-        name = self.SURAH_NAMES[ayahNumber]
-
+    def getSurahNameFromNumber(self, surahNumber: int):
+        surahNumber = int(surahNumber) - 1
+        name = self.SURAH_NAMES[surahNumber]
         return name
 
     def getAyahNumberCount(self, surahNo: int):
@@ -182,14 +180,29 @@ class QuranClass:
         return data
 
     def detectLanguage(self, text: str):
+        if not text:
+            return None
+        
         text = text.lower()
+        if text == "en2":
+            return "english_2"  # Mufti Taqi Usmani
+
         for lang in self.languages:
             if lang.startswith(text):
                 return lang
         return None
 
     def getAbbr(self, lang):
+        if not lang:
+            return "None"
+
         return self.abbreviations[lang]
 
     def getTitleLanguageFromAbbr(self, abbr):
+        if not abbr or abbr == "None":
+            return None
+
         return self.titleLanguages[abbr]
+
+    def getLanguages(self):
+        return self.titleLanguages.items()

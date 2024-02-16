@@ -2,7 +2,7 @@ from .. import Quran, replies
 from ..database import db
 
 
-def getAyahReplyFromPreference(userID, surahNo, ayahNo, language=None):
+def getAyahReplyFromPreference(surahNo, ayahNo, userID):
     """Returns the reply for the ayah"""
     surah = Quran.getSurahNameFromNumber(surahNo)
     ayah = Quran.getAyah(surahNo, ayahNo)
@@ -24,7 +24,7 @@ def getAyahReplyFromPreference(userID, surahNo, ayahNo, language=None):
     secondaryTitle = Quran.getTitleLanguageFromAbbr(secondaryLanguage)
     otherTitle = Quran.getTitleLanguageFromAbbr(otherLanguage)
 
-    # If the user has a selected font (only for Arabic ), then use the preferred font
+    # If the user has a selected font ( only for Arabic ), then use the preferred font
     # it will be like "arabic_1" or "arabic_2"
     if primary == "arabic":
         primary = f"arabic_{font}"
@@ -39,7 +39,7 @@ Ayah  : <b>{ayahNo} out of {totalAyah}</b>
 """
     template = """
 <u><b>{title}</b></u>
-{ayah}
+<blockquote>{ayah}</blockquote>
 """
     if primary:
         reply += template.format(title=primaryTitle, ayah=ayah[primary])
@@ -49,7 +49,7 @@ Ayah  : <b>{ayahNo} out of {totalAyah}</b>
         reply += template.format(title=otherTitle, ayah=ayah[other])
 
     if showTafsir:
-        tafsir = Quran.getAyah(surahNo, ayahNo).tafsir
+        tafsir = ayah.tafsir
         reply += f"""
 <b>Tafsir:</b> <a href="{tafsir}">Telegraph</a>
 """
@@ -72,8 +72,7 @@ def getAyahReply(surahNo, ayahNo, language):
     if language:
         lang = Quran.detectLanguage(language)
     ayah = Quran.getAyah(surahNo, ayahNo)[lang]
-    print(ayah)
-    reply += f"""
+    reply = f"""
 <u><b>{language}</b></u>
 {ayah}
 """

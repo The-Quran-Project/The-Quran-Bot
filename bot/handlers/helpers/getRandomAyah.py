@@ -1,10 +1,7 @@
-from telegram import Update, Bot
-
 import secrets
 
-
 from .. import Quran
-from ..helpers import getAyahReply, getAyahButton
+from ..helpers import getAyahButton, getAyahReplyFromPreference
 
 
 def getRandomAyah(userID):
@@ -14,6 +11,6 @@ def getRandomAyah(userID):
     randAyah = secrets.randbelow(ayahCount) + 1  # number -> 1 to `ayahCount`
 
     return {
-        "reply": getAyahReply(userID, randSurah, randAyah),
+        "reply": getAyahReplyFromPreference(randSurah, randAyah, userID),
         "buttons": getAyahButton(randSurah, randAyah),
     }

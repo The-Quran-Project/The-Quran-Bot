@@ -31,7 +31,7 @@ class Database:
     def __init__(self) -> None:
         uri = os.environ.get("MONGODB_URI")
         self.client = MongoClient(uri, server_api=ServerApi("1"))
-        self.db = self.client.quranbot_test  # TODO: Change this to quranbot
+        self.db = self.client.quranbot_test  # TODO Change this to quranbot
         self.defaultSettings = {
             "font": 1,  # 1 -> Uthmani, 2 -> Simple
             "showTafsir": True,
@@ -39,6 +39,11 @@ class Database:
             "primary": "ar",
             "secondary": "en",
             "other": None,
+        }
+        self.defaultGroupSettings = {
+            "handleMessages": False, # Sending `x:y` for ayah
+            "allowAudio": True, # Allow sending audio recitations
+            "previewLink": False, # Show preview of the Tafsir link
         }
 
     def getAllUsers(self):
@@ -62,7 +67,7 @@ class Database:
         return user
 
     def addChat(self, chatID: int):
-        chat = {"_id": chatID}
+        chat = {"_id": chatID, "settings": self.defaultGroupSettings}
         self.db.chats.insert_one(chat)
         return chat
 
@@ -77,8 +82,18 @@ class Database:
         settings = {**user["settings"], **settings}
 
         self.db.users.update_one({"_id": userID}, {"$set": {"settings": settings}})
+        return None # self.getUser(userID)
+    
+    def updateChat(self, chatID: int, settings: dict):
+        chat = self.getChat(chatID)
+        if not chat:
+            chat = self.addChat(chatID)
 
-        return self.getUser(userID)
+        settings = {**chat["settings"], **settings}
+
+        self.db.chats.update_one({"_id": chatID}, {"$set": {"settings": settings}})
+
+        return None # self.getChat(chatID)
 
     # def deleteUser(self, userID: int):
     #     return self.db.users.delete_one({"_id": userID})

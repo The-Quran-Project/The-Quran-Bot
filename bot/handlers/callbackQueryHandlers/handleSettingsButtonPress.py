@@ -1,13 +1,8 @@
 from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
 from ..database import db
+from .. import Quran
 
-
-ayahModes = {
-    "1": "Arabic + English",
-    "2": "Arabic Only",
-    "3": "English Only",
-}
 
 arabicStyles = {
     "1": "Uthmani",
@@ -20,23 +15,15 @@ reciterNames = {"1": "Mishary Rashid Al-Afasy", "2": "Abu Bakr Al-Shatri"}
 settingsStateText = """
 <u><b>Settings</b></u>
 
-<b>Ayah Mode</b>: {ayahMode}
-<b>Arabic Style</b>: {font}
-<b>Show Tafsir</b>: {showTafsir}
-<b>Reciter</b>: {reciter}
+<b>Languages:</b>
+- <b>Primary</b>    : {primary}
+- <b>Secondary</b>  : {secondary}
+- <b>Other</b>      : {other}
+
+<b>Arabic Style</b> : {font}
+<b>Show Tafsir</b>  : {showTafsir}
+<b>Reciter</b>      : {reciter}
 """
-
-
-settingsStateButtons = [
-    [
-        InlineKeyboardButton("Ayah Mode", callback_data="settings ayahMode"),
-        InlineKeyboardButton("Arabic Style", callback_data="settings font"),
-    ],
-    [
-        InlineKeyboardButton("Show Tafsir", callback_data="settings showTafsir"),
-        InlineKeyboardButton("Reciter", callback_data="settings reciter"),
-    ],
-]
 
 
 async def handleSettingsButtonPress(u: Update, c):
@@ -46,153 +33,273 @@ async def handleSettingsButtonPress(u: Update, c):
     chatID = u.effective_chat.id
     isGroup = chatID != userID
 
+    homeState = [
+    [
+        InlineKeyboardButton("Languages", callback_data="settings languages"),
+        InlineKeyboardButton("Arabic Style", callback_data="settings font"),
+    ],
+    [
+        InlineKeyboardButton("Tafsir", callback_data="settings showTafsir"),
+        InlineKeyboardButton("Reciter", callback_data="settings reciter"),
+    ],
+]
+
+    if isGroup:
+        return await handleGroupSettingsButtonPress(u, c)
+
     user = db.getUser(userID)
 
     query = u.callback_query
     query_data = query.data
 
     query_data = query_data.split()[1:]
+    method = query_data[0]
 
-    if query_data[0] == "home":
+    if method == "languages":
+        reply = "<b>Select your preferred languages by selecting any of the below:</b>"
+        buttons = [
+            [
+                InlineKeyboardButton("Primary", callback_data="settings primary"),
+                InlineKeyboardButton("Secondary", callback_data="settings secondary"),
+            ],
+            [InlineKeyboardButton("Other", callback_data="settings other")],
+            [
+                InlineKeyboardButton("Back", callback_data="settings home")
+            ],  # Return to the home state
+        ]
+
+    elif method in ("primary", "secondary", "other"):
+        languages = Quran.getLanguages()
+        reply = f"""
+<b>Select your preferred {method.capitalize()} language:</b>
+If you don't want to set any language, select <b>None</b>.
+
+Current Setting: <b>{Quran.getTitleLanguageFromAbbr(user['settings'][method])}</b>
+"""
+        buttons = [[]]
+
+        for abbr, lang in languages:
+            if len(buttons[-1]) == 2:
+                buttons.append([])
+            buttons[-1].append(
+                InlineKeyboardButton(
+                    lang, callback_data=f"settings set {method} {abbr}"
+                )
+            )
+
+        if len(buttons[-1]) == 1:
+            buttons[-1].append(
+                InlineKeyboardButton(
+                    "None", callback_data=f"settings set {method} None"
+                )
+            )
+
+        buttons.append(
+            [InlineKeyboardButton("Back", callback_data="settings languages")]
+        )
+
+    elif method == "set":
+        setting = query_data[1]
+        title = Quran.getTitleLanguageFromAbbr(query_data[2])
+        
+        otherLanguages = (i for i in ("primary", "secondary", "other") if i != setting)
+
+        if title == None and all(user["settings"][i] == "None" for i in otherLanguages):
+            reply = "You can't set all of the languages to None. At least one language should be set."
+            await query.answer(reply, show_alert=True)
+            buttons = homeState
+        else:
+            user["settings"][setting] = query_data[2]
+            db.updateUser(userID, user["settings"])
+            reply = f"Your preferred <b>{setting}</b> language has been set to <b>{title}</b>"
+            buttons = homeState
+
+    elif method == "font":
+        if len(query_data) == 1:
+            reply = f"""
+<b>Select your preferred Arabic font style:</b>
+
+Uthmani : بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
+Simple  : بسم الله الرحمن الرحيم
+
+Current Setting: <b>{arabicStyles[str(user['settings']['font'])]}</b>
+"""
+            buttons = [
+                [
+                    InlineKeyboardButton("Uthmani", callback_data="settings font 1"),
+                    InlineKeyboardButton("Simple", callback_data="settings font 2"),
+                ],
+                [InlineKeyboardButton("Back", callback_data="settings home")],
+            ]
+        else:
+            user["settings"]["font"] = int(query_data[1])
+            db.updateUser(userID, user["settings"])
+            reply = f"Your preferred Arabic font style has been set to <b>{arabicStyles[str(user['settings']['font'])]}</b>"
+            buttons = homeState
+
+    elif method == "showTafsir":
+        if len(query_data) == 1:
+            reply = f"""
+<b>Select whether you want to see Tafsir in the ayah:</b>
+
+Current Setting: <b>{["No", "Yes"][user['settings']['showTafsir']]}</b>
+"""
+            buttons = [
+                [
+                    InlineKeyboardButton("Yes", callback_data="settings showTafsir 1"),
+                    InlineKeyboardButton("No", callback_data="settings showTafsir 0"),
+                ],
+                [InlineKeyboardButton("Back", callback_data="settings home")],
+            ]
+        else:
+            user["settings"]["showTafsir"] = int(query_data[1])
+            db.updateUser(userID, user["settings"])
+            reply = f"Show Tafsir has been set to <b>{['No', 'Yes'][user['settings']['showTafsir']]}</b>"
+            buttons = homeState
+
+    elif method == "reciter":
+        if len(query_data) == 1:
+            reply = f"""
+<b>Select your preferred reciter:</b>
+
+Current Setting: <b>{reciterNames[str(user['settings']['reciter'])]}</b>
+"""
+            buttons = [
+                [
+                    InlineKeyboardButton(
+                        "Mishary Rashid Al-Afasy", callback_data="settings reciter 1"
+                    ),
+                    InlineKeyboardButton(
+                        "Abu Bakr Al-Shatri", callback_data="settings reciter 2"
+                    ),
+                ],
+                [InlineKeyboardButton("Back", callback_data="settings home")],
+            ]
+        else:
+            user["settings"]["reciter"] = int(query_data[1])
+            db.updateUser(userID, user["settings"])
+            reply = f"Your preferred reciter has been set to <b>{reciterNames[str(user['settings']['reciter'])]}</b>"
+            buttons = homeState
+
+    elif method == "home":
         reply = settingsStateText.format(
-            ayahMode=ayahModes[str(user["settings"]["ayahMode"])],
+            primary=Quran.getTitleLanguageFromAbbr(user["settings"]["primary"]),
+            secondary=Quran.getTitleLanguageFromAbbr(user["settings"]["secondary"]),
+            other=Quran.getTitleLanguageFromAbbr(user["settings"]["other"]),
             font=arabicStyles[str(user["settings"]["font"])],
             showTafsir=["No", "Yes"][user["settings"]["showTafsir"]],
             reciter=reciterNames[str(user["settings"]["reciter"])],
         )
-        await message.edit_text(
-            reply, reply_markup=InlineKeyboardMarkup(settingsStateButtons)
-        )
+        buttons = homeState
 
-    elif query_data[0] == "set":
-        option, value = query_data[1:]
-        newSettings = user["settings"]
+    await message.edit_text(reply, reply_markup=InlineKeyboardMarkup(buttons))
 
-        if option == "ayahMode":
-            newSettings["ayahMode"] = int(value)
-        elif option == "font":
-            newSettings["font"] = int(value)
-        elif option == "showTafsir":
-            newSettings["showTafsir"] = bool(int(value))
-        elif option == "reciter":
-            newSettings["reciter"] = int(value)
 
-        reply = settingsStateText.format(
-            ayahMode=ayahModes[str(user["settings"]["ayahMode"])],
-            font=arabicStyles[str(user["settings"]["font"])],
-            showTafsir=["No", "Yes"][user["settings"]["showTafsir"]],
-            reciter=reciterNames[str(user["settings"]["reciter"])],
-        )
-        await message.edit_text(
-            reply, reply_markup=InlineKeyboardMarkup(settingsStateButtons)
-        )
 
-        await query.answer("Settings Updated")
-        db.updateUser(userID, newSettings)
 
-    elif query_data[0] == "ayahMode":
-        ayahMode = user["settings"]["ayahMode"]
-        reply = f"""
-<u><b>Change Ayah Mode</b></u>
+async def handleGroupSettingsButtonPress(u: Update, c):
+    """Handles the settings buttons press in a group"""
+    message = u.effective_message
+    userID = u.effective_user.id
+    chatID = u.effective_chat.id
+    homeStateGroup = [
+    [
+        InlineKeyboardButton("Handle Messages", callback_data=f"settings handleMessages {userID}"),
+        InlineKeyboardButton("Allow Audio", callback_data=f"settings allowAudio {userID}"),
+    ],
+    [
+        InlineKeyboardButton("Preview Link", callback_data=f"settings previewLink {userID}"),
+        InlineKeyboardButton("Close", callback_data=f"close {userID}")
+    ],
+]
 
-<b>Ayah Mode</b>: {ayahModes[str(ayahMode)]}
+    chat = db.getChat(chatID)
+    settings = chat["settings"]
+    query = u.callback_query
+    query_data = query.data    
 
-<b>-------------------------</b>
+    query_data = query_data.split()[1:-1]
+    method = query_data[0]
 
-<b>Arabic + English</b>: Show Arabic and English Ayah
-<b>Arabic Only</b>: Show only Arabic Ayah
-<b>English Only</b>: Show only English Ayah
+    if method == "handleMessages":
+        if len(query_data) == 1:
+            reply = f"""
+<b>Select whether you want to handle messages in this group:</b>
+
+Current Setting: <b>{["No", "Yes"][settings['handleMessages']]}</b>
+
+<b>Yes</b>: Members can send `x:y` to get the ayah
+<b>No</b>: Members needs to send send `/get x:y` to get the ayah
 """
-        buttons = [
-            [
-                InlineKeyboardButton(
-                    "Arabic + English", callback_data="settings set ayahMode 1"
-                ),
-                InlineKeyboardButton(
-                    "Arabic Only", callback_data="settings set ayahMode 2"
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    "English Only", callback_data="settings set ayahMode 3"
-                ),
-            ],
-            [
-                InlineKeyboardButton("Go Back", callback_data="settings home"),
-            ],
-        ]
-        await message.edit_text(reply, reply_markup=InlineKeyboardMarkup(buttons))
+            buttons = [
+                [
+                    InlineKeyboardButton("Yes", callback_data=f"settings handleMessages 1 {userID}"),
+                    InlineKeyboardButton("No", callback_data=f"settings handleMessages 0 {userID}"),
+                ],
+                [InlineKeyboardButton("Back", callback_data=f"settings home {userID}")],
+            ]
+        else:
+            settings["handleMessages"] = int(query_data[1])
+            db.updateChat(chatID, settings)
+            reply = f"Handling messages has been set to <b>{['No', 'Yes'][settings['handleMessages']]}</b>"
+            buttons = homeStateGroup
 
-    elif query_data[0] == "font":
-        font = user["settings"]["font"]
-        reply = f"""
-<u><b>Change Arabic Style</b></u>
+    elif method == "allowAudio":
+        if len(query_data) == 1:
+            reply = f"""
+<b>Select whether you want to allow sending audio recitations in this group:</b>
 
-<b>Arabic Style</b>: {arabicStyles[str(font)]}
+Current Setting: <b>{["No", "Yes"][settings['allowAudio']]}</b>
 
-<b>-------------------------</b>
-
-<b>Uthmani</b>: With Harakat
-<b>Simple</b>: Without Harakat
+<b>Yes</b>: Bot will send audio files if asked for
+<b>No</b>: Bot will not send audio files if asked for
 """
-        buttons = [
-            [
-                InlineKeyboardButton("Uthmani", callback_data="settings set font 1"),
-                InlineKeyboardButton("Simple", callback_data="settings set font 2"),
-            ],
-            [
-                InlineKeyboardButton("Go Back", callback_data="settings home"),
-            ],
-        ]
-        await message.edit_text(reply, reply_markup=InlineKeyboardMarkup(buttons))
+            buttons = [
+                [
+                    InlineKeyboardButton("Yes", callback_data=f"settings allowAudio 1 {userID}"),
+                    InlineKeyboardButton("No", callback_data=f"settings allowAudio 0 {userID}"),
+                ],
+                [InlineKeyboardButton("Back", callback_data=f"settings home {userID}")],
+            ]
+        else:
+            settings["allowAudio"] = int(query_data[1])
+            db.updateChat(chatID, settings)
+            reply = f"Allowing audio has been set to <b>{['No', 'Yes'][settings['allowAudio']]}</b>"
+            buttons = homeStateGroup
+    
+    elif method == "previewLink":
+        if len(query_data) == 1:
+            reply = f"""
+<b>Select whether you want to show preview of the Tafsir link in this group:</b>
 
-    elif query_data[0] == "showTafsir":
-        showTafsir = user["settings"]["showTafsir"]
-        reply = f"""
-<u><b>Change Show Tafsir</b></u>
+Current Setting: <b>{["No", "Yes"][settings['previewLink']]}</b>
 
-<b>Show Tafsir</b>: {["No", "Yes"][showTafsir]}
+<b>Yes</b>: Bot will show the preview of the Tafsir link
+<b>No</b>: Bot will not show the preview of the Tafsir link
 
-<b>-------------------------</b>
-
-<b>Yes</b>: Show Tafsir with Ayah
-<b>No</b>: Don't show Tafsir with Ayah
+The preview will be like <a href="https://telegra.ph/Tafsir-of-1-1-06-03-4">this</a>
 """
-        buttons = [
-            [
-                InlineKeyboardButton("No", callback_data="settings set showTafsir 0"),
-                InlineKeyboardButton("Yes", callback_data="settings set showTafsir 1"),
-            ],
-            [
-                InlineKeyboardButton("Go Back", callback_data="settings home"),
-            ],
-        ]
-        await message.edit_text(reply, reply_markup=InlineKeyboardMarkup(buttons))
-
-    elif query_data[0] == "reciter":
+            buttons = [
+                [
+                    InlineKeyboardButton("Yes", callback_data=f"settings previewLink 1 {userID}"),
+                    InlineKeyboardButton("No", callback_data=f"settings previewLink 0 {userID}"),
+                ],
+                [InlineKeyboardButton("Back", callback_data=f"settings home {userID}")],
+            ]
+        else:
+            settings["previewLink"] = int(query_data[1])
+            db.updateChat(chatID, settings)
+            reply = f"Preview link has been set to <b>{['No', 'Yes'][settings['previewLink']]}</b>"
+            buttons = homeStateGroup
+    
+    elif method == "home":
         reply = f"""
-<u><b>Change Reciter</b></u>
+<u><b>Group Settings</b></u>
 
-<b>Reciter</b>: {reciterNames[str(user["settings"]["reciter"])]}
-
-<b>-------------------------</b>
-
-<b>1</b>: Mishary Rashid Al-Afasy
-
-<b>2</b>: Abu Bakr Al-Shatri
-
+<b>Handle Messages</b>: {["No", "Yes"][settings['handleMessages']]}
+<b>Allow Audio</b>: {["No", "Yes"][settings['allowAudio']]}
+<b>Preview Link</b>: {["No", "Yes"][settings['previewLink']]}
 """
-        buttons = [
-            [
-                InlineKeyboardButton(
-                    "Mishary Rashid Al-Afasy", callback_data="settings set reciter 1"
-                ),
-                InlineKeyboardButton(
-                    "Abu Bakr Al-Shatri", callback_data="settings set reciter 2"
-                ),
-            ],
-            [
-                InlineKeyboardButton("Go Back", callback_data="settings home"),
-            ],
-        ]
-        await message.edit_text(reply, reply_markup=InlineKeyboardMarkup(buttons))
+        buttons = homeStateGroup
+
+    await message.edit_text(reply, reply_markup=InlineKeyboardMarkup(buttons))
