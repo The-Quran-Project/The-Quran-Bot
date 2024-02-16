@@ -39,10 +39,12 @@ async def handleErrors(u: Update, c: CallbackContext):
     caption = f"""
 <b><u>Error {'❎' if messageSendingError else ''}</u></b>
 
-<b>Chat ID:</b> <code>{u.effective_chat.id if u.effective_chat else None}</code>
-<b>User ID:</b> <code>{u.effective_user.id}</code>
-<b>User:</b> <a href="tg://user?id={u.effective_user.id}">{escape(u.effective_user.first_name)}</a>
-<b>Username: @{u.effective_user.username}</b>
+<b>Chat ID  :</b> <code>{u.effective_chat.id if u.effective_chat else None}</code>
+<b>User ID  :</b> <code>{u.effective_user.id}</code>
+<b>User     :</b> <a href="tg://user?id={u.effective_user.id}">{escape(u.effective_user.first_name)}</a>
+<b>Username : @{u.effective_user.username}</b>
+<b>Message ID :</b> <code>{u.effective_message.message_id}</code>
+<b>Timestamp  :</b> <code>{u.effective_message.date} UTC</code>
 """
 
     admins = db.getAllAdmins()
