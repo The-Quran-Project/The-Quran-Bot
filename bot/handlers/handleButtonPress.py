@@ -51,11 +51,14 @@ async def handleButtonPress(u: Update, c):
     elif method == "audio":
         if chatID != userID:
             permissions = await bot.getChatMember(chatID, bot.id)
-            if not permissions.can_send_audios:
-                return await query.answer(
-                    "I don't have permission to send audio messages in this group",
-                    show_alert=True,
-                )
+            try:
+                if not permissions.can_send_audios:
+                    return await query.answer(
+                        "I don't have permission to send audio messages in this group",
+                        show_alert=True,
+                    )
+            except Exception as e:
+                print(e)
 
             allowAudio = chat["settings"]["allowAudio"]
             if not allowAudio:
