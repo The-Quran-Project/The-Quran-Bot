@@ -16,6 +16,7 @@ async def handleErrors(u: Update, c: CallbackContext):
 
     if not u:
         return
+    print(u)
     print("--- Error Occurred ---")
     tbList = traceback.format_exception(None, c.error, c.error.__traceback__)
     tbString = "".join(tbList)
@@ -38,7 +39,7 @@ async def handleErrors(u: Update, c: CallbackContext):
     caption = f"""
 <b><u>Error {'❎' if messageSendingError else ''}</u></b>
 
-<b>Chat ID:</b> <code>{u.effective_chat.id}</code>
+<b>Chat ID:</b> <code>{u.effective_chat.id if u.effective_chat else None}</code>
 <b>User ID:</b> <code>{u.effective_user.id}</code>
 <b>User:</b> <a href="tg://user?id={u.effective_user.id}">{escape(u.effective_user.first_name)}</a>
 <b>Username: @{u.effective_user.username}</b>
@@ -55,17 +56,20 @@ async def handleErrors(u: Update, c: CallbackContext):
         chatID = admin["_id"]
         try:
             # forward the message the user sent
-            m: Message = await bot.forwardMessage(
-                chatID,
-                u.effective_chat.id,
-                u.effective_message.message_id,
-            )
+            msgID = None
+            if u.effective_chat:
+                msgID: Message = (await bot.forwardMessage(
+                    chatID,
+                    u.effective_chat.id,
+                    u.effective_message.message_id,
+                )).message_id
+                
             await bot.sendDocument(
                 chatID,
                 BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
-                filename=f"error-{u.effective_chat.id}.json",
+                filename=f"error-{u.effective_user.id}.json",
                 caption=caption,
-                reply_to_message_id=m.message_id,
+                reply_to_message_id=msgID,
             )
         except Exception as e:
             print(f"Error while sending error report to {admin}: {e}")

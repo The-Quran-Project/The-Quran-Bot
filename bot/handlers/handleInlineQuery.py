@@ -9,7 +9,7 @@ from telegram import (
 
 from . import Quran
 from .database import db
-from .helpers import getAyahReply
+from .helpers import getAyahReplyFromPreference
 
 
 async def handleInlineQuery(u: Update, c):
@@ -40,6 +40,7 @@ async def handleInlineQuery(u: Update, c):
         return
 
     sep = query.split(":")
+
     if "" in sep:
         sep.remove("")
 
@@ -57,7 +58,7 @@ async def handleInlineQuery(u: Update, c):
         await u.inline_query.answer(res)
         return
 
-    surahNo, ayahNo, *ext = sep
+    surahNo, ayahNo = sep
 
     surahNo = surahNo.strip()
     ayahNo = ayahNo.strip()
@@ -110,7 +111,7 @@ async def handleInlineQuery(u: Update, c):
         return
 
     surahName = Quran.getSurahNameFromNumber(surahNo)
-    reply = getAyahReply(userID, surahNo, ayahNo)
+    reply = getAyahReplyFromPreference(surahNo, ayahNo, userID)
     buttons = InlineKeyboardMarkup(
         [
             [
