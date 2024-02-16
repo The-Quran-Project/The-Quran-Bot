@@ -35,7 +35,9 @@ howToUse = """
 /settings - Change your settings
 /surah - The list of all the Surahs
 /get x:y - Get the ayah x from Surah y
-/<lang> x:y - Get the ayah x from Surah y in the language <lang>
+/&lt;lang&gt; x:y - Get the ayah x from Surah y in the language &lt;lang&gt;
+
+
 /langs, /languages, /translations - Get the list of all the available translations
 /rand, /random - Get a random ayah
 /tafsir x:y - Get the Tafsir of ayah x from Surah y
