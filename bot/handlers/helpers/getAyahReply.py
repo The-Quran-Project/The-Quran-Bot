@@ -13,48 +13,46 @@ def getAyahReplyFromPreference(userID, surahNo, ayahNo, language=None):
     primaryLanguage = settings["primary"]
     secondaryLanguage = settings["secondary"]
     otherLanguage = settings["other"]
-    arabicStyle = settings["arabicStyle"]
+    font = settings["font"]
     showTafsir = settings["showTafsir"]
 
-    arabic = f"""
-<u><b>Arabic</b></u>
-{ayah.arabic1 if arabicStyle == 1 else ayah.arabic2}
+    primary = Quran.detectLanguage(primaryLanguage)
+    secondary = Quran.detectLanguage(secondaryLanguage)
+    other = Quran.detectLanguage(otherLanguage)
+
+    primaryTitle = Quran.getTitleLanguageFromAbbr(primaryLanguage)
+    secondaryTitle = Quran.getTitleLanguageFromAbbr(secondaryLanguage)
+    otherTitle = Quran.getTitleLanguageFromAbbr(otherLanguage)
+
+    # If the user has a selected font (only for Arabic ), then use the preferred font
+    # it will be like "arabic_1" or "arabic_2"
+    if primary == "arabic":
+        primary = f"arabic_{font}"
+    if secondary == "arabic":
+        secondary = f"arabic_{font}"
+    if other == "arabic":
+        other = f"arabic{font}"
+
+    reply = f"""
+Surah : <b>{surah} ({surahNo})</b>
+Ayah  : <b>{ayahNo} out of {totalAyah}</b>
 """
-
-    english = f"""
-<u><b>English</b></u>
-{ayah.english}
+    template = """
+<u><b>{title}</b></u>
+{ayah}
 """
-
-    tafsir = f"""
-<u><b>Tafsir</b></u>
-<b>Read Here: <a href="{ayah.tafsir}">Telegraph</a></b>
-"""
-
-    reply = replies.sendAyah.format(
-        surahName=surah,
-        surahNo=surahNo,
-        ayahNo=ayahNo,
-        totalAyah=totalAyah,
-    )
-
-    return "Hello From Preference"
-
-    if language:
-        reply += {
-            "en": english,
-            "ar": arabic,
-        }[language]
-
-    elif ayahMode == 1:
-        reply += arabic + english
-    elif ayahMode == 2:
-        reply += arabic
-    elif ayahMode == 3:
-        reply += english
+    if primary:
+        reply += template.format(title=primaryTitle, ayah=ayah[primary])
+    if secondary:
+        reply += template.format(title=secondaryTitle, ayah=ayah[secondary])
+    if other:
+        reply += template.format(title=otherTitle, ayah=ayah[other])
 
     if showTafsir:
-        reply += tafsir
+        tafsir = Quran.getAyah(surahNo, ayahNo).tafsir
+        reply += f"""
+<b>Tafsir:</b> <a href="{tafsir}">Telegraph</a>
+"""
 
     return reply
 
@@ -71,5 +69,12 @@ def getAyahReply(surahNo, ayahNo, language):
         ayahNo=ayahNo,
         totalAyah=totalAyah,
     )
-    ayah = Quran.getAyah(surahNo, ayahNo)
-    print(language)
+    if language:
+        lang = Quran.detectLanguage(language)
+    ayah = Quran.getAyah(surahNo, ayahNo)[lang]
+    print(ayah)
+    reply += f"""
+<u><b>{language}</b></u>
+{ayah}
+"""
+    return reply

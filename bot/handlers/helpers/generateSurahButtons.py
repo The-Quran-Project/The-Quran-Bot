@@ -68,7 +68,7 @@ def generateSurahButtons(Quran: QuranClass):
         ]
     """
     inlineButtons = [[]]
-    allSurahNames = Quran.SURAH_NAMES
+    allSurahNames = Quran.getSurahNames()
 
     # A Matrix of 11 x 3 per page
     # | 1  | 2  | 3  |

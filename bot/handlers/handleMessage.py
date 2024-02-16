@@ -67,8 +67,7 @@ baqarah</b>
     buttons = []
     for surah, number in res:
         buttons.append(
-            InlineKeyboardButton(f"{number} {surah}",
-                                 callback_data=f"surah {number}")
+            InlineKeyboardButton(f"{number} {surah}", callback_data=f"surah {number}")
         )
 
     buttons = InlineKeyboardMarkup([buttons])

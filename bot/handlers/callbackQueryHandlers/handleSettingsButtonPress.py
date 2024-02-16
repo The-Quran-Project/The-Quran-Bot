@@ -21,7 +21,7 @@ settingsStateText = """
 <u><b>Settings</b></u>
 
 <b>Ayah Mode</b>: {ayahMode}
-<b>Arabic Style</b>: {arabicStyle}
+<b>Arabic Style</b>: {font}
 <b>Show Tafsir</b>: {showTafsir}
 <b>Reciter</b>: {reciter}
 """
@@ -30,7 +30,7 @@ settingsStateText = """
 settingsStateButtons = [
     [
         InlineKeyboardButton("Ayah Mode", callback_data="settings ayahMode"),
-        InlineKeyboardButton("Arabic Style", callback_data="settings arabicStyle"),
+        InlineKeyboardButton("Arabic Style", callback_data="settings font"),
     ],
     [
         InlineKeyboardButton("Show Tafsir", callback_data="settings showTafsir"),
@@ -56,7 +56,7 @@ async def handleSettingsButtonPress(u: Update, c):
     if query_data[0] == "home":
         reply = settingsStateText.format(
             ayahMode=ayahModes[str(user["settings"]["ayahMode"])],
-            arabicStyle=arabicStyles[str(user["settings"]["arabicStyle"])],
+            font=arabicStyles[str(user["settings"]["font"])],
             showTafsir=["No", "Yes"][user["settings"]["showTafsir"]],
             reciter=reciterNames[str(user["settings"]["reciter"])],
         )
@@ -70,8 +70,8 @@ async def handleSettingsButtonPress(u: Update, c):
 
         if option == "ayahMode":
             newSettings["ayahMode"] = int(value)
-        elif option == "arabicStyle":
-            newSettings["arabicStyle"] = int(value)
+        elif option == "font":
+            newSettings["font"] = int(value)
         elif option == "showTafsir":
             newSettings["showTafsir"] = bool(int(value))
         elif option == "reciter":
@@ -79,7 +79,7 @@ async def handleSettingsButtonPress(u: Update, c):
 
         reply = settingsStateText.format(
             ayahMode=ayahModes[str(user["settings"]["ayahMode"])],
-            arabicStyle=arabicStyles[str(user["settings"]["arabicStyle"])],
+            font=arabicStyles[str(user["settings"]["font"])],
             showTafsir=["No", "Yes"][user["settings"]["showTafsir"]],
             reciter=reciterNames[str(user["settings"]["reciter"])],
         )
@@ -123,12 +123,12 @@ async def handleSettingsButtonPress(u: Update, c):
         ]
         await message.edit_text(reply, reply_markup=InlineKeyboardMarkup(buttons))
 
-    elif query_data[0] == "arabicStyle":
-        arabicStyle = user["settings"]["arabicStyle"]
+    elif query_data[0] == "font":
+        font = user["settings"]["font"]
         reply = f"""
 <u><b>Change Arabic Style</b></u>
 
-<b>Arabic Style</b>: {arabicStyles[str(arabicStyle)]}
+<b>Arabic Style</b>: {arabicStyles[str(font)]}
 
 <b>-------------------------</b>
 
@@ -137,12 +137,8 @@ async def handleSettingsButtonPress(u: Update, c):
 """
         buttons = [
             [
-                InlineKeyboardButton(
-                    "Uthmani", callback_data="settings set arabicStyle 1"
-                ),
-                InlineKeyboardButton(
-                    "Simple", callback_data="settings set arabicStyle 2"
-                ),
+                InlineKeyboardButton("Uthmani", callback_data="settings set font 1"),
+                InlineKeyboardButton("Simple", callback_data="settings set font 2"),
             ],
             [
                 InlineKeyboardButton("Go Back", callback_data="settings home"),

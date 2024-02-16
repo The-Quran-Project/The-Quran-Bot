@@ -42,7 +42,7 @@ async def updateSettings(u: Update, c):
 
     ayahMode = settings["ayahMode"]
 
-    arabicStyle = settings["arabicStyle"]
+    font = settings["font"]
 
     showTafsir = settings["showTafsir"]
 
@@ -56,7 +56,7 @@ async def updateSettings(u: Update, c):
 
 <b>Ayah Mode</b>: {ayahModes[str(ayahMode)]}
 
-<b>Arabic Style</b>: {arabicStyles[str(arabicStyle)]}
+<b>Arabic Style</b>: {arabicStyles[str(font)]}
 
 <b>Show Tafsir</b>: {["No", "Yes"][showTafsir]}
 
@@ -67,7 +67,7 @@ async def updateSettings(u: Update, c):
     buttons = [
         [
             InlineKeyboardButton("Ayah Mode", callback_data="settings ayahMode"),
-            InlineKeyboardButton("Arabic Style", callback_data="settings arabicStyle"),
+            InlineKeyboardButton("Arabic Style", callback_data="settings font"),
         ],
         [
             InlineKeyboardButton("Show Tafsir", callback_data="settings showTafsir"),
