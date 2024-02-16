@@ -133,14 +133,14 @@ Available languages are:
 {', '.join(availableLanguages)}
 </blockquote>
 """
-        await message.reply_html(reply, quote=True)
+        await message.reply_html(reply)
         return
 
     x = getValidReply(userID, text, language)
     reply = x["text"]
     buttons = x["buttons"]
 
-    await message.reply_html(reply, reply_markup=buttons, quote=True)
+    await message.reply_html(reply, reply_markup=buttons)
 
 
 # Command:  /random or /rand
@@ -178,8 +178,7 @@ async def audioCommand(u: Update, c):
 
     await message.reply_audio(
         f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{
-            surah}_{ayah}.mp3""",
-        quote=True,
+            surah}_{ayah}.mp3"""
     )
 
 
@@ -204,6 +203,18 @@ async def tafsirCommand(u: Update, c):
     ayah = ayah.strip()
 
     tafsir = Quran.getAyah(surah, ayah).tafsir
-    await message.reply_html(
-        f"<b>Tafsir:</b> <a href='{tafsir}'>Telegraph</a>", quote=True
-    )
+    await message.reply_html(f"<b>Tafsir:</b> <a href='{tafsir}'>Telegraph</a>")
+
+
+# Command:  /translations
+async def translationsCommand(u: Update, c):
+    """Sends the list of all the available translations to the user"""
+    message = u.effective_message
+    reply = f"""
+<b>Available Translations:</b>
+
+<blockquote>\
+{', '.join([i[1] for i in Quran.getLanguages()])}
+</blockquote>
+"""
+    await message.reply_html(reply)

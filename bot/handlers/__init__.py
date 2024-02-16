@@ -34,6 +34,7 @@ from .commands import (
     audioCommand,
     tafsirCommand,
     randomCommand,
+    translationsCommand,
 )
 from .others import (
     pingCommand,

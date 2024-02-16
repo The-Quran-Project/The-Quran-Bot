@@ -14,9 +14,7 @@ TOKEN = os.environ.get("TOKEN") if not LOCAL else os.environ.get("TEST")
 
 
 def runBot(token):
-    df = Defaults(
-        parse_mode=constants.ParseMode.HTML, block=False, disable_web_page_preview=False
-    )
+    df = Defaults(parse_mode=constants.ParseMode.HTML, block=False, quote=True)
 
     app = (
         ApplicationBuilder()
@@ -43,8 +41,12 @@ def runBot(token):
         "get": getCommand,
         "audio": audioCommand,
         "tafsir": tafsirCommand,
-        "random": randomCommand,
-        "rand": randomCommand,
+        ("random", "rand"): randomCommand,
+        (
+            "translations",
+            "langs",
+            "languages",
+        ): translationsCommand,  # "languages" is an alias for "translations"
         "settings": updateSettings,
     }
     adminCommands = {
@@ -54,6 +56,11 @@ def runBot(token):
     }
 
     for cmd, handler in commands.items():
+        if type(cmd) == list:
+            for alias in cmd:
+                app.add_handler(CommandHandler(alias, handler))
+            continue
+
         app.add_handler(CommandHandler(cmd, handler))
 
     for cmd, handler in adminCommands.items():
@@ -63,7 +70,9 @@ def runBot(token):
     app.add_handler(InlineQueryHandler(handleInlineQuery))
     app.add_handler(
         MessageHandler(
-            filters.Regex(r"^\/([A-Za-z]{1,10})\s(\d+)\s?:\s?(\d+)$"), # match: /<lang> <surah>:<ayah>
+            filters.Regex(
+                r"^\/([A-Za-z]{1,10})\s(\d+)\s?:\s?(\d+)$"
+            ),  # match: /<lang> <surah>:<ayah>
             getTranslationCommand,
         )
     )
