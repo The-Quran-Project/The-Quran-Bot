@@ -174,6 +174,9 @@ async def handleButtonPress(u: Update, c):
             reply = getAyahReplyFromPreference(surahNo, ayahNo, userID)
             buttons = getAyahButton(surahNo, ayahNo, userID)
 
+    if not reply:
+        return await query.answer("Maybe it was an old message?", show_alert=True)
+
     await message.edit_text(
         reply, reply_markup=buttons, disable_web_page_preview=1 - previewLink
     )
