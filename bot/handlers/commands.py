@@ -1,3 +1,5 @@
+import html
+
 from telegram import Update, Message, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
 from . import Quran
@@ -5,6 +7,9 @@ from .database import db
 from . import Constants, replies
 from .helpers import getRandomAyah, getValidReply
 
+
+def escapeHTML(text: str) -> str:
+    return html.escape(str(text))
 
 # Command:  /start
 async def startCommand(u: Update, c):
@@ -14,7 +19,7 @@ async def startCommand(u: Update, c):
     userID = u.effective_user.id
     fn = u.effective_user.first_name
     url = "https://github.com/The-Quran-Project/TG-Quran-Bot"
-    reply = replies.start.format(firstName=fn, repoURL=url)
+    reply = replies.start.format(firstName=escapeHTML(fn), repoURL=url)
 
     buttons = InlineKeyboardMarkup([[InlineKeyboardButton("Github", url=url)]])
 
