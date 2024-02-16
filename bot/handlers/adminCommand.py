@@ -40,7 +40,7 @@ async def adminCommand(u: Update, c):
 
 <b>Commands:</b>
 /forward <code>chatID</code> [ Reply to a message ]
-/get <code>chatID</code> [ Reply to a message ]
+/getUser <code>chatID</code> [ Reply to a message ]
 """
     buttons = InlineKeyboardMarkup(buttons)
 
