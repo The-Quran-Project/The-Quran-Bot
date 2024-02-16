@@ -1,7 +1,7 @@
-from dotenv import load_dotenv
-
 import os
 import multiprocessing
+
+from dotenv import load_dotenv
 
 from bot import startBot
 from bot.utils import checkOnInterval

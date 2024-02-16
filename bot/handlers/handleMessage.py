@@ -1,11 +1,11 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-
 import html
 import string
 
-from .helpers import getValidReply, getAyahReply, getAyahButton
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+
 from . import Quran
 from .database import db
+from .helpers import getValidReply, getAyahReply, getAyahButton
 
 
 def escapeHTML(text: str):

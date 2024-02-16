@@ -1,8 +1,10 @@
-from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
-from dotenv import load_dotenv
-
 import os
+
+
+from dotenv import load_dotenv
+from pymongo.server_api import ServerApi
+from pymongo.mongo_client import MongoClient
+
 
 
 load_dotenv()
@@ -31,7 +33,7 @@ class Database:
     def __init__(self) -> None:
         uri = os.environ.get("MONGODB_URI")
         self.client = MongoClient(uri, server_api=ServerApi("1"))
-        self.db = self.client.quranbot_test  # TODO Change this to quranbot
+        self.db = self.client.quranbot  # TODO Change this to quranbot
         self.defaultSettings = {
             "font": 1,  # 1 -> Uthmani, 2 -> Simple
             "showTafsir": True,

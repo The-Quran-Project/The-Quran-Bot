@@ -1,10 +1,9 @@
 from telegram import Update, InlineKeyboardMarkup
 
-from .helpers import getAyahReply, getAyahReplyFromPreference, getAyahButton
-from . import Constants
 from . import Quran
+from . import Constants
 from .database import db
-
+from .helpers import getAyahReply, getAyahReplyFromPreference, getAyahButton
 from .callbackQueryHandlers import handleSettingsButtonPress, handleAdminButtonPress
 
 

@@ -1,9 +1,9 @@
 from telegram import Update, Message, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
-from .helpers import getRandomAyah, getValidReply
-from . import Constants, replies
 from . import Quran
 from .database import db
+from . import Constants, replies
+from .helpers import getRandomAyah, getValidReply
 
 
 # Command:  /start

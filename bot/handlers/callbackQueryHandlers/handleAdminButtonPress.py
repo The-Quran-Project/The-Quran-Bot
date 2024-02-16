@@ -1,7 +1,7 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+import json
 
 from io import BytesIO
-import json
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 
 from ..database import db
 

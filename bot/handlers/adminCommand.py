@@ -1,6 +1,6 @@
-from telegram import Update, Message, Bot, InlineKeyboardButton, InlineKeyboardMarkup
-
 import html
+
+from telegram import Update, Message, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
 from .database import db
 

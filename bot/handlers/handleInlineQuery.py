@@ -1,3 +1,4 @@
+from uuid import uuid4
 from telegram import (
     Update,
     InlineKeyboardButton,
@@ -6,11 +7,9 @@ from telegram import (
     InlineQueryResultArticle,
 )
 
-from uuid import uuid4
-
 from . import Quran
-from .helpers import getAyahReply
 from .database import db
+from .helpers import getAyahReply
 
 
 async def handleInlineQuery(u: Update, c):
