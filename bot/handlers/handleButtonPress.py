@@ -1,4 +1,4 @@
-from telegram import Update, InlineKeyboardMarkup
+from telegram import Update, Bot, InlineKeyboardMarkup
 
 from . import Quran
 from . import Constants
@@ -9,6 +9,7 @@ from .callbackQueryHandlers import handleSettingsButtonPress, handleAdminButtonP
 
 async def handleButtonPress(u: Update, c):
     """Handles all the buttons presses / callback queries"""
+    bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id
@@ -47,6 +48,20 @@ async def handleButtonPress(u: Update, c):
         return await message.delete()
 
     elif method == "audio":
+        if chatID != userID:
+            permissions = await bot.getChatMember(chatID, bot.id)
+            if not permissions.can_send_audios:
+                return await query.answer(
+                    "I don't have permission to send audio messages in this group",
+                    show_alert=True,
+                )
+
+            allowAudio = chat["settings"]["allowAudio"]
+            if not allowAudio:
+                return await query.answer(
+                    "The admin has disabled audio recitations", show_alert=True
+                )
+
         try:
             surahNo, ayahNo = map(int, queryData.split()[1:-1])
         except ValueError:
@@ -63,12 +78,12 @@ async def handleButtonPress(u: Update, c):
         surahNo = int(queryData.split()[1])
 
         entities = message.entities
-        
-        if len(entities) < 2: # When selected from searched surahs
+
+        if len(entities) < 2:  # When selected from searched surahs
             messageOwnerID = int(entities[0].url.split("/")[-1])
-        else: # When selected from surahNames
+        else:  # When selected from surahNames
             messageOwnerID = int(entities[1].url.split("/")[-1])
-        
+
         if messageOwnerID != userID:
             return await query.answer(
                 "Only the message owner can use this buttons", show_alert=True
@@ -140,7 +155,6 @@ async def handleButtonPress(u: Update, c):
             surahNo = int(surahNo)
             ayahNo = int(ayahNo)
 
-
         if surahNo == 114 and ayahNo == 6:
             surahNo = 1
             ayahNo = 1
@@ -153,7 +167,9 @@ async def handleButtonPress(u: Update, c):
 
         if language:
             reply = getAyahReply(surahNo, ayahNo, language)
-            buttons = getAyahButton(surahNo, ayahNo, userID, language) # language is the abbr
+            buttons = getAyahButton(
+                surahNo, ayahNo, userID, language
+            )  # language is the abbr
         else:
             reply = getAyahReplyFromPreference(surahNo, ayahNo, userID)
             buttons = getAyahButton(surahNo, ayahNo, userID)
