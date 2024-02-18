@@ -30,8 +30,7 @@ async def handleMessage(u: Update, c):
         if res:
             return
 
-    if u.effective_message.via_bot:
-        return
+    if not text:return
 
     if text.startswith("/"):
         return  # Ignore commands

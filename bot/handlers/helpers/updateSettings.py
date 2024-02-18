@@ -74,9 +74,13 @@ async def updateSettingsForGroup(u: Update, c):
     chatID = u.effective_chat.id
 
     # Check if the user is a group admin
-    member = await bot.getChatMember(chatID, userID)
+    isAnonymous = False
+    if userID == 1087968824: # Group Anonymous Bot
+        isAnonymous = True
+    if not isAnonymous:
+        member = await bot.getChatMember(chatID, userID)
 
-    if member.status not in ["creator", "administrator"]:
+    if not isAnonymous and member.status not in ["creator", "administrator"]:
         return await message.reply_html("<b>Only the group admin can change the settings in the group</b>")
     
     chat = db.getChat(chatID)
