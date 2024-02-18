@@ -71,8 +71,8 @@ def runBot(token):
     app.add_handler(
         MessageHandler(
             filters.Regex(
-                r"^\/([A-Za-z]{1,10})\s(\d+)\s?:\s?(\d+)$"
-            ),  # match: /<lang> <surah>:<ayah>
+                r"^\/([A-Za-z]{1,10})\s\d+\s?:*\s?\d*$"
+            ),  # match: /<lang> <surah>:<ayah> or /<lang> <surah>
             getTranslationCommand,
         )
     )
