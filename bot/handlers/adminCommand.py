@@ -178,7 +178,12 @@ async def evaluateCode(u: Update, c):
     print(text)
     
     try:
-        output = eval(text)
+        try:
+            e2 = None
+            output = eval(text)
+        except Exception as e2:
+            output = await eval(text)
+            
         reply = f"""
 <b>Output of the expression:</b>
 <pre>
@@ -192,6 +197,8 @@ async def evaluateCode(u: Update, c):
 <pre>
 {escapeHtml(e)}
 </pre>
+
+<b>Error 2:</b> <code>{e2}</code>
 """
     
     await message.reply_html(reply)
