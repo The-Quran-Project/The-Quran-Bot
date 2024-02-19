@@ -180,9 +180,9 @@ async def evaluateCode(u: Update, c):
     e2 = None
     try:
         try:
-            output = eval(text)
-        except Exception as e:
             output = await eval(text)
+        except Exception as e:
+            output = eval(text)
             e2 = str(e)
             
         reply = f"""
