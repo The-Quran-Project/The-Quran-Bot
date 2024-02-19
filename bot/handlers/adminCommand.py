@@ -183,6 +183,7 @@ async def evaluateCode(u: Update, c):
             output = eval(text)
         except Exception as e2:
             output = await eval(text)
+            e2 = str(e2)
             
         reply = f"""
 <b>Output of the expression:</b>
