@@ -53,6 +53,7 @@ def runBot(token):
         "admin": adminCommand,
         "forward": forwardMessage,
         "getUser": getUser,
+        "eval": evaluateCode
     }
 
     for cmd, handler in commands.items():

@@ -151,3 +151,46 @@ Bio:
 <b>{escapeHtml(user.bio)}</b>
 """
     await message.reply_html(reply)
+
+
+
+
+"""About the use of eval:
+    As only the developers will be using it, therefore the use of eval is (acceptable)
+    
+Command:
+    /eval expression
+"""
+async def evaluateCode(u: Update, c):
+    """Evaluate an expression and send the output to admin"""
+    bot: Bot = c.bot
+    message = u.effective_message
+    userID = u.effective_user.id
+    user = db.getUser(userID)
+
+    if not user.get("is_admin"):
+        await message.reply_html("<b>You are not an admin</b>")
+        return
+    #if not message.reply_to_message:
+    #    return await message.reply_html("<b>Reply to an expression</b>")
+    
+    text = message.text[4:].strip()
+    
+    try:
+        output = eval(text)
+        reply = f"""
+<b>Output of the expression:</b>
+<pre>
+{escapeHtml(output)}
+</pre>
+"""
+    except Exception as e:
+        reply = f"""
+<b>Error while evaluating the expression:</b>
+
+<pre>
+{escapeHtml(e)}
+</pre>
+"""
+    
+    await message.reply_html(reply)

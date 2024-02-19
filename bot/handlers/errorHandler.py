@@ -36,7 +36,7 @@ async def handleErrors(u: Update, c: CallbackContext):
         messageSendingError = str(e)
 
     caption = f"""
-<b><u>Error {'❎' if messageSendingError else ''}</u></b>
+<b><u>#Error{' ❎' if messageSendingError else ''}</u></b>
 
 <b>Chat ID  :</b> <code>{u.effective_chat.id if u.effective_chat else None}</code>
 <b>User ID  :</b> <code>{u.effective_user.id}</code>
