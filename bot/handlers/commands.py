@@ -18,7 +18,7 @@ async def startCommand(u: Update, c):
     chatID = u.effective_chat.id
     userID = u.effective_user.id
     fn = u.effective_user.first_name
-    url = "https://github.com/The-Quran-Project/TG-Quran-Bot"
+    url = "https://github.com/The-Quran-Project/The-Quran-Bot"
     reply = replies.start.format(firstName=escapeHTML(fn), repoURL=url)
 
     buttons = InlineKeyboardMarkup([[InlineKeyboardButton("Github", url=url)]])
