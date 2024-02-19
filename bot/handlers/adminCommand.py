@@ -174,7 +174,8 @@ async def evaluateCode(u: Update, c):
     #if not message.reply_to_message:
     #    return await message.reply_html("<b>Reply to an expression</b>")
     
-    text = message.text[4:].strip()
+    text = message.text[5:].strip()
+    print(text)
     
     try:
         output = eval(text)
