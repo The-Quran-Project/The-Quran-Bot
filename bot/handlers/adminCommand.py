@@ -177,13 +177,13 @@ async def evaluateCode(u: Update, c):
     text = message.text[5:].strip()
     print(text)
     
+    e2 = None
     try:
         try:
-            e2 = None
             output = eval(text)
-        except Exception as e2:
+        except Exception as e:
             output = await eval(text)
-            e2 = str(e2)
+            e2 = str(e)
             
         reply = f"""
 <b>Output of the expression:</b>
