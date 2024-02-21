@@ -22,6 +22,9 @@ async def infoCommand(u: Update, c):
     """Get info about the user"""
 
     message = u.effective_message
+    text = message.text.split()[-1]
+    if text.lower() == "json":
+        return await message.reply_html(f"<pre>{escapeHTML(u.to_json())}</pre>")
 
     if message.reply_to_message:
         user = message.reply_to_message.from_user

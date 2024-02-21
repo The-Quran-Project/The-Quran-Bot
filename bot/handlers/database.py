@@ -63,8 +63,7 @@ class Database:
         self.db.chats.insert_one(chat)
         return chat
 
-    def getChat(self, chatID: int):
-        return self.db.chats.find_one({"_id": chatID})
+    
 
     def updateUser(self, userID: int, settings: dict):
         user = self.getUser(userID)
@@ -86,6 +85,13 @@ class Database:
         self.db.chats.update_one({"_id": chatID}, {"$set": {"settings": settings}})
 
         return None # self.getChat(chatID)
+    
+    
+    # TODO: keep count of all the requests handled per day
+    # Run this in a separate thread or use a TypeHandler to run after the other handlers (group=3)
+    # so it doesn't block the event loop
+    def updateCounter(self, date: str):
+        self.db.update_one({"_id": date}, {"$inc": "requests"})
 
 
     # def deleteUser(self, userID: int):
