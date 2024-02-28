@@ -30,7 +30,8 @@ async def handleMessage(u: Update, c):
         if res:
             return
 
-    if not text:return
+    if not text:
+        return
 
     if text.startswith("/"):
         return  # Ignore commands

@@ -182,7 +182,7 @@ class QuranClass:
     def detectLanguage(self, text: str):
         if not text:
             return None
-        
+
         text = text.lower()
         if text == "en2":
             return "english_2"  # Mufti Taqi Usmani

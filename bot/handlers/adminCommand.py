@@ -153,14 +153,14 @@ Bio:
     await message.reply_html(reply)
 
 
-
-
 """About the use of eval:
     As only the developers will be using it, therefore the use of eval is (acceptable)
     
 Command:
     /eval expression
 """
+
+
 async def evaluateCode(u: Update, c):
     """Evaluate an expression and send the output to admin"""
     bot: Bot = c.bot
@@ -171,12 +171,12 @@ async def evaluateCode(u: Update, c):
     if not user.get("is_admin"):
         await message.reply_html("<b>You are not an admin</b>")
         return
-    #if not message.reply_to_message:
+    # if not message.reply_to_message:
     #    return await message.reply_html("<b>Reply to an expression</b>")
-    
+
     text = message.text[5:].strip()
     print(text)
-    
+
     e2 = None
     try:
         try:
@@ -185,7 +185,7 @@ async def evaluateCode(u: Update, c):
         except Exception as e:
             output = eval(text)
             e2 = str(e)
-            
+
         reply = f"""
 <b>Output of the expression:</b>
 
@@ -195,7 +195,7 @@ async def evaluateCode(u: Update, c):
 
 <b>Error 2:</b> <code>{e2}</code>
 """
-    
+
     except Exception as e:
         reply = f"""
 <b>Error while evaluating the expression:</b>
@@ -206,5 +206,5 @@ async def evaluateCode(u: Update, c):
 
 <b>Error 2:</b> <code>{e2}</code>
 """
-    
+
     await message.reply_html(reply)

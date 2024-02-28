@@ -6,7 +6,6 @@ from pymongo.server_api import ServerApi
 from pymongo.mongo_client import MongoClient
 
 
-
 load_dotenv()
 
 
@@ -32,9 +31,9 @@ class Database:
             "other": None,
         }
         self.defaultGroupSettings = {
-            "handleMessages": False, # Sending `x:y` for ayah
-            "allowAudio": True, # Allow sending audio recitations
-            "previewLink": False, # Show preview of the Tafsir link
+            "handleMessages": False,  # Sending `x:y` for ayah
+            "allowAudio": True,  # Allow sending audio recitations
+            "previewLink": False,  # Show preview of the Tafsir link
         }
         self.admins = [i["_id"] for i in self.getAllAdmins()]
 
@@ -63,8 +62,6 @@ class Database:
         self.db.chats.insert_one(chat)
         return chat
 
-    
-
     def updateUser(self, userID: int, settings: dict):
         user = self.getUser(userID)
         if not user:
@@ -73,8 +70,8 @@ class Database:
         settings = {**user["settings"], **settings}
 
         self.db.users.update_one({"_id": userID}, {"$set": {"settings": settings}})
-        return None # self.getUser(userID)
-    
+        return None  # self.getUser(userID)
+
     def updateChat(self, chatID: int, settings: dict):
         chat = self.getChat(chatID)
         if not chat:
@@ -84,15 +81,13 @@ class Database:
 
         self.db.chats.update_one({"_id": chatID}, {"$set": {"settings": settings}})
 
-        return None # self.getChat(chatID)
-    
-    
+        return None  # self.getChat(chatID)
+
     # TODO: keep count of all the requests handled per day
     # Run this in a separate thread or use a TypeHandler to run after the other handlers (group=3)
     # so it doesn't block the event loop
     def updateCounter(self, date: str):
         self.db.update_one({"_id": date}, {"$inc": "requests"})
-
 
     # def deleteUser(self, userID: int):
     #     return self.db.users.delete_one({"_id": userID})

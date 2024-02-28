@@ -11,6 +11,7 @@ from .helpers import getRandomAyah, getValidReply
 def escapeHTML(text: str) -> str:
     return html.escape(str(text))
 
+
 # Command:  /start
 async def startCommand(u: Update, c):
     """Sends a welcome message to the user and a link to the repo"""
@@ -124,9 +125,13 @@ async def getTranslationCommand(u: Update, c):
     text = message.text[1:].strip()  # 1 is the length of "/"
 
     lang, text = text.split(" ", 1)
+    if len(lang) < 2:
+        return
+
     language = Quran.detectLanguage(lang)
 
     if not language:
+        return
         availableLanguages = [i[1] for i in Quran.getLanguages()]
         reply = f"""
 <b>❌ Invalid Language ❌</b>

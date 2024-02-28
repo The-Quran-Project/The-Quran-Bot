@@ -34,15 +34,15 @@ async def handleSettingsButtonPress(u: Update, c):
     isGroup = chatID != userID
 
     homeState = [
-    [
-        InlineKeyboardButton("Languages", callback_data="settings languages"),
-        InlineKeyboardButton("Arabic Style", callback_data="settings font"),
-    ],
-    [
-        InlineKeyboardButton("Tafsir", callback_data="settings showTafsir"),
-        InlineKeyboardButton("Reciter", callback_data="settings reciter"),
-    ],
-]
+        [
+            InlineKeyboardButton("Languages", callback_data="settings languages"),
+            InlineKeyboardButton("Arabic Style", callback_data="settings font"),
+        ],
+        [
+            InlineKeyboardButton("Tafsir", callback_data="settings showTafsir"),
+            InlineKeyboardButton("Reciter", callback_data="settings reciter"),
+        ],
+    ]
 
     if isGroup:
         return await handleGroupSettingsButtonPress(u, c)
@@ -101,7 +101,7 @@ Current Setting: <b>{Quran.getTitleLanguageFromAbbr(user['settings'][method])}</
     elif method == "set":
         setting = query_data[1]
         title = Quran.getTitleLanguageFromAbbr(query_data[2])
-        
+
         otherLanguages = (i for i in ("primary", "secondary", "other") if i != setting)
 
         if title == None and all(user["settings"][i] == "None" for i in otherLanguages):
@@ -195,28 +195,32 @@ Current Setting: <b>{reciterNames[str(user['settings']['reciter'])]}</b>
     await message.edit_text(reply, reply_markup=InlineKeyboardMarkup(buttons))
 
 
-
-
 async def handleGroupSettingsButtonPress(u: Update, c):
     """Handles the settings buttons press in a group"""
     message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id
     homeStateGroup = [
-    [
-        InlineKeyboardButton("Handle Messages", callback_data=f"settings handleMessages {userID}"),
-        InlineKeyboardButton("Allow Audio", callback_data=f"settings allowAudio {userID}"),
-    ],
-    [
-        InlineKeyboardButton("Preview Link", callback_data=f"settings previewLink {userID}"),
-        InlineKeyboardButton("Close", callback_data=f"close {userID}")
-    ],
-]
+        [
+            InlineKeyboardButton(
+                "Handle Messages", callback_data=f"settings handleMessages {userID}"
+            ),
+            InlineKeyboardButton(
+                "Allow Audio", callback_data=f"settings allowAudio {userID}"
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                "Preview Link", callback_data=f"settings previewLink {userID}"
+            ),
+            InlineKeyboardButton("Close", callback_data=f"close {userID}"),
+        ],
+    ]
 
     chat = db.getChat(chatID)
     settings = chat["settings"]
     query = u.callback_query
-    query_data = query.data    
+    query_data = query.data
 
     query_data = query_data.split()[1:-1]
     method = query_data[0]
@@ -233,8 +237,12 @@ Current Setting: <b>{["No", "Yes"][settings['handleMessages']]}</b>
 """
             buttons = [
                 [
-                    InlineKeyboardButton("Yes", callback_data=f"settings handleMessages 1 {userID}"),
-                    InlineKeyboardButton("No", callback_data=f"settings handleMessages 0 {userID}"),
+                    InlineKeyboardButton(
+                        "Yes", callback_data=f"settings handleMessages 1 {userID}"
+                    ),
+                    InlineKeyboardButton(
+                        "No", callback_data=f"settings handleMessages 0 {userID}"
+                    ),
                 ],
                 [InlineKeyboardButton("Back", callback_data=f"settings home {userID}")],
             ]
@@ -256,8 +264,12 @@ Current Setting: <b>{["No", "Yes"][settings['allowAudio']]}</b>
 """
             buttons = [
                 [
-                    InlineKeyboardButton("Yes", callback_data=f"settings allowAudio 1 {userID}"),
-                    InlineKeyboardButton("No", callback_data=f"settings allowAudio 0 {userID}"),
+                    InlineKeyboardButton(
+                        "Yes", callback_data=f"settings allowAudio 1 {userID}"
+                    ),
+                    InlineKeyboardButton(
+                        "No", callback_data=f"settings allowAudio 0 {userID}"
+                    ),
                 ],
                 [InlineKeyboardButton("Back", callback_data=f"settings home {userID}")],
             ]
@@ -266,7 +278,7 @@ Current Setting: <b>{["No", "Yes"][settings['allowAudio']]}</b>
             db.updateChat(chatID, settings)
             reply = f"Allowing audio has been set to <b>{['No', 'Yes'][settings['allowAudio']]}</b>"
             buttons = homeStateGroup
-    
+
     elif method == "previewLink":
         if len(query_data) == 1:
             reply = f"""
@@ -281,8 +293,12 @@ The preview will be like <a href="https://telegra.ph/Tafsir-of-1-1-06-03-4">this
 """
             buttons = [
                 [
-                    InlineKeyboardButton("Yes", callback_data=f"settings previewLink 1 {userID}"),
-                    InlineKeyboardButton("No", callback_data=f"settings previewLink 0 {userID}"),
+                    InlineKeyboardButton(
+                        "Yes", callback_data=f"settings previewLink 1 {userID}"
+                    ),
+                    InlineKeyboardButton(
+                        "No", callback_data=f"settings previewLink 0 {userID}"
+                    ),
                 ],
                 [InlineKeyboardButton("Back", callback_data=f"settings home {userID}")],
             ]
@@ -291,7 +307,7 @@ The preview will be like <a href="https://telegra.ph/Tafsir-of-1-1-06-03-4">this
             db.updateChat(chatID, settings)
             reply = f"Preview link has been set to <b>{['No', 'Yes'][settings['previewLink']]}</b>"
             buttons = homeStateGroup
-    
+
     elif method == "home":
         reply = f"""
 <u><b>Group Settings</b></u>

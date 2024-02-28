@@ -68,21 +68,23 @@ async def updateSettings(u: Update, c):
 async def updateSettingsForGroup(u: Update, c):
     """Sends the settings message to groups to change preferences (only for group admins)"""
 
-    bot:Bot = c.bot
+    bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id
 
     # Check if the user is a group admin
     isAnonymous = False
-    if userID == 1087968824: # Group Anonymous Bot
+    if userID == 1087968824:  # Group Anonymous Bot
         isAnonymous = True
     if not isAnonymous:
         member = await bot.getChatMember(chatID, userID)
 
     if not isAnonymous and member.status not in ["creator", "administrator"]:
-        return await message.reply_html("<b>Only the group admin can change the settings in the group</b>")
-    
+        return await message.reply_html(
+            "<b>Only the group admin can change the settings in the group</b>"
+        )
+
     chat = db.getChat(chatID)
 
     settings = chat["settings"]
@@ -98,16 +100,22 @@ async def updateSettingsForGroup(u: Update, c):
 <b>Allow Audio</b>      : {["No", "Yes"][allowAudio]}
 <b>Preview Link</b>     : {["No", "Yes"][previewLink]}
 """
-    
+
     buttons = [
-            [
-                InlineKeyboardButton("Handle Messages", callback_data=f"settings handleMessages {userID}"),
-                InlineKeyboardButton("Allow Audio", callback_data=f"settings allowAudio {userID}"),
-            ],
-            [
-                InlineKeyboardButton("Preview Link", callback_data=f"settings previewLink {userID}"),
-                InlineKeyboardButton("Close", callback_data=f"close {userID}")
-            ],
-        ]
-    
+        [
+            InlineKeyboardButton(
+                "Handle Messages", callback_data=f"settings handleMessages {userID}"
+            ),
+            InlineKeyboardButton(
+                "Allow Audio", callback_data=f"settings allowAudio {userID}"
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                "Preview Link", callback_data=f"settings previewLink {userID}"
+            ),
+            InlineKeyboardButton("Close", callback_data=f"close {userID}"),
+        ],
+    ]
+
     await message.reply_html(reply, reply_markup=InlineKeyboardMarkup(buttons))
