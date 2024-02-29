@@ -44,6 +44,8 @@ async def handleErrors(u: Update, c: CallbackContext):
 <b>Username : @{u.effective_user.username}</b>
 <b>Message ID :</b> <code>{u.effective_message.message_id}</code>
 <b>Timestamp  :</b> <code>{u.effective_message.date} UTC</code>
+<b>Error:</b>
+<blockquote>{escape(c.error)}</blockquote>
 """
 
     admins = db.getAllAdmins()
