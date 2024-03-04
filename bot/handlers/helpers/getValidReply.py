@@ -11,7 +11,7 @@ surahNo : ayahNo
 </pre>"""
 
 
-def getValidReply(userID, text, language=None):
+def getValidReply(userID, text, language=None, restrictedLangs: list = None):
     text = text.strip()
     if text.isdigit() and 1 <= int(text) <= 114:  # if only surah number is given
         surahNo = int(text)
@@ -22,7 +22,9 @@ def getValidReply(userID, text, language=None):
         if language:
             reply = getAyahReply(surahNo, ayahNo, language)
         else:
-            reply = getAyahReplyFromPreference(surahNo, ayahNo, userID)
+            reply = getAyahReplyFromPreference(
+                surahNo, ayahNo, userID, restrictedLangs=restrictedLangs
+            )
 
         buttons = getAyahButton(surahNo, ayahNo, userID, language)
 
@@ -63,10 +65,10 @@ But you gave ayah no. {ayahNo}
         return {"text": reply, "buttons": None, "send": True}
 
     if language:
-        reply = getAyahReply(surahNo, ayahNo, language)
+        reply = getAyahReply(surahNo, ayahNo, language=language)
     else:
-        reply = getAyahReplyFromPreference(surahNo, ayahNo, userID)
+        reply = getAyahReplyFromPreference(surahNo, ayahNo, userID, restrictedLangs)
 
-    buttons = getAyahButton(surahNo, ayahNo, userID, language)
+    buttons = getAyahButton(surahNo, ayahNo, userID, language=language)
 
     return {"text": reply, "buttons": buttons}

@@ -84,7 +84,11 @@ async def updateSettingsForGroup(u: Update, c):
     if not isAnonymous:
         member = await bot.getChatMember(chatID, userID)
 
-    if not isAnonymous and member.status not in ["creator", "administrator"]:
+    if (
+        not isAnonymous
+        and member.status not in ["creator", "administrator"]
+        and userID not in db.getAllAdmins()
+    ):
         return await message.reply_html(
             "<b>Only the group admin can change the settings in the group</b>"
         )
@@ -108,7 +112,7 @@ Change the settings of the group from here.
 <b>Handle Messages</b>  : {["No", "Yes"][handleMessages]}
 <b>Allow Audio</b>      : {["No", "Yes"][allowAudio]}
 <b>Preview Link</b>     : {["No", "Yes"][previewLink]}
-<b>Restricted Languages: </b> {', '.join(allLangs[i] for i in restrictedLangs)}
+<b>Restricted Languages: </b> {', '.join(allLangs[i] for i in restrictedLangs) or None}
 """
 
     buttons = [

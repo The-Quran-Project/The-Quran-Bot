@@ -123,7 +123,9 @@ async def handleButtonPress(u: Update, c):
             language = None
         elif len(values) == 3:
             # language is the abbreviation of the language
-            surahNo, ayahNo, language = map(int, values)
+            surahNo, ayahNo, language = values
+            surahNo = int(surahNo)
+            ayahNo = int(ayahNo)
 
         if (
             surahNo == ayahNo == 1
@@ -139,10 +141,18 @@ async def handleButtonPress(u: Update, c):
 
         if language:
             reply = getAyahReply(surahNo, ayahNo, language)
+            buttons = getAyahButton(
+                surahNo, ayahNo, userID, language
+            )  # language is the abbr
         else:
-            reply = getAyahReplyFromPreference(surahNo, ayahNo, userID)
+            restrictedLangs = None
+            if userID != chatID:
+                restrictedLangs = db.getChat(chatID)["settings"]["restrictedLangs"]
 
-        buttons = getAyahButton(surahNo, ayahNo, userID)
+            reply = getAyahReplyFromPreference(
+                surahNo, ayahNo, userID, restrictedLangs=restrictedLangs
+            )
+            buttons = getAyahButton(surahNo, ayahNo, userID)
 
     elif method == "next_ayah":
         # Go to Next Ayah
@@ -174,7 +184,13 @@ async def handleButtonPress(u: Update, c):
                 surahNo, ayahNo, userID, language
             )  # language is the abbr
         else:
-            reply = getAyahReplyFromPreference(surahNo, ayahNo, userID)
+            restrictedLangs = None
+            if userID != chatID:
+                restrictedLangs = db.getChat(chatID)["settings"]["restrictedLangs"]
+
+            reply = getAyahReplyFromPreference(
+                surahNo, ayahNo, userID, restrictedLangs=restrictedLangs
+            )
             buttons = getAyahButton(surahNo, ayahNo, userID)
 
     if not reply:

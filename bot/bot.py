@@ -66,11 +66,7 @@ def runBot(token):
         app.add_handler(CommandHandler(cmd, handler))
 
     for cmd, handler in adminCommands.items():
-        app.add_handler(
-            CommandHandler(
-                cmd, handler, filters.User([i["_id"] for i in db.getAllAdmins()])
-            )
-        )
+        app.add_handler(CommandHandler(cmd, handler, filters.User(db.getAllAdmins())))
 
     app.add_handler(CallbackQueryHandler(handleButtonPress))
     app.add_handler(InlineQueryHandler(handleInlineQuery))

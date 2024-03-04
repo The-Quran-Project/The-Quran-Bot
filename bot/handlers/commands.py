@@ -84,6 +84,7 @@ async def surahCommand(u: Update, c):
     """Sends a list of all the Surahs to the user"""
     message = u.effective_message
     userID = u.effective_user.id
+    chatID = u.effective_chat.id
     text = message.text[6:].strip()  # 6 is the length of "/surah"
     attachedUserID = f'<a href="https://xyz.co/{userID}"> </a>'  # Later used to check the message owner
 
@@ -96,11 +97,20 @@ async def surahCommand(u: Update, c):
         await message.reply_html(reply, reply_markup=InlineKeyboardMarkup(buttons))
         return
 
-    x = getValidReply(userID, text)
+    restrictedLangs = None
+    previewLink = True
+    if userID != chatID:
+        settings = db.getChat(chatID)["settings"]
+        restrictedLangs = settings["restrictedLangs"]
+        previewLink = settings["previewLink"]
+
+    x = getValidReply(userID, text, restrictedLangs=restrictedLangs)
     reply = x["text"]
     buttons = x["buttons"]
 
-    await message.reply_html(reply, reply_markup=buttons)
+    await message.reply_html(
+        reply, reply_markup=buttons, disable_notification=not previewLink
+    )
 
 
 # Command:  /get
@@ -108,13 +118,23 @@ async def getCommand(u: Update, c):
     """Sends the ayah to the user"""
     message = u.effective_message
     userID = u.effective_user.id
+    chatID = u.effective_chat.id
     text = message.text[4:].strip()  # 4 is the length of "/get"
 
-    x = getValidReply(userID, text)
+    restrictedLangs = None
+    previewLink = True
+    if userID != chatID:
+        settings = db.getChat(chatID)["settings"]
+        restrictedLangs = settings["restrictedLangs"]
+        previewLink = settings["previewLink"]
+
+    x = getValidReply(userID, text, restrictedLangs=restrictedLangs)
     reply = x["text"]
     buttons = x["buttons"]
 
-    await message.reply_html(reply, reply_markup=buttons)
+    await message.reply_html(
+        reply, reply_markup=buttons, disable_notification=not previewLink
+    )
 
 
 # Command:  /<lang> x:y
@@ -122,6 +142,7 @@ async def getTranslationCommand(u: Update, c):
     """Sends the ayah in the specified language to the user"""
     message = u.effective_message
     userID = u.effective_user.id
+    chatID = u.effective_chat.id
     text = message.text[1:].strip()  # 1 is the length of "/"
 
     lang, text = text.split(" ", 1)
@@ -131,7 +152,8 @@ async def getTranslationCommand(u: Update, c):
     language = Quran.detectLanguage(lang)
 
     if not language:
-        return
+        if userID != chatID:
+            return
         availableLanguages = [i[1] for i in Quran.getLanguages()]
         reply = f"""
 <b>❌ Invalid Language ❌</b>
@@ -157,6 +179,7 @@ Available languages are:
 async def randomCommand(u: Update, c):
     """Sends a random Ayah to the user"""
     userID = u.effective_user.id
+    chatID = u.effective_chat.id
     message = u.effective_message
 
     x = getRandomAyah(userID)

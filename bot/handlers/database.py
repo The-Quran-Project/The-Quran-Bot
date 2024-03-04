@@ -21,7 +21,7 @@ class Database:
     def __init__(self) -> None:
         uri = os.environ.get("MONGODB_URI")
         self.client = MongoClient(uri, server_api=ServerApi("1"))
-        self.db = self.client.quranbot_test
+        self.db = self.client.quranbot
         self.defaultSettings = {
             "font": 1,  # 1 -> Uthmani, 2 -> Simple
             "showTafsir": True,
@@ -36,7 +36,7 @@ class Database:
             "previewLink": False,  # Show preview of the Tafsir link
             "restrictedLangs": ["ar"],
         }
-        self.admins = [i["_id"] for i in self.getAllAdmins()]
+        self.admins = [i["_id"] for i in self.db.users.find({"is_admin": True})]
 
     def getAllUsers(self):
         return [i for i in self.db.users.find({})]
@@ -45,7 +45,7 @@ class Database:
         return [i for i in self.db.chats.find({})]
 
     def getAllAdmins(self):
-        return [i for i in self.db.users.find({"is_admin": True})]
+        return [i for i in self.admins]
 
     def getUser(self, userID: int):
         return self.db.users.find_one({"_id": userID})
@@ -99,6 +99,7 @@ class Database:
     #     return self.db.users.delete_many({})
 
     def deleteEverything(self):
+        return
         self.db.drop_collection(self.db.users)
         self.db.drop_collection(self.db.chats)
 
@@ -107,11 +108,11 @@ db = Database()
 
 
 def main():
-    # db.deleteEverything()
     users = db.getAllUsers()
     chats = db.getAllChat()
     print("Total Users:", len(users))
     print("Total Chats:", len(chats))
+    print(db.getAllAdmins())
 
 
 if __name__ == "__main__":

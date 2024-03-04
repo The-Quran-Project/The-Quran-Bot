@@ -2,8 +2,24 @@ from .. import Quran, replies
 from ..database import db
 
 
-def getAyahReplyFromPreference(surahNo, ayahNo, userID):
+def useTemplate(title, ayah, lang, restrictedLangs):
+    if lang in restrictedLangs:
+        return f"""
+<u><b>{title}</b></u>
+<blockquote>This group has restricted {title} translation. Admins can use /settings to change the preference.</blockquote>
+"""
+
+    return f"""
+<u><b>{title}</b></u>
+<blockquote>{ayah}</blockquote>
+"""
+
+
+def getAyahReplyFromPreference(surahNo, ayahNo, userID, restrictedLangs=None):
     """Returns the reply for the ayah"""
+    if restrictedLangs == None:
+        restrictedLangs = []
+
     surah = Quran.getSurahNameFromNumber(surahNo)
     ayah = Quran.getAyah(surahNo, ayahNo)
     totalAyah = Quran.getAyahNumberCount(surahNo)
@@ -31,22 +47,23 @@ def getAyahReplyFromPreference(surahNo, ayahNo, userID):
     if secondary == "arabic":
         secondary = f"arabic_{font}"
     if other == "arabic":
-        other = f"arabic{font}"
+        other = f"arabic_{font}"
 
     reply = f"""
 Surah : <b>{surah} ({surahNo})</b>
 Ayah  : <b>{ayahNo} out of {totalAyah}</b>
 """
-    template = """
-<u><b>{title}</b></u>
-<blockquote>{ayah}</blockquote>
-"""
+
     if primary:
-        reply += template.format(title=primaryTitle, ayah=ayah[primary])
+        reply += useTemplate(
+            primaryTitle, ayah[primary], primaryLanguage, restrictedLangs
+        )
     if secondary:
-        reply += template.format(title=secondaryTitle, ayah=ayah[secondary])
+        reply += useTemplate(
+            secondaryTitle, ayah[secondary], secondaryLanguage, restrictedLangs
+        )
     if other:
-        reply += template.format(title=otherTitle, ayah=ayah[other])
+        reply += useTemplate(otherTitle, ayah[other], otherLanguage, restrictedLangs)
 
     if showTafsir:
         tafsir = ayah.tafsir
