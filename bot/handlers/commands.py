@@ -131,6 +131,8 @@ async def getCommand(u: Update, c):
     x = getValidReply(userID, text, restrictedLangs=restrictedLangs)
     reply = x["text"]
     buttons = x["buttons"]
+    if not buttons and userID != chatID:
+        return
 
     await message.reply_html(
         reply, reply_markup=buttons, disable_notification=not previewLink
