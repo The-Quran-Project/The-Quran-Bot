@@ -21,9 +21,13 @@ async def handleErrors(u: Update, c: CallbackContext):
     tbList = traceback.format_exception(None, c.error, c.error.__traceback__)
     tbString = "".join(tbList)
 
-    print(tbString)
+    
 
     messageSendingError = ""
+    if "Message is not modified" in str(c.error):
+        return print(f"Error: {c.error}")
+   
+    print(tbString)  
     try:
         await u.effective_message.reply_html(
             f"""

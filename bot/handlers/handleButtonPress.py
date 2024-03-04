@@ -20,11 +20,6 @@ async def handleButtonPress(u: Update, c):
     reply = buttons = None
 
     isGroup = chatID != userID
-    previewLink = False
-    if isGroup:
-        chat = db.getChat(chatID)
-        previewLink = chat["settings"]["previewLink"]
-
     messageOwnerID = queryData.split()[-1]
 
     if (
@@ -38,6 +33,15 @@ async def handleButtonPress(u: Update, c):
         return await query.answer(
             "Only the message owner can use this buttons", show_alert=True
         )
+    
+    await message.edit_reply_markup(InlineKeyboardMarkup([]))
+    
+    
+    previewLink = False
+    if isGroup:
+        chat = db.getChat(chatID)
+        previewLink = chat["settings"]["previewLink"]
+
 
     if method == "settings":
         return await handleSettingsButtonPress(u, c)
