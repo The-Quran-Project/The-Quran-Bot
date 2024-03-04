@@ -204,5 +204,10 @@ class QuranClass:
 
         return self.titleLanguages[abbr]
 
-    def getLanguages(self):
+    def getLanguages(self) -> dict:
         return self.titleLanguages.items()
+
+
+if __name__ == "__main__":
+    q = QuranClass()
+    print(q.getLanguages())

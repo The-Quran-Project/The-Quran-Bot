@@ -192,6 +192,9 @@ Current Setting: <b>{reciterNames[str(user['settings']['reciter'])]}</b>
         )
         buttons = homeState
 
+    if not reply:
+        return await query.answer("Maybe it was an old message?", show_alert=True)
+
     await message.edit_text(reply, reply_markup=InlineKeyboardMarkup(buttons))
 
 
@@ -213,6 +216,12 @@ async def handleGroupSettingsButtonPress(u: Update, c):
             InlineKeyboardButton(
                 "Preview Link", callback_data=f"settings previewLink {userID}"
             ),
+            InlineKeyboardButton(
+                "Restricted Languages",
+                callback_data=f"settings restrictedLangs {userID}",
+            ),
+        ],
+        [
             InlineKeyboardButton("Close", callback_data=f"close {userID}"),
         ],
     ]
@@ -308,14 +317,137 @@ The preview will be like <a href="https://telegra.ph/Tafsir-of-1-1-06-03-4">this
             reply = f"Preview link has been set to <b>{['No', 'Yes'][settings['previewLink']]}</b>"
             buttons = homeStateGroup
 
+    elif method == "restrictedLangs":
+        allLangs = Quran.getLanguages()
+        restrictedLangs = settings["restrictedLangs"]
+        reply = (
+            "<b>Click on a language to toggle it between restricted & allowed.</b>"
+            "\n✅ means the language is allowed.\n❌ means the language is restricted."
+            "\n\nRestricted languages are not shown in groups even if the user has the language selected."
+        )
+        buttons = [[]]
+        for langCode, lang in allLangs:
+            isRstd = langCode in restrictedLangs
+            text = f"{'❌' if isRstd else '✅'} {lang}"
+
+            # unrestrict if already restricted, else restrict
+            callback_text = (
+                f"settings {'un' if isRstd else ''}restrict {langCode} {userID}"
+            )
+
+            button = InlineKeyboardButton(text, callback_data=callback_text)
+            if len(buttons[-1]) < 2:
+                buttons[-1].append(button)
+            else:
+                buttons.append([button])
+
+        buttons.append(
+            [InlineKeyboardButton("Back", callback_data=f"settings home {userID}")]
+        )
+
+    elif method == "restrict":
+        langCode = query_data[1]
+        allLangs = dict(Quran.getLanguages())
+        settings = db.getChat(chatID)["settings"]
+        if langCode in settings["restrictedLangs"]:
+            return await query.answer(f"{allLangs[langCode]} is already restricted.")
+
+        await query.answer(f"You restricted {allLangs[langCode]}")
+
+        settings["restrictedLangs"].append(langCode)
+
+        db.updateChat(chatID, settings)
+
+        # -- Previous State --
+        restrictedLangs = settings["restrictedLangs"]
+        reply = (
+            "<b>Click on a language to toggle it between restricted & allowed.</b>"
+            "\n✅ means the language is allowed.\n❌ means the language is restricted."
+            "\n\nRestricted languages are not shown in groups even if the user has the language selected."
+        )
+        buttons = [[]]
+        for langCode, lang in allLangs.items():
+            isRstd = langCode in restrictedLangs
+            text = f"{'❌' if isRstd else '✅'} {lang}"
+
+            # unrestrict if already restricted, else restrict
+            callback_text = (
+                f"settings {'un' if isRstd else ''}restrict {langCode} {userID}"
+            )
+
+            button = InlineKeyboardButton(text, callback_data=callback_text)
+            if len(buttons[-1]) < 2:
+                buttons[-1].append(button)
+            else:
+                buttons.append([button])
+
+        buttons.append(
+            [InlineKeyboardButton("Back", callback_data=f"settings home {userID}")]
+        )
+
+    elif method == "unrestrict":
+        langCode = query_data[1]
+        allLangs = dict(Quran.getLanguages())
+        settings = db.getChat(chatID)["settings"]
+        if langCode not in settings["restrictedLangs"]:
+            return await query.answer(f"{allLangs[langCode]} is not restricted.")
+
+        await query.answer(f"You unrestricted {allLangs[langCode]}")
+
+        settings["restrictedLangs"].remove(langCode)
+
+        db.updateChat(chatID, settings)
+
+        # -- Previous State --
+        restrictedLangs = settings["restrictedLangs"]
+        reply = (
+            "<b>Click on a language to toggle it between restricted & allowed.</b>"
+            "\n✅ means the language is allowed.\n❌ means the language is restricted."
+            "\n\nRestricted languages are not shown in groups even if the user has the language selected."
+        )
+        buttons = [[]]
+        for langCode, lang in allLangs.items():
+            isRstd = langCode in restrictedLangs
+            text = f"{'❌' if isRstd else '✅'} {lang}"
+
+            # unrestrict if already restricted, else restrict
+            callback_text = (
+                f"settings {'un' if isRstd else ''}restrict {langCode} {userID}"
+            )
+
+            button = InlineKeyboardButton(text, callback_data=callback_text)
+            if len(buttons[-1]) < 2:
+                buttons[-1].append(button)
+            else:
+                buttons.append([button])
+
+        buttons.append(
+            [InlineKeyboardButton("Back", callback_data=f"settings home {userID}")]
+        )
+
     elif method == "home":
+        handleMessages = settings["handleMessages"]
+        allowAudio = settings["allowAudio"]
+        previewLink = settings["previewLink"]
+        restrictedLangs = settings["restrictedLangs"]
+        allLangs = dict(Quran.getLanguages())
+
+        # <a href="https://t.me/quraniumbot?startgroup=bot">Add me to your group</a>
+
         reply = f"""
 <u><b>Group Settings</b></u>
+Change the settings of the group from here.
 
-<b>Handle Messages</b>: {["No", "Yes"][settings['handleMessages']]}
-<b>Allow Audio</b>: {["No", "Yes"][settings['allowAudio']]}
-<b>Preview Link</b>: {["No", "Yes"][settings['previewLink']]}
+
+<b>Handle Messages</b>  : {["No", "Yes"][handleMessages]}
+<b>Allow Audio</b>      : {["No", "Yes"][allowAudio]}
+<b>Preview Link</b>     : {["No", "Yes"][previewLink]}
+<b>Restricted Languages: </b> {', '.join(allLangs[i] for i in restrictedLangs)}
 """
+
         buttons = homeStateGroup
+
+    if not reply:
+        return await query.answer("Maybe it was an old message?", show_alert=True)
 
     await message.edit_text(reply, reply_markup=InlineKeyboardMarkup(buttons))

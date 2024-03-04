@@ -1,3 +1,5 @@
+import html
+
 from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
 from ..database import db
@@ -39,6 +41,8 @@ async def updateSettings(u: Update, c):
 
     reply = f"""
 <u><b>Settings</b></u>
+Change your settings to your preference.
+
 
 <b>Languages:</b>
 - <b>Primary</b>    : {primary}
@@ -91,14 +95,20 @@ async def updateSettingsForGroup(u: Update, c):
     handleMessages = settings["handleMessages"]
     allowAudio = settings["allowAudio"]
     previewLink = settings["previewLink"]
+    restrictedLangs = settings["restrictedLangs"]
+    allLangs = dict(Quran.getLanguages())
+
     # <a href="https://t.me/quraniumbot?startgroup=bot">Add me to your group</a>
 
     reply = f"""
 <u><b>Group Settings</b></u>
+Change the settings of the group from here.
+
 
 <b>Handle Messages</b>  : {["No", "Yes"][handleMessages]}
 <b>Allow Audio</b>      : {["No", "Yes"][allowAudio]}
 <b>Preview Link</b>     : {["No", "Yes"][previewLink]}
+<b>Restricted Languages: </b> {', '.join(allLangs[i] for i in restrictedLangs)}
 """
 
     buttons = [
@@ -114,6 +124,12 @@ async def updateSettingsForGroup(u: Update, c):
             InlineKeyboardButton(
                 "Preview Link", callback_data=f"settings previewLink {userID}"
             ),
+            InlineKeyboardButton(
+                "Allowed Languages",
+                callback_data=f"settings restrictedLangs {userID}",
+            ),
+        ],
+        [
             InlineKeyboardButton("Close", callback_data=f"close {userID}"),
         ],
     ]

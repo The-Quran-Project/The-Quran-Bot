@@ -21,7 +21,7 @@ class Database:
     def __init__(self) -> None:
         uri = os.environ.get("MONGODB_URI")
         self.client = MongoClient(uri, server_api=ServerApi("1"))
-        self.db = self.client.quranbot  # TODO Change this to quranbot
+        self.db = self.client.quranbot_test
         self.defaultSettings = {
             "font": 1,  # 1 -> Uthmani, 2 -> Simple
             "showTafsir": True,
@@ -34,6 +34,7 @@ class Database:
             "handleMessages": False,  # Sending `x:y` for ayah
             "allowAudio": True,  # Allow sending audio recitations
             "previewLink": False,  # Show preview of the Tafsir link
+            "restrictedLangs": ["ar"],
         }
         self.admins = [i["_id"] for i in self.getAllAdmins()]
 
@@ -79,6 +80,8 @@ class Database:
 
         settings = {**chat["settings"], **settings}
 
+        # TODO : Do it in a better way
+        settings["restrictedLangs"] = list(set(settings["restrictedLangs"]))
         self.db.chats.update_one({"_id": chatID}, {"$set": {"settings": settings}})
 
         return None  # self.getChat(chatID)
@@ -95,11 +98,16 @@ class Database:
     # def deleteAllUsers(self):
     #     return self.db.users.delete_many({})
 
+    def deleteEverything(self):
+        self.db.drop_collection(self.db.users)
+        self.db.drop_collection(self.db.chats)
+
 
 db = Database()
 
 
 def main():
+    # db.deleteEverything()
     users = db.getAllUsers()
     chats = db.getAllChat()
     print("Total Users:", len(users))
