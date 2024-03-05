@@ -108,9 +108,9 @@ db = Database()
 
 
 def main():
-    users = db.getAllUsers()
+    #users = db.getAllUsers()
     chats = db.getAllChat()
-    print("Total Users:", len(users))
+    #print("Total Users:", len(users))
     print("Total Chats:", len(chats))
     print(db.getAllAdmins())
 

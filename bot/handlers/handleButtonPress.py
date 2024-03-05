@@ -34,7 +34,7 @@ async def handleButtonPress(u: Update, c):
             "Only the message owner can use this buttons", show_alert=True
         )
 
-    await message.edit_reply_markup(InlineKeyboardMarkup([]))
+    # await message.edit_reply_markup(InlineKeyboardMarkup([]))
 
     previewLink = False
     if isGroup:
