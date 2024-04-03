@@ -26,7 +26,7 @@ class LocalDB:
     def __init__(self, users: list, chats: list) -> None:
         self.users = list(users)
         self.chats = list(chats)
-        self.admins = [i["_id"] for i in self.users if i.get("admin")]
+        self.admins = [i["_id"] for i in self.users if i.get("is_admin")]
         print(f"LocalDB: {len(self.users)} users, {len(self.chats)} chats")
 
     def findUser(self, userID: int) -> dict:

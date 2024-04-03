@@ -1,8 +1,10 @@
 import os
+import asyncio
 
 from dotenv import load_dotenv
 from telegram.ext import *
 from telegram import Update, constants
+from datetime import datetime
 
 from .handlers import *
 from .handlers.database import db
@@ -81,7 +83,13 @@ def runBot(token):
     app.add_handler(
         MessageHandler(filters.TEXT & ~filters.ChatType.CHANNEL, handleMessage)
     )  # for private chats
+
     app.add_error_handler(handleErrors)
+
+    # Send a message to the admin when the bot starts
+    loop = asyncio.get_event_loop()
+    msg = f"<b>Bot started at {datetime.now().strftime('%d %B %Y, %H:%M:%S %A GMT+6')} 🚀</b>"
+    loop.run_until_complete(app.bot.sendMessage(5596148289, msg))
 
     app.run_polling()
 
