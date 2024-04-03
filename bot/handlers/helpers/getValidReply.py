@@ -22,6 +22,7 @@ def getValidReply(userID, text, language=None, restrictedLangs: list = None):
         if language:
             reply = getAyahReply(surahNo, ayahNo, language)
         else:
+            print("getAyahReplyFromPreference")
             reply = getAyahReplyFromPreference(
                 surahNo, ayahNo, userID, restrictedLangs=restrictedLangs
             )

@@ -22,19 +22,18 @@ async def handleButtonPress(u: Update, c):
     isGroup = chatID != userID
     messageOwnerID = queryData.split()[-1]
 
+    valid_commands = ("surahName", "prev", "next")
     if (
         isGroup
-        # naive way to check if it's a valid id ( Change it later )
         and messageOwnerID.isdigit()
         and len(messageOwnerID) >= 9
         and str(userID) != messageOwnerID
-        and queryData.split()[0] not in "surahName prev next".split()
+        and queryData.split()[0] not in valid_commands
     ):
         return await query.answer(
             "Only the message owner can use this buttons", show_alert=True
         )
 
-    # await message.edit_reply_markup(InlineKeyboardMarkup([]))
 
     previewLink = False
     if isGroup:

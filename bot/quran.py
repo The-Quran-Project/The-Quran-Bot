@@ -19,18 +19,20 @@ Structure of json files in Data folder:
 
 
 class objectify:
+    english_1: str
+    english_2: str
+    arabic_1: str
+    arabic_2: str
+    bengali: str
+    urdu: str
+    hindi: str
+    german: str
+    kurdish: str
+    persian: str
+    russian: str
+    tafsir: str
+
     def __init__(self, entries):
-        self.english_1: str
-        self.english_2: str
-        self.arabic_1: str
-        self.arabic_2: str
-        self.bengali: str
-        self.urdu: str
-        self.hindi: str
-        self.german: str
-        self.kurdish: str
-        self.persian: str
-        self.tafsir: str
         self.__dict__.update(entries)
 
     def __getitem__(self, key):
@@ -44,9 +46,7 @@ DIR_PATH = (
 
 
 class QuranClass:
-    languages = (
-        "arabic english_1 english_2 bengali urdu hindi german kurdish persian".split()
-    )
+    languages = "arabic english_1 english_2 bengali urdu hindi german kurdish persian russian".split()
     abbreviations = {
         "arabic": "ar",
         "english_1": "en",
@@ -57,6 +57,7 @@ class QuranClass:
         "german": "ge",
         "kurdish": "ku",
         "persian": "pe",
+        "russian": "ru",
     }
 
     titleLanguages = {
@@ -69,6 +70,7 @@ class QuranClass:
         "ge": "German",
         "ku": "Kurdish",
         "pe": "Persian",
+        "ru": "Russian",
     }
 
     DATA = {}
@@ -107,6 +109,7 @@ class QuranClass:
             - `german`   : The German translation
             - `kurdish`  : The Kurdish translation
             - `persian`  : The Persian translation
+            - `russian`  : The Russian translation
             - `tafsir`   : The telegra.ph link of the tafsir of that verse.
         """
 
