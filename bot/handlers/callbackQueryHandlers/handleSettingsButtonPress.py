@@ -93,6 +93,14 @@ Current Setting: <b>{Quran.getTitleLanguageFromAbbr(user['settings'][method])}</
                     "None", callback_data=f"settings set {method} None"
                 )
             )
+        else:
+            buttons.append(
+                [
+                    InlineKeyboardButton(
+                        "None", callback_data=f"settings set {method} None"
+                    )
+                ]
+            )
 
         buttons.append(
             [InlineKeyboardButton("Back", callback_data="settings languages")]
