@@ -2,6 +2,14 @@
 
 **Latests are on top**
 
+
+
+## 12) 5th April, 2024
+- Integrate custom local database logic to make database operations faster and more efficient.
+- Add **Russian** translation of the Quran. Now, the bot supports 9 languages.
+- Other minor bug fixes and improvements.
+
+
 ## 11) 16rd February, 2024
 
 - Added 7 new translations of the Quran. Now, the bot supports 8 languages.
