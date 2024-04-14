@@ -1,10 +1,10 @@
 import os
 import asyncio
 
-from dotenv import load_dotenv
 from telegram.ext import *
-from telegram import Update, constants
 from datetime import datetime
+from dotenv import load_dotenv
+from telegram import Update, constants
 
 from .handlers import *
 from .handlers.database import db
@@ -62,10 +62,12 @@ def runBot(token):
     for cmd, handler in commands.items():
         if type(cmd) == list:
             for alias in cmd:
-                app.add_handler(CommandHandler(alias, handler))
+                app.add_handler(
+                    CommandHandler(alias, handler, ~filters.ChatType.CHANNEL)
+                )
             continue
 
-        app.add_handler(CommandHandler(cmd, handler))
+        app.add_handler(CommandHandler(cmd, handler, ~filters.ChatType.CHANNEL))
 
     for cmd, handler in adminCommands.items():
         app.add_handler(CommandHandler(cmd, handler, filters.User(db.getAllAdmins())))
@@ -74,7 +76,8 @@ def runBot(token):
     app.add_handler(InlineQueryHandler(handleInlineQuery))
     app.add_handler(
         MessageHandler(
-            filters.Regex(
+            (~filters.ChatType.CHANNEL)
+            & filters.Regex(
                 r"^\/([A-Za-z]{1,10})\s\d+\s?:*\s?\d*$"
             ),  # match: /<lang> <surah>:<ayah> or /<lang> <surah>
             getTranslationCommand,
@@ -82,7 +85,7 @@ def runBot(token):
     )
     app.add_handler(
         MessageHandler(filters.TEXT & ~filters.ChatType.CHANNEL, handleMessage)
-    )  # for private chats
+    )
 
     app.add_error_handler(handleErrors)
 
