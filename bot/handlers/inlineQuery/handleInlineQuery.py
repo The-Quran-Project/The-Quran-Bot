@@ -6,10 +6,11 @@ from telegram import (
     InputTextMessageContent,
     InlineQueryResultArticle,
 )
+from telegram.ext import InlineQueryHandler
 
-from . import Quran
-from .database import db
-from .helpers import getAyahReplyFromPreference
+from .. import Quran
+from ..database import db
+from ..helpers import getAyahReplyFromPreference
 
 
 async def handleInlineQuery(u: Update, c):
@@ -136,3 +137,6 @@ async def handleInlineQuery(u: Update, c):
     ]
 
     await u.inline_query.answer(res, cache_time=1)
+
+
+exportedHandlers = [InlineQueryHandler(handleInlineQuery)]

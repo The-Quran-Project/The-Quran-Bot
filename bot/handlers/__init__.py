@@ -3,8 +3,8 @@ from ..quran import QuranClass
 # Variables has to be declared before importing handlers
 Quran = QuranClass()
 
-from .helpers import generateSurahButtons
 from .database import db as _
+from .helpers import generateSurahButtons
 
 
 class Constants:
@@ -22,28 +22,16 @@ class Constants:
     allSurahInlineButtons = generateSurahButtons(Quran)
 
 
-# --- Importing Handlers ---
-from .commands import (
-    startCommand,
-    helpCommand,
-    aboutCommand,
-    useCommand,
-    surahCommand,
-    getCommand,
-    getTranslationCommand,
-    audioCommand,
-    tafsirCommand,
-    randomCommand,
-    translationsCommand,
-)
-from .others import (
-    pingCommand,
-    infoCommand,
-)
-from .handleMessage import handleMessage
-from .handleButtonPress import handleButtonPress
-from .handleInlineQuery import handleInlineQuery
-from .helpers.updateSettings import updateSettings
-from .middleware import middleware
-from .adminCommand import adminCommand, forwardMessage, getUser, evaluateCode
-from .errorHandler import handleErrors
+from middleware import middleware
+from errorHandler import handleErrors
+from command import handlers as commandHandlers
+from message import handlers as messageHandlers
+from inlineQuery import handlers as inlineQueryHandlers
+from callbackQuery import handlers as callbackQueryHandlers
+
+exportedHandlers = [
+    *commandHandlers,
+    *messageHandlers,
+    *inlineQueryHandlers,
+    *callbackQueryHandlers
+]

@@ -1,7 +1,9 @@
 from telegram import Update
+from telegram.ext import TypeHandler
+
 
 from .database import db
-from .helpers import updateSettings
+from .command.updateSettings import updateSettings
 
 
 async def middleware(u: Update, c):
@@ -25,3 +27,6 @@ async def middleware(u: Update, c):
 
     if isGroup and not chat:  # for groups
         chat = db.addChat(chatID)
+
+
+# exportedHandlers = [TypeHandler(Update, middleware)] # TODO: if instance(TypeHandler), group = 1

@@ -1,11 +1,13 @@
 import html
 
-from telegram import Update, Message, Bot, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import CommandHandler, MessageHandler, filters
+from telegram import Update, Message, InlineKeyboardButton, InlineKeyboardMarkup
 
-from . import Quran
-from .database import db
-from . import Constants, replies
-from .helpers import getRandomAyah, getValidReply
+
+from .. import Quran
+from ..database import db
+from .. import Constants, replies
+from ..helpers import getRandomAyah, getValidReply
 
 
 def escapeHTML(text: str) -> str:
@@ -253,3 +255,27 @@ async def translationsCommand(u: Update, c):
 </blockquote>
 """
     await message.reply_html(reply)
+
+
+exportedHandlers = [
+    CommandHandler("start", startCommand),
+    CommandHandler("help", helpCommand),
+    CommandHandler("about", aboutCommand),
+    CommandHandler("use", useCommand),
+    CommandHandler("surah", surahCommand),
+    CommandHandler("get", getCommand),
+    CommandHandler("audio", audioCommand),
+    CommandHandler("tafsir", tafsirCommand),
+    CommandHandler("translations", translationsCommand),
+    CommandHandler("random", randomCommand),
+    CommandHandler("rand", randomCommand),
+    CommandHandler("langs", translationsCommand),
+    CommandHandler("languages", translationsCommand),
+    MessageHandler(
+        (~filters.ChatType.CHANNEL)
+        & filters.Regex(
+            r"^\/([A-Za-z]{1,10})\s\d+\s?:*\s?\d*$"
+        ),  # match: /<lang> <surah>:<ayah> or /<lang> <surah>
+        getTranslationCommand,
+    ),
+]

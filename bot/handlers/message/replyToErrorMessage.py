@@ -16,20 +16,13 @@ async def replyToErrorMessage(u: Update, c: CallbackContext):
         or not repliedTo.document  # if doesn't have the json file
         or not repliedTo.document.file_name.startswith("error-")
     ):
-        return
+        return False
 
     # `filename` = error-<userID>.json
     # - you thought about regex?
     # - Nope! Not happening ❄
     userID = repliedTo.document.file_name[6:-5]
-    # entities = message.entities
-    # text = message.text
     htmlText = message.text_html
-    # if entities:
-    #     for entity in entities:
-    #         if entity.type == "blockquote":
-    #             quote = text[entity.offset : entity.offset + entity.length]
-    #             htmlText = htmlText.replace(f"\n{quote}", f"\n<blockquote>{quote}</blockquote>")
 
     reply = f"""
 <b>Message from the Developer:</b>

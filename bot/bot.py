@@ -6,8 +6,8 @@ from datetime import datetime
 from dotenv import load_dotenv
 from telegram import Update, constants
 
-from .handlers import *
 from .handlers.database import db
+from .handlers import exportedHandlers, handleErrors, middleware
 
 
 # Load Environment Variables
@@ -33,59 +33,7 @@ def runBot(token):
         TypeHandler(Update, middleware), group=-1
     )  # called in every update, then passed to other handlers
 
-    commands = {
-        "start": startCommand,
-        "help": helpCommand,
-        "about": aboutCommand,
-        "use": useCommand,
-        "ping": pingCommand,
-        "info": infoCommand,
-        "surah": surahCommand,
-        "get": getCommand,
-        "audio": audioCommand,
-        "tafsir": tafsirCommand,
-        ("random", "rand"): randomCommand,
-        (
-            "translations",
-            "langs",
-            "languages",
-        ): translationsCommand,  # "languages" is an alias for "translations"
-        "settings": updateSettings,
-    }
-    adminCommands = {
-        "admin": adminCommand,
-        "forward": forwardMessage,
-        "getUser": getUser,
-        "eval": evaluateCode,
-    }
-
-    for cmd, handler in commands.items():
-        if type(cmd) == list:
-            for alias in cmd:
-                app.add_handler(
-                    CommandHandler(alias, handler, ~filters.ChatType.CHANNEL)
-                )
-            continue
-
-        app.add_handler(CommandHandler(cmd, handler, ~filters.ChatType.CHANNEL))
-
-    for cmd, handler in adminCommands.items():
-        app.add_handler(CommandHandler(cmd, handler, filters.User(db.getAllAdmins())))
-
-    app.add_handler(CallbackQueryHandler(handleButtonPress))
-    app.add_handler(InlineQueryHandler(handleInlineQuery))
-    app.add_handler(
-        MessageHandler(
-            (~filters.ChatType.CHANNEL)
-            & filters.Regex(
-                r"^\/([A-Za-z]{1,10})\s\d+\s?:*\s?\d*$"
-            ),  # match: /<lang> <surah>:<ayah> or /<lang> <surah>
-            getTranslationCommand,
-        )
-    )
-    app.add_handler(
-        MessageHandler(filters.TEXT & ~filters.ChatType.CHANNEL, handleMessage)
-    )
+    app.add_handlers(handlers=exportedHandlers)
 
     app.add_error_handler(handleErrors)
 

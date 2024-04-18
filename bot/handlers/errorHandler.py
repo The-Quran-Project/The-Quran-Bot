@@ -3,10 +3,9 @@ import traceback
 
 from io import BytesIO
 from html import escape
-from telegram import Update, Bot, Message
-from telegram.ext import CallbackContext
-
 from .database import db
+from telegram.ext import CallbackContext
+from telegram import Update, Bot, Message
 
 
 async def handleErrors(u: Update, c: CallbackContext):

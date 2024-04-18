@@ -7,3 +7,5 @@ benchmark.py
 bot/__pycache__/
 bot/utils/__pycache__/
 test*
+users.json
+realUsers.json

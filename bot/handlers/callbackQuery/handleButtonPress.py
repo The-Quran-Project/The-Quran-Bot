@@ -1,10 +1,12 @@
+from telegram.ext import CallbackQueryHandler
 from telegram import Update, Bot, InlineKeyboardMarkup
 
-from . import Quran
-from . import Constants
-from .database import db
-from .helpers import getAyahReply, getAyahReplyFromPreference, getAyahButton
-from .callbackQueryHandlers import handleSettingsButtonPress, handleAdminButtonPress
+
+from .. import Quran
+from .. import Constants
+from ..database import db
+from . import handleSettingsButtonPress, handleAdminButtonPress
+from ..helpers import getAyahReply, getAyahReplyFromPreference, getAyahButton
 
 
 async def handleButtonPress(u: Update, c):
@@ -33,7 +35,6 @@ async def handleButtonPress(u: Update, c):
         return await query.answer(
             "Only the message owner can use this buttons", show_alert=True
         )
-
 
     previewLink = False
     if isGroup:
@@ -200,3 +201,6 @@ async def handleButtonPress(u: Update, c):
     await message.edit_text(
         reply, reply_markup=buttons, disable_web_page_preview=bool(1 - previewLink)
     )
+
+
+exportedHandlers = [CallbackQueryHandler(handleButtonPress)]

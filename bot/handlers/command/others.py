@@ -1,6 +1,7 @@
 import time
 import html
 from telegram import Update
+from telegram.ext import CommandHandler
 
 
 def escapeHTML(text: str):
@@ -65,3 +66,9 @@ Time Zone   : +00:00 UTC</b>
 
     else:
         await message.reply_html(reply)
+
+
+exportedHandlers = [
+    CommandHandler("ping", pingCommand),
+    CommandHandler("info", infoCommand),
+]

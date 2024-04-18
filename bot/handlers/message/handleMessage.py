@@ -1,11 +1,12 @@
 import html
 import string
 
+from telegram.ext import MessageHandler, filters
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 
-from . import Quran
-from .database import db
-from .helpers import getValidReply
+from .. import Quran
+from ..database import db
+from ..helpers import getValidReply
 from .replyToErrorMessage import replyToErrorMessage
 
 
@@ -100,3 +101,8 @@ baqarah
         "reply": f"These{attachedUserID}are the surah that matches the most with the text you sent:",
         "buttons": buttons,
     }
+
+
+exportedHandlers = [
+    MessageHandler(filters.TEXT & ~filters.ChatType.CHANNEL, handleMessage)
+]

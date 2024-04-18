@@ -1,9 +1,9 @@
-import html
-
+from telegram.ext import CommandHandler
 from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
-from ..database import db
+
 from .. import Quran
+from ..database import db
 
 
 arabicStyles = {
@@ -139,3 +139,8 @@ Change the settings of the group from here.
     ]
 
     await message.reply_html(reply, reply_markup=InlineKeyboardMarkup(buttons))
+
+
+exportedHandlers = [
+    CommandHandler("settings", updateSettings),
+]

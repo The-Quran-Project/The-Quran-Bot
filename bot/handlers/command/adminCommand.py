@@ -1,8 +1,15 @@
 import html
 
-from telegram import Update, Message, Bot, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import CommandHandler, filters
+from telegram import (
+    Bot,
+    Update,
+    InlineKeyboardButton,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+)
 
-from .database import db
+from ..database import db
 
 
 def escapeHtml(text: str):
@@ -208,3 +215,11 @@ async def evaluateCode(u: Update, c):
 """
 
     await message.reply_html(reply)
+
+
+exportedHandlers = [
+    CommandHandler("admin", adminCommand, filters.User(db.getAllAdmins())), # TODO: use decorators instead
+    CommandHandler("forward", forwardMessage, filters.User(db.getAllAdmins())),
+    CommandHandler("getUser", getUser, filters.User(db.getAllAdmins())),
+    CommandHandler("eval", evaluateCode, filters.User(db.getAllAdmins())),
+]
