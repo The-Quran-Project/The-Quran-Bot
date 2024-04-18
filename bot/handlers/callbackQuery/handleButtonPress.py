@@ -24,12 +24,14 @@ async def handleButtonPress(u: Update, c):
 
     isGroup = u.effective_chat.type in ("group", "supergroup")
     messageOwnerID = queryData.split()[-1]
+    groupAnonymousBot = 1087968824
 
     valid_commands = ("surahName", "prev", "next")
     if (
         isGroup
         and messageOwnerID.isdigit()
         and len(messageOwnerID) >= 9
+        and int(messageOwnerID) != groupAnonymousBot
         and str(userID) != messageOwnerID
         and queryData.split()[0] not in valid_commands
     ):
@@ -52,7 +54,7 @@ async def handleButtonPress(u: Update, c):
         return await message.delete()
 
     elif method == "audio":
-        if u.effective_chat.type in ("group", "supergroup"): # for groups
+        if u.effective_chat.type in ("group", "supergroup"):  # for groups
             permissions = await bot.getChatMember(chatID, bot.id)
             try:
                 if not permissions.can_send_audios:
@@ -90,7 +92,7 @@ async def handleButtonPress(u: Update, c):
         else:  # When selected from surahNames
             messageOwnerID = int(entities[1].url.split("/")[-1])
 
-        if messageOwnerID != userID:
+        if messageOwnerID != groupAnonymousBot and messageOwnerID != userID:
             return await query.answer(
                 "Only the message owner can use this buttons", show_alert=True
             )
@@ -109,7 +111,7 @@ async def handleButtonPress(u: Update, c):
 
         url = message.entities
         messageOwnerID = int(url[1].url.split("/")[-1])
-        if messageOwnerID != userID:
+        if messageOwnerID != groupAnonymousBot and messageOwnerID != userID:
             return await query.answer(
                 "Only the message owner can use this buttons", show_alert=True
             )
