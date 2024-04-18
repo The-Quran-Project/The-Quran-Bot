@@ -7,7 +7,7 @@ import threading
 from dotenv import load_dotenv
 from pymongo.server_api import ServerApi
 from pymongo.mongo_client import MongoClient
-
+from collections.abc import Iterable
 
 load_dotenv()
 
@@ -23,9 +23,10 @@ if os.environ.get("LOCAL"):
 class LocalDB:
     """Local Database to store users and chats in memory."""
 
-    def __init__(self, users: list, chats: list) -> None:
+    def __init__(self, users: Iterable, chats: Iterable, channels: Iterable) -> None:
         self.users = list(users)
         self.chats = list(chats)
+        self.channels = list(channels)
         self.admins = [i["_id"] for i in self.users if i.get("is_admin")]
         print(f"LocalDB: {len(self.users)} users, {len(self.chats)} chats")
 
@@ -35,12 +36,19 @@ class LocalDB:
     def findChat(self, chatID: int) -> dict:
         return next((i for i in self.chats if i["_id"] == chatID), None)
 
+    def findChannel(self, channelID: int) -> dict:
+        return next((i for i in self.channels if i["_id"] == channelID), None)
+
     def addUser(self, user) -> None:
         self.users.append(user)
         return None
 
     def addChat(self, chat) -> None:
         self.chats.append(chat)
+        return None
+
+    def addChannel(self, channel) -> None:
+        self.channels.append(channel)
         return None
 
     def updateUser(self, userID: int, settings: dict) -> dict:
@@ -58,6 +66,14 @@ class LocalDB:
 
         chat["settings"] = {**chat["settings"], **settings}
         return chat
+
+    def updateChannel(self, channelID: int, settings: dict) -> dict:
+        channel = self.findChannel(channelID)
+        if not channel:
+            channel = self.addChannel(channelID)
+
+        channel["settings"] = {**channel["settings"], **settings}
+        return channel
 
     def getAllUsers(self) -> list:
         return self.users
@@ -88,11 +104,15 @@ class Database:
             "previewLink": False,  # Show preview of the Tafsir link
             "restrictedLangs": ["ar"],
         }
+        self.defaultChannelSettings = {
+            "schedule": {"hour": 0, "minute": 0},
+        }
         # --- Local DB ---
         self.queue = []
-        users = self.db.users.find({})
+        channels = self.db.channels.find({})
         chats = self.db.chats.find({})
-        self.localDB = LocalDB(users, chats)
+        users = self.db.users.find({})
+        self.localDB = LocalDB(users, chats, channels)
 
         # --- Scheduled Tasks ---
         schedule.every(20).seconds.do(self.runQueue)
@@ -119,6 +139,10 @@ class Database:
         res = self.localDB.getAllChat()
         return res
 
+    def getAllChannels(self):
+        res = self.localDB.getAllChannels()
+        return res
+
     def getAllAdmins(self):
         res = self.localDB.getAllAdmins()
         return res
@@ -129,6 +153,10 @@ class Database:
 
     def getChat(self, chatID: int):
         res = self.localDB.findChat(chatID)
+        return res
+
+    def getChannel(self, channelID: int):
+        res = self.localDB.findChannel(channelID)
         return res
 
     def addUser(self, userID: int):
@@ -148,6 +176,15 @@ class Database:
         value = chat
         self.queue.append((func, value))
         return chat
+
+    def addChannel(self, channelID: int):
+        channel = {"_id": channelID, "settings": self.defaultChannelSettings}
+        self.localDB.addChannel(channel)
+
+        func = self.db.channels.insert_one
+        value = channel
+        self.queue.append((func, value))
+        return channel
 
     def updateUser(self, userID: int, settings: dict):
         user = self.getUser(userID)
@@ -175,8 +212,21 @@ class Database:
         self.queue.append((func, value))
         return None
 
+    def updateChannel(self, channelID: int, settings: dict):
+        channel = self.getChannel(channelID)
+        if not channel:
+            channel = self.addChannel(channelID)
+
+        settings = {**channel["settings"], **settings}
+        self.localDB.updateChannel(channelID, settings)
+
+        func = self.db.channels.update_one
+        value = ({"_id": channelID}, {"$set": {"settings": settings}})
+        self.queue.append((func, value))
+        return None
+
     def runQueue(self):
-        print("--- Running Queue ---\r", end='')
+        print("--- Running Queue ---\r", end="")
         start = time.time()
 
         for func, value in self.queue:
@@ -192,8 +242,9 @@ class Database:
     # TODO: keep count of all the requests handled per day
     # Run this in a separate thread or use a TypeHandler to run after the other handlers (group=3)
     # so it doesn't block the event loop
-    def updateCounter(self, date: str):
-        self.db.update_one({"_id": date}, {"$inc": "requests"})
+    def updateCounter(self):
+        date = time.strftime("%Y-%m-%d")
+        self.db.analytics.update_one({"_id": date}, {"$inc": "requests"})
 
     # def deleteUser(self, userID: int):
     #     return self.db.users.delete_one({"_id": userID})
