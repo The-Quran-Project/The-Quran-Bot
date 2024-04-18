@@ -58,7 +58,7 @@ Time Zone   : +00:00 UTC</b>
 
     pps = profile_photos["photos"]
 
-    if pps and chatID == userID:
+    if pps and u.effective_chat.type == "private":
         photo = pps[0][-1]["file_id"]
         await message.reply_photo(
             photo, caption=f"👆🏻<u><b>Your Profile Photo</b></u> 👌🏻\n\n{reply}"

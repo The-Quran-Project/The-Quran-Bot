@@ -21,7 +21,7 @@ async def updateSettings(u: Update, c):
     userID = u.effective_user.id
     chatID = u.effective_chat.id
 
-    if chatID != userID:  # if not private chat
+    if u.effective_chat.type in ("group", "supergroup"):  # if group
         return await updateSettingsForGroup(u, c)
 
     user = db.getUser(userID)

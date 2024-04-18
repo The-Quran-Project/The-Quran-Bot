@@ -21,7 +21,7 @@ async def handleButtonPress(u: Update, c):
     method = queryData.split()[0]
     reply = buttons = None
 
-    isGroup = chatID != userID
+    isGroup = u.effective_chat.type in ("group", "supergroup")
     messageOwnerID = queryData.split()[-1]
 
     valid_commands = ("surahName", "prev", "next")
@@ -51,7 +51,7 @@ async def handleButtonPress(u: Update, c):
         return await message.delete()
 
     elif method == "audio":
-        if chatID != userID:
+        if u.effective_chat.type in ("group", "supergroup"): # for groups
             permissions = await bot.getChatMember(chatID, bot.id)
             try:
                 if not permissions.can_send_audios:

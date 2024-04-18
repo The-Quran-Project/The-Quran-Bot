@@ -11,7 +11,7 @@ async def handleAdminButtonPress(u: Update, c):
     message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id
-    isGroup = chatID != userID
+    isGroup = u.effective_chat.type in ("group", "supergroup")
 
     user = db.getUser(userID)
 

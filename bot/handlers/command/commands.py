@@ -27,7 +27,7 @@ async def startCommand(u: Update, c):
     buttons = InlineKeyboardMarkup([[InlineKeyboardButton("Github", url=url)]])
 
     msg: Message = message
-    if chatID == userID:  # Send sticker only if it's a private chat
+    if u.effective_chat.type == "private":  # Send sticker only if it's a private chat
         msg = await message.reply_sticker(Constants.salamSticker)
 
     await msg.reply_html(reply, reply_markup=buttons)

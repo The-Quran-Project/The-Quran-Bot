@@ -1,3 +1,5 @@
+import json
+
 from telegram import Update
 from telegram.ext import TypeHandler
 
@@ -11,9 +13,16 @@ async def middleware(u: Update, c):
     if u.inline_query:
         return
 
+    if u.channel_post:
+        await u.effective_message.reply_html(
+            f"<pre>{json.dumps(json.loads(u.to_json()), indent=4, ensure_ascii=False)}</pre>"
+        )
+
+        return
+
     userID = u.effective_user.id
     chatID = u.effective_chat.id
-    isGroup = chatID != userID
+    isGroup = u.effective_chat.type in ("group", "supergroup")
 
     user = db.getUser(userID)
 
