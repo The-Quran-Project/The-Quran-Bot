@@ -5,7 +5,8 @@ from telegram import Update, Bot, InlineKeyboardMarkup
 from .. import Quran
 from .. import Constants
 from ..database import db
-from . import handleSettingsButtonPress, handleAdminButtonPress
+from .handleAdminButtonPress import handleAdminButtonPress
+from .handleSettingsButtonPress import handleSettingsButtonPress
 from ..helpers import getAyahReply, getAyahReplyFromPreference, getAyahButton
 
 
