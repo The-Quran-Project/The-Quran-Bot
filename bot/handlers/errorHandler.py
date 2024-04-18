@@ -1,11 +1,15 @@
+import html
 import json
 import traceback
 
 from io import BytesIO
-from html import escape
 from .database import db
 from telegram.ext import CallbackContext
 from telegram import Update, Bot, Message
+
+
+def escape(text: any):
+    return html.escape(str(text))
 
 
 async def handleErrors(u: Update, c: CallbackContext):
@@ -52,12 +56,12 @@ async def handleErrors(u: Update, c: CallbackContext):
     admins = db.getAllAdmins()
     data = {
         "error_message": str(c.error),
-        "error": tbString,
+        "error": tbString.replace("\\n", '\n'),
         "update": u.to_dict(),
         "sendingError": messageSendingError,
     }
     for admin in admins:
-        chatID = admin["_id"]
+        chatID = admin
         try:
             # forward the message the user sent
             msgID = None

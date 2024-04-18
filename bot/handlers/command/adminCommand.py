@@ -10,17 +10,18 @@ from telegram import (
 )
 
 from ..database import db
+from ..helpers.decorators import onlyDeveloper
 
 
 def escapeHtml(text: str):
     return html.escape(str(text))
 
 
+@onlyDeveloper
 async def adminCommand(u: Update, c):
     """Sends a message to the user on how to use the bot"""
     message = u.effective_message
     userID = u.effective_user.id
-    user = db.getUser(userID)
     buttons = [
         [
             InlineKeyboardButton("Users Len", callback_data="admin users len"),
@@ -35,10 +36,6 @@ async def adminCommand(u: Update, c):
             InlineKeyboardButton("Get Admins", callback_data="admin admins all"),
         ],
     ]
-    if not user.get("is_admin"):
-        await message.reply_html("<b>You are not an admin</b>")
-        return
-
     reply = """
 <u><b>Admin Panel</b></u>
 
@@ -50,15 +47,12 @@ async def adminCommand(u: Update, c):
     await message.reply_html(reply, reply_markup=InlineKeyboardMarkup(buttons))
 
 
+@onlyDeveloper
 async def forwardMessage(u: Update, c):
     """Forwards a message to a chat or All chats"""
     message = u.effective_message
     userID = u.effective_user.id
     user = db.getUser(userID)
-
-    if not user.get("is_admin"):
-        await message.reply_html("<b>You are not an admin</b>")
-        return
 
     if not message.reply_to_message:
         await message.reply_html("<b>Reply to a message</b>")
@@ -109,16 +103,13 @@ async def forwardMessage(u: Update, c):
     await message.reply_html("<b>Invalid chatID</b>")
 
 
+@onlyDeveloper
 async def getUser(u: Update, c):
     """Gets a user's details"""
     bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id
     user = db.getUser(userID)
-
-    if not user.get("is_admin"):
-        await message.reply_html("<b>You are not an admin</b>")
-        return
 
     chatID = message.text.split()[1]
     if not chatID[1:].isdigit():
@@ -160,26 +151,15 @@ Bio:
     await message.reply_html(reply)
 
 
-"""About the use of eval:
-    As only the developers will be using it, therefore the use of eval is (acceptable)
-    
-Command:
-    /eval expression
-"""
-
-
+# Command:
+#     /eval expression
+@onlyDeveloper
 async def evaluateCode(u: Update, c):
     """Evaluate an expression and send the output to admin"""
     bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id
     user = db.getUser(userID)
-
-    if not user.get("is_admin"):
-        await message.reply_html("<b>You are not an admin</b>")
-        return
-    # if not message.reply_to_message:
-    #    return await message.reply_html("<b>Reply to an expression</b>")
 
     text = message.text[5:].strip()
     print(text)
@@ -218,7 +198,9 @@ async def evaluateCode(u: Update, c):
 
 
 exportedHandlers = [
-    CommandHandler("admin", adminCommand, filters.User(db.getAllAdmins())), # TODO: use decorators instead
+    CommandHandler(
+        "admin", adminCommand, filters.User(db.getAllAdmins())
+    ),  # TODO: use decorators instead
     CommandHandler("forward", forwardMessage, filters.User(db.getAllAdmins())),
     CommandHandler("getUser", getUser, filters.User(db.getAllAdmins())),
     CommandHandler("eval", evaluateCode, filters.User(db.getAllAdmins())),

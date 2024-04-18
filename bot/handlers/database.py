@@ -1,13 +1,13 @@
 import os
 import time
 import asyncio
-import schedule
 import threading
+import schedule as scheduleModule
 
 from dotenv import load_dotenv
+from collections.abc import Iterable
 from pymongo.server_api import ServerApi
 from pymongo.mongo_client import MongoClient
-from collections.abc import Iterable
 
 load_dotenv()
 
@@ -20,14 +20,15 @@ if os.environ.get("LOCAL"):
     dns.resolver.default_resolver.nameservers = ["8.8.8.8"]
 
 
-class LocalDB:
+class _LocalDB:
     """Local Database to store users and chats in memory."""
 
-    def __init__(self, users: Iterable, chats: Iterable, channels: Iterable) -> None:
+    def __init__(self, users, chats, channels, schedules) -> None:
         self.users = list(users)
         self.chats = list(chats)
         self.channels = list(channels)
         self.admins = [i["_id"] for i in self.users if i.get("is_admin")]
+        self.schedules = list(schedules)
         print(f"LocalDB: {len(self.users)} users, {len(self.chats)} chats")
 
     def findUser(self, userID: int) -> dict:
@@ -38,6 +39,9 @@ class LocalDB:
 
     def findChannel(self, channelID: int) -> dict:
         return next((i for i in self.channels if i["_id"] == channelID), None)
+
+    def findSchedule(self, chatID: int):
+        return next((i for i in self.schedules if i["_id"] == chatID), None)
 
     def addUser(self, user) -> None:
         self.users.append(user)
@@ -75,6 +79,11 @@ class LocalDB:
         channel["settings"] = {**channel["settings"], **settings}
         return channel
 
+    def updateSchedule(self, chatID: int, data):
+        schedule = self.findSchedule(chatID)
+        schedule = data
+        return schedule
+
     def getAllUsers(self) -> list:
         return self.users
 
@@ -84,12 +93,19 @@ class LocalDB:
     def getAllAdmins(self) -> list:
         return self.admins
 
+    def getAllChannels(self) -> list:
+        return self.channels
+
+    def getAllSchedules(self):
+        return self.schedules
+
 
 class Database:
     def __init__(self) -> None:
         uri = os.environ.get("MONGODB_URI")
         self.client = MongoClient(uri, server_api=ServerApi("1"))
-        self.db = self.client.quranbot
+        self.db = self.client.quranbot_test  # TODO: change it to quranbot
+
         self.defaultSettings = {
             "font": 1,  # 1 -> Uthmani, 2 -> Simple
             "showTafsir": True,
@@ -104,23 +120,27 @@ class Database:
             "previewLink": False,  # Show preview of the Tafsir link
             "restrictedLangs": ["ar"],
         }
-        self.defaultChannelSettings = {
-            "schedule": {"hour": 0, "minute": 0},
-        }
+        self.defaultChannelSettings = {}
+
         # --- Local DB ---
         self.queue = []
         channels = self.db.channels.find({})
         chats = self.db.chats.find({})
         users = self.db.users.find({})
-        self.localDB = LocalDB(users, chats, channels)
+        schedules = self.db.schedules.find({})
+        self.localDB = _LocalDB(users, chats, channels, schedules)
 
         # --- Scheduled Tasks ---
-        schedule.every(20).seconds.do(self.runQueue)
+        interval = 60
+        if os.environ.get("LOCAL"):
+            interval = 20
+
+        scheduleModule.every(interval).seconds.do(self.runQueue)
 
         def runScheduledTasks():
             while True:
                 try:
-                    schedule.run_pending()
+                    scheduleModule.run_pending()
                 except Exception as e:
                     print("Error in scheduled tasks:", e)
                 time.sleep(1)
@@ -147,6 +167,10 @@ class Database:
         res = self.localDB.getAllAdmins()
         return res
 
+    def getAllSchedules(self):
+        res = self.localDB.getAllSchedules()
+        return res
+
     def getUser(self, userID: int):
         res = self.localDB.findUser(userID)
         return res
@@ -157,6 +181,10 @@ class Database:
 
     def getChannel(self, channelID: int):
         res = self.localDB.findChannel(channelID)
+        return res
+
+    def getSchedule(self, chatID: int):
+        res = self.localDB.findSchedule(chatID)
         return res
 
     def addUser(self, userID: int):
@@ -185,6 +213,13 @@ class Database:
         value = channel
         self.queue.append((func, value))
         return channel
+
+    def addSchedule(self, item):
+        self.localDB.schedules.append(item)
+
+        func = self.db.schedules.insert_one
+        value = item
+        self.queue.append((func, value))
 
     def updateUser(self, userID: int, settings: dict):
         user = self.getUser(userID)
@@ -225,6 +260,14 @@ class Database:
         self.queue.append((func, value))
         return None
 
+    def updateSchedule(self, chatID: int, data: dict):
+        self.localDB.updateSchedule(chatID, data)
+
+        func = self.db.schedules.update_one
+        value = ({"_id": chatID}, {"$set": {"data": data}})
+        self.queue.append((func, value))
+        return None
+
     def runQueue(self):
         print("--- Running Queue ---\r", end="")
         start = time.time()
@@ -252,10 +295,10 @@ class Database:
     # def deleteAllUsers(self):
     #     return self.db.users.delete_many({})
 
-    def deleteEverything(self):
-        return
-        self.db.drop_collection(self.db.users)
-        self.db.drop_collection(self.db.chats)
+    # def deleteEverything(self):
+    #     return
+    #     self.db.drop_collection(self.db.users)
+    #     self.db.drop_collection(self.db.chats)
 
 
 db = Database()
@@ -267,6 +310,29 @@ async def main():
     print("Total Users:", len(users))
     print("Total Chats:", len(chats))
     print(db.getAllAdmins())
+
+    # test
+    print(db.getAllSchedules())
+    chat = db.addSchedule(
+        {
+            "_id": 121,
+            "data": {
+                "time": "12:12",
+                "say":"meow"
+            },
+        }
+    )
+    print(db.getSchedule(121))
+    print(db.getAllSchedules())
+    db.updateSchedule(
+        121,
+        {
+            "time": "1:23",
+            "say":"meow"
+        }
+    )
+    print(db.getSchedule(121))
+
 
 
 if __name__ == "__main__":

@@ -21,6 +21,7 @@ Structure of json files in Data folder:
 class objectify:
     english_1: str
     english_2: str
+    arabic: str
     arabic_1: str
     arabic_2: str
     bengali: str
@@ -128,6 +129,7 @@ class QuranClass:
 
         res = {
             "arabic_1": z[0],
+            "arabic": z[0],
             "arabic_2": z[1],
             **result,
             "tafsir": graph,

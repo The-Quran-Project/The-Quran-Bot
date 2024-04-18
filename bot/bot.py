@@ -2,9 +2,9 @@ import os
 import asyncio
 
 from telegram.ext import *
-from datetime import datetime, timezone
 from dotenv import load_dotenv
 from telegram import Update, constants
+from datetime import datetime, timezone
 
 from .handlers.database import db
 from .handlers import exportedHandlers, handleErrors, middleware
@@ -31,7 +31,7 @@ def runBot(token):
         .build()
     )
     app.add_handler(
-        TypeHandler(Update, middleware), group=-1
+        TypeHandler(Update, middleware), group=-19
     )  # called in every update, then passed to other handlers
 
     app.add_handlers(handlers=exportedHandlers)
