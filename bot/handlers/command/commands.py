@@ -274,7 +274,7 @@ exportedHandlers = [
     MessageHandler(
         (~filters.ChatType.CHANNEL)
         & filters.Regex(
-            r"^\/([A-Za-z]{1,10})\s\d+\s?:*\s?\d*$"
+            r"^\/([A-Za-z0-9]{1,10})\s\d+\s?:*\s?\d*$"
         ),  # match: /<lang> <surah>:<ayah> or /<lang> <surah>
         getTranslationCommand,
     ),
