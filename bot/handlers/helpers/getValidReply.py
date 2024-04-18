@@ -1,5 +1,6 @@
 from .. import Quran
-from . import getAyahReply, getAyahButton, getAyahReplyFromPreference
+from .getAyahReply import getAyahReply, getAyahReplyFromPreference
+from .getAyahButton import getAyahButton
 
 
 validFormat = """

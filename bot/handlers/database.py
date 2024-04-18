@@ -176,7 +176,7 @@ class Database:
         return None
 
     def runQueue(self):
-        print("--- Running Queue ---")
+        print("--- Running Queue ---\r", end='')
         start = time.time()
 
         for func, value in self.queue:

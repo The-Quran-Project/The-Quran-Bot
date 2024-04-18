@@ -1,7 +1,8 @@
 import secrets
 
 from .. import Quran
-from ..helpers import getAyahButton, getAyahReplyFromPreference
+from .getAyahButton import getAyahButton
+from .getAyahReply import getAyahReplyFromPreference
 
 
 def getRandomAyah(userID):

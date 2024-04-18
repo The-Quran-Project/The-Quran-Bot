@@ -2,12 +2,13 @@ import os
 import asyncio
 
 from telegram.ext import *
-from datetime import datetime
+from datetime import datetime, timezone
 from dotenv import load_dotenv
 from telegram import Update, constants
 
 from .handlers.database import db
 from .handlers import exportedHandlers, handleErrors, middleware
+
 
 
 # Load Environment Variables
@@ -39,22 +40,24 @@ def runBot(token):
 
     # Send a message to the admin when the bot starts
     loop = asyncio.get_event_loop()
-    msg = f"<b>Bot started at {datetime.now().strftime('%d %B %Y, %H:%M:%S %A GMT+6')} 🚀</b>"
+    
+    msg = f"<b>Bot started at {datetime.now(timezone.utc).strftime('%d %B %Y, %H:%M:%S %A UTC')} 🚀</b>"
     loop.run_until_complete(app.bot.sendMessage(5596148289, msg))
 
     app.run_polling()
 
 
 def startBot():
+    if not TOKEN:
+        print("Please put your bot token in `.env` file")
+        print()
+        return
+    
     if LOCAL:
         print("-" * 27)
         print("Running on local test Bot")
         print("-" * 27)
 
-    if not TOKEN:
-        print("Please put your bot token in `.env` file")
-        print()
-        return
 
     runBot(TOKEN)
 

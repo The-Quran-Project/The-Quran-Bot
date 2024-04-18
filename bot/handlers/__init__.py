@@ -22,12 +22,12 @@ class Constants:
     allSurahInlineButtons = generateSurahButtons(Quran)
 
 
-from middleware import middleware
-from errorHandler import handleErrors
-from command import handlers as commandHandlers
-from message import handlers as messageHandlers
-from inlineQuery import handlers as inlineQueryHandlers
-from callbackQuery import handlers as callbackQueryHandlers
+from .middleware import middleware
+from .errorHandler import handleErrors
+from .command import handlers as commandHandlers
+from .message import handlers as messageHandlers
+from .inlineQuery import handlers as inlineQueryHandlers
+from .callbackQuery import handlers as callbackQueryHandlers
 
 exportedHandlers = [
     *commandHandlers,
