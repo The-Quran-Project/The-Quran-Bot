@@ -4,7 +4,7 @@ from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
 from .. import Quran
 from ..database import db
-
+from ..helpers.decorators import onlyGroupAdmin
 
 arabicStyles = {
     "1": "Uthmani",
@@ -21,7 +21,7 @@ async def updateSettings(u: Update, c):
     userID = u.effective_user.id
     chatID = u.effective_chat.id
 
-    if chatID != userID:  # if not private chat
+    if u.effective_chat.type in ("group", "supergroup"):  # if group
         return await updateSettingsForGroup(u, c)
 
     user = db.getUser(userID)
@@ -69,6 +69,7 @@ Change your settings to your preference.
 
 
 # Will be called when the user is in a group
+@onlyGroupAdmin
 async def updateSettingsForGroup(u: Update, c):
     """Sends the settings message to groups to change preferences (only for group admins)"""
 
@@ -76,22 +77,6 @@ async def updateSettingsForGroup(u: Update, c):
     message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id
-
-    # Check if the user is a group admin
-    isAnonymous = False
-    if userID == 1087968824:  # Group Anonymous Bot
-        isAnonymous = True
-    if not isAnonymous:
-        member = await bot.getChatMember(chatID, userID)
-
-    if (
-        not isAnonymous
-        and member.status not in ["creator", "administrator"]
-        and userID not in db.getAllAdmins()
-    ):
-        return await message.reply_html(
-            "<b>Only the group admin can change the settings in the group</b>"
-        )
 
     chat = db.getChat(chatID)
 

@@ -3,6 +3,9 @@
 **Latests are on top**
 
 
+## 13) 19th April, 2024
+- `/schedule` command added. Now, you can schedule a verse to be sent at a specific time of every day.
+
 
 ## 12) 5th April, 2024
 - Integrate custom local database logic to make database operations faster and more efficient.

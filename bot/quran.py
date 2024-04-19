@@ -1,5 +1,6 @@
 import os
 import json
+import secrets
 
 
 """
@@ -21,6 +22,7 @@ Structure of json files in Data folder:
 class objectify:
     english_1: str
     english_2: str
+    arabic: str
     arabic_1: str
     arabic_2: str
     bengali: str
@@ -128,12 +130,25 @@ class QuranClass:
 
         res = {
             "arabic_1": z[0],
+            "arabic": z[0],
             "arabic_2": z[1],
             **result,
             "tafsir": graph,
         }
 
         return objectify(res)
+
+    def random(self):
+        randSurah = secrets.randbelow(114) + 1  # number -> 1 to 114
+        ayahCount = self.getAyahNumberCount(randSurah)
+        randAyah = secrets.randbelow(ayahCount) + 1  # number -> 1 to `ayahCount`
+
+        return {
+            "verse": self.getAyah(randSurah, randAyah),
+            "surahNo": randSurah,
+            "ayahNo": randAyah,
+            "totalAyah": ayahCount,
+        }
 
     def getSurahNames(self):
         return self.SURAH_NAMES
@@ -189,6 +204,8 @@ class QuranClass:
         text = text.lower()
         if text == "en2":
             return "english_2"  # Mufti Taqi Usmani
+        if text == "bn":
+            return "bengali"
 
         for lang in self.languages:
             if lang.startswith(text):
@@ -206,6 +223,12 @@ class QuranClass:
             return None
 
         return self.titleLanguages[abbr]
+
+    def getTitleLanguageFromLang(self, lang):
+        if not lang or lang == "None":
+            return None
+
+        return self.titleLanguages[self.getAbbr(lang)]
 
     def getLanguages(self) -> dict:
         return self.titleLanguages.items()

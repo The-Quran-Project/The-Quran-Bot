@@ -2,13 +2,13 @@ import os
 import asyncio
 
 from telegram.ext import *
-from datetime import datetime, timezone
 from dotenv import load_dotenv
 from telegram import Update, constants
+from datetime import datetime, timezone
 
 from .handlers.database import db
+from .handlers.sendScheduled import jobSendScheduled
 from .handlers import exportedHandlers, handleErrors, middleware
-
 
 
 # Load Environment Variables
@@ -30,8 +30,11 @@ def runBot(token):
         .connect_timeout(333)
         .build()
     )
+
+    app.job_queue.run_repeating(jobSendScheduled, 60, name="scheduledMessages")
+
     app.add_handler(
-        TypeHandler(Update, middleware), group=-1
+        TypeHandler(Update, middleware), group=-19
     )  # called in every update, then passed to other handlers
 
     app.add_handlers(handlers=exportedHandlers)
@@ -40,7 +43,7 @@ def runBot(token):
 
     # Send a message to the admin when the bot starts
     loop = asyncio.get_event_loop()
-    
+
     msg = f"<b>Bot started at {datetime.now(timezone.utc).strftime('%d %B %Y, %H:%M:%S %A UTC')} 🚀</b>"
     loop.run_until_complete(app.bot.sendMessage(5596148289, msg))
 
@@ -52,12 +55,11 @@ def startBot():
         print("Please put your bot token in `.env` file")
         print()
         return
-    
+
     if LOCAL:
         print("-" * 27)
         print("Running on local test Bot")
         print("-" * 27)
-
 
     runBot(TOKEN)
 
