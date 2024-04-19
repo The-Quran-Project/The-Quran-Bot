@@ -67,6 +67,7 @@ async def scheduleCommand(u: Update, c: ContextTypes.DEFAULT_TYPE):
         return
 
     langs = [Quran.detectLanguage(i) for i in langs]
+    langs = list(dict.fromkeys(langs))
     languages = [str(Quran.getTitleLanguageFromLang(i)) for i in langs]
     currentTime = datetime.utcnow()
     hours, minutes = result.split(":")
