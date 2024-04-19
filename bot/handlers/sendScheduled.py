@@ -33,7 +33,7 @@ async def jobSendScheduled(context: ContextTypes.DEFAULT_TYPE):
                 f"Chat ID: {chatID}, Time: {runTime}, Now Time: {nowHour}:{nowMinute}"
             )
 
-            if hour == nowHour and abs(nowMinute - minute) <= 10:
+            if hour == nowHour and nowMinute - minute <= 5:
                 print("Sending scheduled verse...")
                 lastSent = schedule.get("lastSent")
                 if lastSent:
