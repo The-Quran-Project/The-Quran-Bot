@@ -240,9 +240,15 @@ class Database:
 
         for func, value in self.queue:
             if isinstance(value, tuple):
-                func(*value)
+                try:
+                    func(*value)
+                except Exception as e:
+                    print("Error in queue:", e)
             else:
-                func(value)
+                try:
+                    func(value)
+                except Exception as e:
+                    print("Error in queue:", e)
 
         end = time.time()
         self.queue = []
