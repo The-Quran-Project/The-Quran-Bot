@@ -1,10 +1,15 @@
+<p align="center" >
+  <img width="200px" src="https://telegra.ph/file/07286283bff972971cbd8.jpg"/>
+</p>
+
+
 # Al Quran Telegram Bot
 ## For the Ummah, By the Ummah
+
 The Al Quran Telegram Bot is an open-source project that enables users to retrieve Arabic or English text, Tafsir and audio of each verse from the Quran.
 The bot can be easily integrated into Telegram, allowing users to access the verses from anywhere at any time.
 
-### To see the Changes and Modifications, see [ChangeLogs.md](ChangeLogs.md)
-### To see what is to be done next, see [TODO.md](TODO.md)
+[ChangeLogs](ChangeLogs.md) [TODOs](TODO.md)
 
 ## How to Use
 
@@ -12,9 +17,7 @@ To use the Al Quran Telegram Bot, you must first have a Telegram account. Once y
 
 1. Search for [@AlFurqanRobot](https://t.me/AlFurqanRobot) in the Telegram app.
 2. Click on the bot and click "Start" to initiate the conversation.
-3. Type in the number of the Surah you want to read or listen to. For example, to read Surah Al-Fatiha, type "1". To listen to Surah Al-Fatiha, type "/audio 1".
-4. Type any surah name to start reading that surah. Ex: Fatiha, nas
-5. You can also search for specific verses by typing in the Surah number and the verse number. For example, to read or listen to Verse 7 of Surah Al-Fatiha, type "1:7" or "/audio 1:7". ( to be added )
+3. Send `/use` command or visit https://telegra.ph/Usage-of-Quran-Bot-04-19
 
 ## How to Contribute
 Contributions to the Al Quran Telegram Bot are welcome and appreciated. Contribution to this will be very helpful for the whole Muslim Ummah.
