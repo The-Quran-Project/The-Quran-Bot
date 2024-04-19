@@ -120,7 +120,9 @@ A random verse will be sent at the following time:
         _addScheduleToTemp(chatID, result, chatType="private", langs=langs)
     else:
         topicID = message.message_thread_id
-        _addScheduleToTemp(chatID, result, chatType="group", langs=langs)
+        _addScheduleToTemp(
+            chatID, result, chatType="group", langs=langs, topicID=topicID
+        )
 
     await message.reply_html(msg, reply_markup=InlineKeyboardMarkup(buttons))
 
