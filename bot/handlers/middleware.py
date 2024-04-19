@@ -16,10 +16,7 @@ async def middleware(u: Update, c):
     # print(u.to_json())
 
     if u.channel_post:
-        await u.effective_message.reply_html(
-            f"<pre>{json.dumps(json.loads(u.to_json()), indent=4, ensure_ascii=False)}</pre>"
-        )
-
+        db.addChannel(u.effective_chat.id)
         return
 
     userID = u.effective_user.id
