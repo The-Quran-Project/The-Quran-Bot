@@ -198,9 +198,7 @@ async def evaluateCode(u: Update, c):
 
 
 exportedHandlers = [
-    CommandHandler(
-        "admin", adminCommand, filters.User(db.getAllAdmins())
-    ),  # TODO: use decorators instead
+    CommandHandler("admin", adminCommand, filters.User(db.getAllAdmins())),
     CommandHandler("forward", forwardMessage, filters.User(db.getAllAdmins())),
     CommandHandler("getUser", getUser, filters.User(db.getAllAdmins())),
     CommandHandler("eval", evaluateCode, filters.User(db.getAllAdmins())),

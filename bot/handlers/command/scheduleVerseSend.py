@@ -1,16 +1,19 @@
+import time
 import regex
 
-from ..database import db
 from .. import Quran
+from ..database import db
 from ..helpers.decorators import onlyGroupAdmin
 
-from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
+from datetime import datetime, tzinfo
 from telegram.ext import MessageHandler, filters, ContextTypes
+from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
 
-def _addScheduleToTemp(chatID: int, time: dict, chatType: str, langs: list = None):
+def _addScheduleToTemp(chatID: int, time: str, chatType: str, langs: list = None):
     """Add a schedule to the temp database."""
     langs = [i for i in langs if i] or ["english_1"]
+    langs = langs[:3]
     collection = db.db.schedules
     return collection.update_one(
         {"_id": chatID},
@@ -44,9 +47,6 @@ pattern = regex.compile(
     regex.IGNORECASE,
 )  # Match for: 11:49 pm - eng ara tur {'hour': '11', 'minute': '49', 'ampm': 'pm', 'langs': 'eng ara tur'}
 
-# TODO: run repeating every minute to check if the time has come
-# Enable, Disable, Delete schedule
-
 
 # /schedule 11:49 pm - eng ara
 @onlyGroupAdmin
@@ -68,12 +68,29 @@ async def scheduleCommand(u: Update, c: ContextTypes.DEFAULT_TYPE):
 
     langs = [Quran.detectLanguage(i) for i in langs]
     languages = [str(Quran.getTitleLanguageFromLang(i)) for i in langs]
+    currentTime = datetime.utcnow()
+    hours, minutes = result.split(":")
+    remaining = (
+        datetime(
+            year=currentTime.year,
+            month=currentTime.month,
+            day=currentTime.day,
+            hour=int(hours),
+            minute=int(minutes),
+            second=0,
+        )
+        - currentTime
+    )
+    remaining = remaining.total_seconds()
+
+    remaining = time.strftime("%H:%M:%S", time.gmtime(remaining))
 
     msg = f"""
 <b>Schedule Enabled</b>
 A random verse will be sent at the following time:
 
-<b>Time:</b> {result["hour"]:02d}:{result["minute"]:02d} UTC (24-hour format)
+<b>Time:</b> {result} UTC (24-hour format)
+<b>Remaining:</b> {remaining}
 
 <b>Language:</b> {", ".join(languages) or "English"}
 
@@ -114,18 +131,35 @@ async def showSchedule(u: Update, c: ContextTypes.DEFAULT_TYPE):
             "No schedule found. See /help for more information."
         )
 
-    time = data.get("time")
+    runTime = data.get("time")
     langs = data.get("langs")
     chatType = data.get("chatType")
     enabled = data.get("enabled")
 
     languages = [str(Quran.getTitleLanguageFromLang(i)) for i in langs]
+    hours, minutes = runTime.split(":")
+
+    currentTime = datetime.utcnow()
+    remaining = (
+        datetime(
+            year=currentTime.year,
+            month=currentTime.month,
+            day=currentTime.day,
+            hour=int(hours),
+            minute=int(minutes),
+            second=0,
+        )
+        - currentTime
+    )
+    remaining = remaining.total_seconds()
+    remaining = time.strftime("%H:%M:%S", time.gmtime(remaining))
 
     msg = f"""
 <b>Schedule Information</b>
 A random verse will be sent at the following time:
 
-<b>Time:</b> {time["hour"]:02d}:{time["minute"]:02d} UTC (24-hour format)
+<b>Time:</b> {hours}:{minutes} UTC (24-hour format)
+<b>Remaining:</b> {remaining}
 
 <b>Languages:</b> <code>{", ".join(languages) or "English"}</code>
 <b>Status:</b> <i>{"Enabled" if enabled else "Disabled"}</i>
@@ -190,7 +224,7 @@ Minute should be less than 60.
         else:
             if hour >= 12:
                 hour -= 12
-
+    return f"{hour:02d}:{minute:02d}"  # 24-hour format
     return {"hour": hour, "minute": minute}
 
 

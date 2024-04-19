@@ -198,7 +198,7 @@ async def handleButtonPress(u: Update, c):
 
     elif method == "close":
         return await message.delete()
-    
+
     elif method == "schedule":
         return await handleSchedule(u, c)
 

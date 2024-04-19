@@ -35,8 +35,9 @@ howToUse = """
 /settings - Change your settings
 /surah - The list of all the Surahs
 /get x:y - Get the ayah x from Surah y
-/&lt;lang&gt; x:y - Get the ayah x from Surah y in the language &lt;lang&gt;
-
+/lang x:y - Get the ayah <code>x</code> from Surah <code>y</code> in the language &lt;lang&gt;
+/schedule 11:30 - Get a random ayah at 11:30 everyday
+<i>See the Telegraph for more in depth usage of schedule</i>
 
 /langs, /languages, /translations - Get the list of all the available translations
 /rand, /random - Get a random ayah

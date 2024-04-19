@@ -1,6 +1,6 @@
 from ..quran import QuranClass
 
-# Variables has to be declared before importing handlers
+# Import after the class definition to avoid circular import
 Quran = QuranClass()
 
 from .helpers import generateSurahButtons
@@ -32,5 +32,5 @@ exportedHandlers = [
     *commandHandlers,
     *messageHandlers,
     *inlineQueryHandlers,
-    *callbackQueryHandlers
+    *callbackQueryHandlers,
 ]

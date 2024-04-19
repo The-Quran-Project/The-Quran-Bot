@@ -1,5 +1,6 @@
 import os
 import json
+import secrets
 
 
 """
@@ -136,6 +137,18 @@ class QuranClass:
         }
 
         return objectify(res)
+
+    def random(self):
+        randSurah = secrets.randbelow(114) + 1  # number -> 1 to 114
+        ayahCount = self.getAyahNumberCount(randSurah)
+        randAyah = secrets.randbelow(ayahCount) + 1  # number -> 1 to `ayahCount`
+
+        return {
+            "verse": self.getAyah(randSurah, randAyah),
+            "surahNo": randSurah,
+            "ayahNo": randAyah,
+            "totalAyah": ayahCount,
+        }
 
     def getSurahNames(self):
         return self.SURAH_NAMES

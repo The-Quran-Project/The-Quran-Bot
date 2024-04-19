@@ -64,7 +64,8 @@ async def aboutCommand(u: Update, c):
 async def useCommand(u: Update, c):
     """Sends a message to the user on how to use the bot"""
     message = u.effective_message
-    url = "https://telegra.ph/Al-Quran-05-29"
+    url = "https://telegra.ph/Al-Quran-05-29"  # old
+    url = "https://telegra.ph/Usage-of-Quran-Bot-04-19"
     reply = replies.howToUse.format(telegraphURL=url)
 
     buttons = InlineKeyboardMarkup(

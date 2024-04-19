@@ -94,7 +94,7 @@ class Database:
     def __init__(self) -> None:
         uri = os.environ.get("MONGODB_URI")
         self.client = MongoClient(uri, server_api=ServerApi("1"))
-        self.db = self.client.quranbot_test  # TODO: change it to quranbot
+        self.db = self.client.quranbot
 
         self.defaultSettings = {
             "font": 1,  # 1 -> Uthmani, 2 -> Simple
@@ -267,8 +267,8 @@ class Database:
     #     self.db.drop_collection(self.db.chats)
 
 
-
 db = Database()
+
 
 async def main():
     db = Database()
@@ -277,24 +277,6 @@ async def main():
     print("Total Users:", len(users))
     print("Total Chats:", len(chats))
     print(db.getAllAdmins())
-
-    # test
-    db = db.db
-    if not db.schedules.find_one({"_id": 919919191}):
-        db.schedules.insert_one(
-            {
-                "_id": 919919191,
-                "time": "12:12", "say": "meow"
-            }
-        )
-
-    print(db.schedules.find_one({"_id": 919919191}))
-
-    db.schedules.update_one(
-        {"_id": 919919191},
-        {"$set": {"time": "12:34", "say": "hello"}},
-    )
-    print(db.schedules.find_one({"_id": 919919191}))
 
 
 if __name__ == "__main__":

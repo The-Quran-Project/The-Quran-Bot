@@ -56,7 +56,7 @@ async def handleErrors(u: Update, c: CallbackContext):
     admins = db.getAllAdmins()
     data = {
         "error_message": str(c.error),
-        "error": tbString.replace("\\n", '\n'),
+        "error": tbString.replace("\\n", "\n"),
         "update": u.to_dict(),
         "sendingError": messageSendingError,
     }

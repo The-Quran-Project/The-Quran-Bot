@@ -38,4 +38,3 @@ async def middleware(u: Update, c):
 
     if isGroup and not chat:  # for groups
         chat = db.addChat(chatID)
-
