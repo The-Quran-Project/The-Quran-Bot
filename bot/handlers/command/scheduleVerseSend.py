@@ -1,5 +1,5 @@
+import re
 import time
-import regex
 
 from .. import Quran
 from ..database import db
@@ -42,9 +42,9 @@ Spaces doesn't matter.
 <code>11 : 49 pm</code> is same as <code>11:49pm</code>"""
 
 
-pattern = regex.compile(
+pattern = re.compile(
     r"^(?P<hour>\d{1,2})\s*:\s*(?P<minute>\d{1,2})\s*(?P<ampm>[ap]\s*m)?\s*(-\s*(?P<langs>[a-z]{3}(?:\s+[a-z]{3})*))?$",
-    regex.IGNORECASE,
+    re.IGNORECASE,
 )  # Match for: 11:49 pm - eng ara tur {'hour': '11', 'minute': '49', 'ampm': 'pm', 'langs': 'eng ara tur'}
 
 
@@ -128,7 +128,7 @@ async def showSchedule(u: Update, c: ContextTypes.DEFAULT_TYPE):
     data = collection.find_one({"_id": chatID})
     if not data:
         return await message.reply_html(
-            "No schedule found. See /help for more information."
+            "No schedule found. See /use for more information."
         )
 
     runTime = data.get("time")
