@@ -33,7 +33,7 @@ async def jobSendScheduled(context: ContextTypes.DEFAULT_TYPE):
                 f"Chat ID: {chatID}, Time: {runTime}, Now Time: {nowHour}:{nowMinute}"
             )
 
-            if hour == nowHour and (1 <= nowMinute - minute <= 5):
+            if hour == nowHour and (0 <= nowMinute - minute <= 5):
                 print("Sending scheduled verse...")
                 lastSent = schedule.get("lastSent")
                 if lastSent:
@@ -44,6 +44,7 @@ async def jobSendScheduled(context: ContextTypes.DEFAULT_TYPE):
                         continue
 
                 langs = schedule["langs"]
+                topicID = schedule.get("topicID")
                 res = Quran.random()
                 verse = res["verse"]
                 surahNo = res["surahNo"]
@@ -64,7 +65,7 @@ Ayah  : <b>{ayahNo} out of {totalAyah}</b>
     """
                 currentTime = datetime.now().strftime("%d:%m:%Y %H:%M:%S")
                 try:
-                    await bot.sendMessage(chatID, msg)
+                    await bot.sendMessage(chatID, msg, message_thread_id=topicID)
                     collection.update_one(
                         {"_id": chatID}, {"$set": {"lastSent": currentTime}}
                     )
@@ -74,7 +75,7 @@ Ayah  : <b>{ayahNo} out of {totalAyah}</b>
                     collection.update_one({"_id": chatID}, {"$set": {"_id": newChatID}})
                     try:
                         print(f"Sending to new chat ID: {newChatID}")
-                        await bot.sendMessage(newChatID, msg)
+                        await bot.sendMessage(newChatID, msg, message_thread_id=topicID)
                         collection.update_one(
                             {"_id": newChatID}, {"$set": {"lastSent": currentTime}}
                         )

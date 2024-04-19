@@ -10,21 +10,25 @@ from telegram.ext import MessageHandler, filters, ContextTypes
 from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
 
-def _addScheduleToTemp(chatID: int, time: str, chatType: str, langs: list = None):
+def _addScheduleToTemp(
+    chatID: int, time: str, chatType: str, langs: list[str], topicID: int = None
+):
     """Add a schedule to the temp database."""
     langs = [i for i in langs if i] or ["english_1"]
     langs = langs[:3]
+    data = {
+        "time": time,
+        "chatType": chatType,
+        "langs": langs,
+        "enabled": True,
+    }
+    if topicID:
+        data["topicID"] = topicID
+
     collection = db.db.schedules
     return collection.update_one(
         {"_id": chatID},
-        {
-            "$set": {
-                "time": time,
-                "chatType": chatType,
-                "langs": langs,
-                "enabled": True,
-            }
-        },
+        {"$set": data},
         upsert=True,
     )
 
@@ -115,6 +119,7 @@ A random verse will be sent at the following time:
     elif u.effective_chat.type in "private":
         _addScheduleToTemp(chatID, result, chatType="private", langs=langs)
     else:
+        topicID = message.message_thread_id
         _addScheduleToTemp(chatID, result, chatType="group", langs=langs)
 
     await message.reply_html(msg, reply_markup=InlineKeyboardMarkup(buttons))
