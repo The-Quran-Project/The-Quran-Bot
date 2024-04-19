@@ -191,6 +191,8 @@ class QuranClass:
         text = text.lower()
         if text == "en2":
             return "english_2"  # Mufti Taqi Usmani
+        if text == "bn":
+            return "bengali"
 
         for lang in self.languages:
             if lang.startswith(text):
@@ -208,6 +210,12 @@ class QuranClass:
             return None
 
         return self.titleLanguages[abbr]
+
+    def getTitleLanguageFromLang(self, lang):
+        if not lang or lang == "None":
+            return None
+
+        return self.titleLanguages[self.getAbbr(lang)]
 
     def getLanguages(self) -> dict:
         return self.titleLanguages.items()

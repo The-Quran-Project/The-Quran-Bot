@@ -9,6 +9,8 @@ from collections.abc import Iterable
 from pymongo.server_api import ServerApi
 from pymongo.mongo_client import MongoClient
 
+from .helpers.utils import LimitedStack
+
 load_dotenv()
 
 
@@ -23,12 +25,11 @@ if os.environ.get("LOCAL"):
 class _LocalDB:
     """Local Database to store users and chats in memory."""
 
-    def __init__(self, users, chats, channels, schedules) -> None:
+    def __init__(self, users, chats, channels) -> None:
         self.users = list(users)
         self.chats = list(chats)
         self.channels = list(channels)
         self.admins = [i["_id"] for i in self.users if i.get("is_admin")]
-        self.schedules = list(schedules)
         print(f"LocalDB: {len(self.users)} users, {len(self.chats)} chats")
 
     def findUser(self, userID: int) -> dict:
@@ -39,9 +40,6 @@ class _LocalDB:
 
     def findChannel(self, channelID: int) -> dict:
         return next((i for i in self.channels if i["_id"] == channelID), None)
-
-    def findSchedule(self, chatID: int):
-        return next((i for i in self.schedules if i["_id"] == chatID), None)
 
     def addUser(self, user) -> None:
         self.users.append(user)
@@ -79,11 +77,6 @@ class _LocalDB:
         channel["settings"] = {**channel["settings"], **settings}
         return channel
 
-    def updateSchedule(self, chatID: int, data):
-        schedule = self.findSchedule(chatID)
-        schedule = data
-        return schedule
-
     def getAllUsers(self) -> list:
         return self.users
 
@@ -95,9 +88,6 @@ class _LocalDB:
 
     def getAllChannels(self) -> list:
         return self.channels
-
-    def getAllSchedules(self):
-        return self.schedules
 
 
 class Database:
@@ -127,8 +117,7 @@ class Database:
         channels = self.db.channels.find({})
         chats = self.db.chats.find({})
         users = self.db.users.find({})
-        schedules = self.db.schedules.find({})
-        self.localDB = _LocalDB(users, chats, channels, schedules)
+        self.localDB = _LocalDB(users, chats, channels)
 
         # --- Scheduled Tasks ---
         interval = 60
@@ -167,10 +156,6 @@ class Database:
         res = self.localDB.getAllAdmins()
         return res
 
-    def getAllSchedules(self):
-        res = self.localDB.getAllSchedules()
-        return res
-
     def getUser(self, userID: int):
         res = self.localDB.findUser(userID)
         return res
@@ -181,10 +166,6 @@ class Database:
 
     def getChannel(self, channelID: int):
         res = self.localDB.findChannel(channelID)
-        return res
-
-    def getSchedule(self, chatID: int):
-        res = self.localDB.findSchedule(chatID)
         return res
 
     def addUser(self, userID: int):
@@ -213,13 +194,6 @@ class Database:
         value = channel
         self.queue.append((func, value))
         return channel
-
-    def addSchedule(self, item):
-        self.localDB.schedules.append(item)
-
-        func = self.db.schedules.insert_one
-        value = item
-        self.queue.append((func, value))
 
     def updateUser(self, userID: int, settings: dict):
         user = self.getUser(userID)
@@ -260,14 +234,6 @@ class Database:
         self.queue.append((func, value))
         return None
 
-    def updateSchedule(self, chatID: int, data: dict):
-        self.localDB.updateSchedule(chatID, data)
-
-        func = self.db.schedules.update_one
-        value = ({"_id": chatID}, {"$set": {"data": data}})
-        self.queue.append((func, value))
-        return None
-
     def runQueue(self):
         print("--- Running Queue ---\r", end="")
         start = time.time()
@@ -301,10 +267,11 @@ class Database:
     #     self.db.drop_collection(self.db.chats)
 
 
+
 db = Database()
 
-
 async def main():
+    db = Database()
     users = db.getAllUsers()
     chats = db.getAllChat()
     print("Total Users:", len(users))
@@ -312,27 +279,22 @@ async def main():
     print(db.getAllAdmins())
 
     # test
-    print(db.getAllSchedules())
-    chat = db.addSchedule(
-        {
-            "_id": 121,
-            "data": {
-                "time": "12:12",
-                "say":"meow"
-            },
-        }
-    )
-    print(db.getSchedule(121))
-    print(db.getAllSchedules())
-    db.updateSchedule(
-        121,
-        {
-            "time": "1:23",
-            "say":"meow"
-        }
-    )
-    print(db.getSchedule(121))
+    db = db.db
+    if not db.schedules.find_one({"_id": 919919191}):
+        db.schedules.insert_one(
+            {
+                "_id": 919919191,
+                "time": "12:12", "say": "meow"
+            }
+        )
 
+    print(db.schedules.find_one({"_id": 919919191}))
+
+    db.schedules.update_one(
+        {"_id": 919919191},
+        {"$set": {"time": "12:34", "say": "hello"}},
+    )
+    print(db.schedules.find_one({"_id": 919919191}))
 
 
 if __name__ == "__main__":

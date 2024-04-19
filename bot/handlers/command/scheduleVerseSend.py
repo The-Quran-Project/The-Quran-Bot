@@ -1,37 +1,30 @@
 import regex
 
 from ..database import db
-from ...quran import QuranClass
+from .. import Quran
 from ..helpers.decorators import onlyGroupAdmin
 
-from telegram import Update, Bot
+from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import MessageHandler, filters, ContextTypes
 
 
-def _addSchedule(chatID: int, time: dict, chatType: str):
-    callbacks = {
-        "group": {"get": db.getChat, "add": db.addChat, "update": db.updateChat},
-        "channel": {
-            "get": db.getChannel,
-            "add": db.addChannel,
-            "update": db.updateChannel,
+def _addScheduleToTemp(chatID: int, time: dict, chatType: str, langs: list = None):
+    """Add a schedule to the temp database."""
+    langs = [i for i in langs if i] or ["english_1"]
+    collection = db.db.schedules
+    return collection.update_one(
+        {"_id": chatID},
+        {
+            "$set": {
+                "time": time,
+                "chatType": chatType,
+                "langs": langs,
+                "enabled": True,
+            }
         },
-        "private": {"get": db.getUser, "add": db.addUser, "update": db.updateUser},
-    }
+        upsert=True,
+    )
 
-    if chatType in callbacks:
-        entity = callbacks[chatType]["get"](chatID)
-        if not entity:
-            entity = callbacks[chatType]["add"](chatID)
-
-        entity["settings"]["schedule"] = {
-            **time,
-            "job": None,
-        }
-        callbacks[chatType]["update"](chatID, entity["settings"])
-
-
-# /schedule 11:49 pm
 
 __length = len("/schedule ")
 
@@ -47,55 +40,114 @@ Spaces doesn't matter.
 
 
 pattern = regex.compile(
-    r"^(?P<hour>\d{1,2})\s*:\s*(?P<minute>\d{1,2})\s*(?P<ampm>[ap]\s*m)?$",
+    r"^(?P<hour>\d{1,2})\s*:\s*(?P<minute>\d{1,2})\s*(?P<ampm>[ap]\s*m)?\s*(-\s*(?P<langs>[a-z]{3}(?:\s+[a-z]{3})*))?$",
     regex.IGNORECASE,
-)
+)  # Match for: 11:49 pm - eng ara tur {'hour': '11', 'minute': '49', 'ampm': 'pm', 'langs': 'eng ara tur'}
 
 # TODO: run repeating every minute to check if the time has come
+# Enable, Disable, Delete schedule
 
-# /schedule 11:49 pm - eng, ara
+
+# /schedule 11:49 pm - eng ara
 @onlyGroupAdmin
-async def scheduleCommand(u: Update, c:ContextTypes.DEFAULT_TYPE):
+async def scheduleCommand(u: Update, c: ContextTypes.DEFAULT_TYPE):
     bot: Bot = c.bot
     message = u.effective_message
     chatID = u.effective_chat.id
 
-    text = message.text[__length:].replace(" ", "").lower()
+    splitted = message.text[__length:].lower().split("-")
+    text = splitted[0].strip()
+    langs = splitted[1].split() if len(splitted) > 1 else []
+
+    if not text:
+        return await showSchedule(u, c)
+
     result = await _validateTime(message, text)
     if not result:
         return
 
+    langs = [Quran.detectLanguage(i) for i in langs]
+    languages = [str(Quran.getTitleLanguageFromLang(i)) for i in langs]
+
     msg = f"""
-<b>Scheduled successfully.</b>
+<b>Schedule Enabled</b>
 A random verse will be sent at the following time:
 
 <b>Time:</b> {result["hour"]:02d}:{result["minute"]:02d} UTC (24-hour format)
+
+<b>Language:</b> {", ".join(languages) or "English"}
+
+{any(lang == None for lang in languages) and "<i>Invalid language(s) will be ignored.</i>" or ""}
 """
+    buttons = [
+        [
+            InlineKeyboardButton("Delete", callback_data="schedule delete"),
+            InlineKeyboardButton("Disable", callback_data="schedule disable"),
+            # InlineKeyboardButton("Enable", callback_data="schedule enable"),
+        ],
+        [
+            InlineKeyboardButton("Close", callback_data="close"),
+        ],
+    ]
 
     if u.channel_post:
         # if previously scheduled, cancel the job
-        _addSchedule(u.effective_chat.id, result, chatType="channel")
+        _addScheduleToTemp(chatID, result, chatType="channel", langs=langs)
 
     elif u.effective_chat.type in "private":
-        _addSchedule(u.effective_user.id, result, chatType="private")
+        _addScheduleToTemp(chatID, result, chatType="private", langs=langs)
     else:
-        _addSchedule(chatID, result, chatType="group")
+        _addScheduleToTemp(chatID, result, chatType="group", langs=langs)
 
-    await message.reply_html(msg)
+    await message.reply_html(msg, reply_markup=InlineKeyboardMarkup(buttons))
 
+
+async def showSchedule(u: Update, c: ContextTypes.DEFAULT_TYPE):
+    bot: Bot = c.bot
+    message = u.effective_message
+    chatID = u.effective_chat.id
+
+    collection = db.db.schedules
+    data = collection.find_one({"_id": chatID})
+    if not data:
+        return await message.reply_html(
+            "No schedule found. See /help for more information."
+        )
+
+    time = data.get("time")
+    langs = data.get("langs")
+    chatType = data.get("chatType")
+    enabled = data.get("enabled")
+
+    languages = [str(Quran.getTitleLanguageFromLang(i)) for i in langs]
+
+    msg = f"""
+<b>Schedule Information</b>
+A random verse will be sent at the following time:
+
+<b>Time:</b> {time["hour"]:02d}:{time["minute"]:02d} UTC (24-hour format)
+
+<b>Languages:</b> <code>{", ".join(languages) or "English"}</code>
+<b>Status:</b> <i>{"Enabled" if enabled else "Disabled"}</i>
+<b>Chat ID:</b> <code>{chatID}</code>
+<b>Chat Type:</b> {chatType.capitalize()}
+"""
+    buttons = [
+        [
+            InlineKeyboardButton("Disable", callback_data="schedule disable"),
+            InlineKeyboardButton("Enable", callback_data="schedule enable"),
+        ],
+        [
+            InlineKeyboardButton("Delete", callback_data="schedule delete"),
+            InlineKeyboardButton("Close", callback_data="close"),
+        ],
+    ]
+
+    await message.reply_html(msg, reply_markup=InlineKeyboardMarkup(buttons))
 
 
 async def _validateTime(message, text: str):
     """Validate the time format and return the time in 24-hour format."""
-    if not text:
-        msg = f"""
-<b>Please provide a time to schedule the verse.</b>
-
-{validMethod}
-"""
-        await message.reply_html(msg)
-        return False
-
     match = pattern.match(text)
     if not match:
         msg = f"""
@@ -143,5 +195,5 @@ Minute should be less than 60.
 
 
 exportedHandlers = [
-    MessageHandler(filters.Regex(r"^/schedule\s"), scheduleCommand),
+    MessageHandler(filters.Regex(r"^/schedule"), scheduleCommand),
 ]

@@ -7,6 +7,7 @@ from .. import Constants
 from ..database import db
 from .handleAdminButtonPress import handleAdminButtonPress
 from .handleSettingsButtonPress import handleSettingsButtonPress
+from .handleSchedule import handleSchedule
 from ..helpers import getAyahReply, getAyahReplyFromPreference, getAyahButton
 
 
@@ -44,45 +45,7 @@ async def handleButtonPress(u: Update, c):
         chat = db.getChat(chatID)
         previewLink = chat["settings"]["previewLink"]
 
-    if method == "settings":
-        return await handleSettingsButtonPress(u, c)
-
-    elif method == "admin":
-        return await handleAdminButtonPress(u, c)
-
-    elif method == "close":
-        return await message.delete()
-
-    elif method == "audio":
-        if u.effective_chat.type in ("group", "supergroup"):  # for groups
-            permissions = await bot.getChatMember(chatID, bot.id)
-            try:
-                if not permissions.can_send_audios:
-                    return await query.answer(
-                        "I don't have permission to send audio messages in this group",
-                        show_alert=True,
-                    )
-            except Exception as e:
-                print(e)
-
-            allowAudio = chat["settings"]["allowAudio"]
-            if not allowAudio:
-                return await query.answer(
-                    "The admin has disabled audio recitations", show_alert=True
-                )
-
-        try:
-            surahNo, ayahNo = map(int, queryData.split()[1:-1])
-        except ValueError:
-            surahNo, ayahNo = map(int, queryData.split()[1:])
-
-        await message.reply_audio(
-            f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{
-                surahNo}_{ayahNo}.mp3"""
-        )
-        return await query.answer()
-
-    elif method == "selectedSurah":
+    if method == "selectedSurah":
         surahNo = int(queryData.split()[1])
 
         entities = message.entities
@@ -197,6 +160,47 @@ async def handleButtonPress(u: Update, c):
                 surahNo, ayahNo, userID, restrictedLangs=restrictedLangs
             )
             buttons = getAyahButton(surahNo, ayahNo, userID)
+
+    elif method == "audio":
+        if u.effective_chat.type in ("group", "supergroup"):  # for groups
+            permissions = await bot.getChatMember(chatID, bot.id)
+            try:
+                if not permissions.can_send_audios:
+                    return await query.answer(
+                        "I don't have permission to send audio messages in this group",
+                        show_alert=True,
+                    )
+            except Exception as e:
+                print(e)
+
+            allowAudio = chat["settings"]["allowAudio"]
+            if not allowAudio:
+                return await query.answer(
+                    "The admin has disabled audio recitations", show_alert=True
+                )
+
+        try:
+            surahNo, ayahNo = map(int, queryData.split()[1:-1])
+        except ValueError:
+            surahNo, ayahNo = map(int, queryData.split()[1:])
+
+        await message.reply_audio(
+            f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{
+                surahNo}_{ayahNo}.mp3"""
+        )
+        return await query.answer()
+
+    if method == "settings":
+        return await handleSettingsButtonPress(u, c)
+
+    elif method == "admin":
+        return await handleAdminButtonPress(u, c)
+
+    elif method == "close":
+        return await message.delete()
+    
+    elif method == "schedule":
+        return await handleSchedule(u, c)
 
     if not reply:
         return await query.answer("Maybe it was an old message?", show_alert=True)

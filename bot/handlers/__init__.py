@@ -3,7 +3,6 @@ from ..quran import QuranClass
 # Variables has to be declared before importing handlers
 Quran = QuranClass()
 
-from .database import db as _
 from .helpers import generateSurahButtons
 
 
