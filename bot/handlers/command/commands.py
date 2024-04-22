@@ -26,11 +26,16 @@ async def startCommand(u: Update, c):
 
     buttons = InlineKeyboardMarkup([[InlineKeyboardButton("Github", url=url)]])
 
-    msg: Message = message
     if u.effective_chat.type == "private":  # Send sticker only if it's a private chat
-        msg = await message.reply_sticker(Constants.salamSticker)
+        message = await message.reply_sticker(Constants.salamSticker)
 
-    await msg.reply_html(reply, reply_markup=buttons)
+    disablePreviewForGroups = False
+    if u.effective_chat.type in ("group", "supergroup"):
+        disablePreviewForGroups = True
+
+    await message.reply_html(
+        reply, reply_markup=buttons, disable_web_page_preview=disablePreviewForGroups
+    )
 
 
 # Command:  /help
@@ -48,7 +53,13 @@ async def helpCommand(u: Update, c):
         ]
     )
 
-    await message.reply_html(reply, reply_markup=buttons)
+    disablePreviewForGroups = False
+    if u.effective_chat.type in ("group", "supergroup"):
+        disablePreviewForGroups = True
+
+    await message.reply_html(
+        reply, reply_markup=buttons, disable_web_page_preview=disablePreviewForGroups
+    )
 
 
 # Command:  /about
@@ -57,7 +68,11 @@ async def aboutCommand(u: Update, c):
     message = u.effective_message
     reply = replies.about
 
-    await message.reply_html(reply)
+    disablePreviewForGroups = False
+    if u.effective_chat.type in ("group", "supergroup"):
+        disablePreviewForGroups = True
+
+    await message.reply_html(reply, disable_web_page_preview=disablePreviewForGroups)
 
 
 # Command:  /use
@@ -79,7 +94,13 @@ async def useCommand(u: Update, c):
         ]
     )
 
-    await message.reply_html(reply, reply_markup=buttons)
+    disablePreviewForGroups = False
+    if u.effective_chat.type in ("group", "supergroup"):
+        disablePreviewForGroups = True
+
+    await message.reply_html(
+        reply, reply_markup=buttons, disable_web_page_preview=disablePreviewForGroups
+    )
 
 
 # Command:  /surah
@@ -101,18 +122,22 @@ async def surahCommand(u: Update, c):
         return
 
     restrictedLangs = None
-    previewLink = True
+    # previewLink = True
     if userID != chatID:
         settings = db.getChat(chatID)["settings"]
         restrictedLangs = settings["restrictedLangs"]
-        previewLink = settings["previewLink"]
+        # previewLink = settings["previewLink"]
 
     x = getValidReply(userID, text, restrictedLangs=restrictedLangs)
     reply = x["text"]
     buttons = x["buttons"]
 
+    disablePreviewForGroups = False
+    if u.effective_chat.type in ("group", "supergroup"):
+        disablePreviewForGroups = True
+
     await message.reply_html(
-        reply, reply_markup=buttons, disable_notification=not previewLink
+        reply, reply_markup=buttons, disable_notification=disablePreviewForGroups
     )
 
 
@@ -125,11 +150,11 @@ async def getCommand(u: Update, c):
     text = message.text[4:].strip()  # 4 is the length of "/get"
 
     restrictedLangs = None
-    previewLink = True
+    # previewLink = True
     if userID != chatID:
         settings = db.getChat(chatID)["settings"]
         restrictedLangs = settings["restrictedLangs"]
-        previewLink = settings["previewLink"]
+        # previewLink = settings["previewLink"]
 
     x = getValidReply(userID, text, restrictedLangs=restrictedLangs)
     reply = x["text"]
@@ -137,8 +162,12 @@ async def getCommand(u: Update, c):
     if not buttons and userID != chatID:
         return
 
+    disablePreviewForGroups = False
+    if u.effective_chat.type in ("group", "supergroup"):
+        disablePreviewForGroups = True
+
     await message.reply_html(
-        reply, reply_markup=buttons, disable_notification=not previewLink
+        reply, reply_markup=buttons, disable_notification=disablePreviewForGroups
     )
 
 
@@ -177,7 +206,13 @@ Available languages are:
     reply = x["text"]
     buttons = x["buttons"]
 
-    await message.reply_html(reply, reply_markup=buttons)
+    disablePreviewForGroups = False
+    if u.effective_chat.type in ("group", "supergroup"):
+        disablePreviewForGroups = True
+
+    await message.reply_html(
+        reply, reply_markup=buttons, disable_web_page_preview=disablePreviewForGroups
+    )
 
 
 # Command:  /random or /rand
@@ -191,7 +226,13 @@ async def randomCommand(u: Update, c):
     reply = x["reply"]
     buttons = x["buttons"]
 
-    await message.reply_html(reply, reply_markup=buttons)
+    disablePreviewForGroups = False
+    if u.effective_chat.type in ("group", "supergroup"):
+        disablePreviewForGroups = True
+
+    await message.reply_html(
+        reply, reply_markup=buttons, disable_web_page_preview=disablePreviewForGroups
+    )
 
 
 # Command:  /audio
@@ -241,7 +282,15 @@ async def tafsirCommand(u: Update, c):
     ayah = ayah.strip()
 
     tafsir = Quran.getAyah(surah, ayah).tafsir
-    await message.reply_html(f"<b>Tafsir:</b> <a href='{tafsir}'>Telegraph</a>")
+    reply = f"<b>Tafsir:</b> <a href='{tafsir}'>Telegraph</a>"
+
+    disablePreviewForGroups = False
+    if u.effective_chat.type in ("group", "supergroup"):
+        disablePreviewForGroups = True
+
+    await message.reply_html(
+        reply, reply_markup=buttons, disable_web_page_preview=disablePreviewForGroups
+    )
 
 
 # Command:  /translations
