@@ -70,3 +70,12 @@ Al Quran Bot is a bot that can give you verses from the Al-Quran. It is a non-pr
 - The bot is written in Python3 using the <a href="https://t.me/pythontelegrambotgroup">python-telegram-bot</a> library
 - The bot is maintained by @Roboter403 and @Nusab19
 """
+
+
+adminCommands = """
+Commands:
+/forward <code>chatID</code> [ Reply to a message ]
+/getUser <code>chatID</code> [ Reply to a message ]
+/delete [ Reply to a message ]
+/eval <code>Python Code</code>
+"""

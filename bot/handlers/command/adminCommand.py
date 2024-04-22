@@ -8,8 +8,8 @@ from telegram import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
 )
-
 from ..database import db
+from ..replies import adminCommands
 from ..helpers.decorators import onlyDeveloper
 
 
@@ -36,12 +36,10 @@ async def adminCommand(u: Update, c):
             InlineKeyboardButton("Get Admins", callback_data="admin admins all"),
         ],
     ]
-    reply = """
+    reply = f"""
 <u><b>Admin Panel</b></u>
 
-<b>Commands:</b>
-/forward <code>chatID</code> [ Reply to a message ]
-/getUser <code>chatID</code> [ Reply to a message ]
+{adminCommands}
 """
 
     await message.reply_html(reply, reply_markup=InlineKeyboardMarkup(buttons))
