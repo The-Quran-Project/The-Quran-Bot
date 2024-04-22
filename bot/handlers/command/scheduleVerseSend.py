@@ -6,8 +6,8 @@ from ..database import db
 from ..helpers.decorators import onlyGroupAdmin
 
 from datetime import datetime, tzinfo
-from telegram.ext import MessageHandler, filters, ContextTypes
 from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import CommandHandler, MessageHandler, filters, ContextTypes
 
 
 def _addScheduleToTemp(
@@ -237,5 +237,8 @@ Minute should be less than 60.
 
 
 exportedHandlers = [
-    MessageHandler(filters.Regex(r"^/schedule"), scheduleCommand),
+    CommandHandler("schedule", scheduleCommand),
+    MessageHandler(
+        filters.ChatType.CHANNEL & filters.Regex(r"^/schedule"), scheduleCommand
+    ),
 ]
