@@ -30,6 +30,7 @@ howToUse = """
 /use - This message
 /info - Details of the current chat
 /ping - Check server's ping
+/showJSON - Get the JSON of the current update
 
 <u>Usage of Bot:</u>
 /settings - Change your settings

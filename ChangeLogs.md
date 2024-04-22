@@ -3,6 +3,14 @@
 **Latests are on top**
 
 
+## 14) 22nd April, 2024
+- `/schedule` command bug fixed. Now, the bot will send the scheduled verse at the exact time.
+- `/schedule` command will now send the verse in the group where the command was sent.
+- `/delete` admin command added to delete a message sent by the bot.
+- `/showJson` admin command added. It'll show the JSON data of the group.
+- Refactor decorators to make the code more readable and maintainable.
+
+
 ## 13) 19th April, 2024
 - `/schedule` command added. Now, you can schedule a verse to be sent at a specific time of every day.
 
