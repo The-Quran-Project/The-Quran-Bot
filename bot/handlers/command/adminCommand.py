@@ -103,6 +103,24 @@ async def forwardMessage(u: Update, c):
     await message.reply_html("<b>Invalid chatID</b>")
 
 
+@onlyDeveloper(notifyNonAdminUsers=False)
+async def deleteMessage(u: Update, c):
+    """Deletes a message"""
+    message = u.effective_message
+    userID = u.effective_user.id
+    user = db.getUser(userID)
+
+    if not message.reply_to_message:
+        # await message.reply_html("<b>Reply to a message</b>")
+        return
+
+    try:
+        await message.reply_to_message.delete()
+        await message.delete()
+    except Exception as e:
+        pass
+
+
 @onlyDeveloper
 async def getUser(u: Update, c):
     """Gets a user's details"""
