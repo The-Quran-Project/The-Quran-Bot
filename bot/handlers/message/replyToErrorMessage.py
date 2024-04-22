@@ -4,6 +4,10 @@ from telegram import Update, Bot
 from telegram.ext import CallbackContext
 
 
+def escape(text: any) -> str:
+    return html.escape(str(text))
+
+
 async def replyToErrorMessage(u: Update, c: CallbackContext):
     """Reply to the user with the error message"""
     bot: Bot = c.bot
@@ -29,6 +33,16 @@ async def replyToErrorMessage(u: Update, c: CallbackContext):
 
 {htmlText}
 """
+    options = {
+        "$userName": repliedTo.from_user.username,
+        "$userID": repliedTo.from_user.id,
+        "$chatID": repliedTo.chat.id,
+        "$chatName": repliedTo.chat.title,
+        "$firstName": repliedTo.from_user.first_name,
+        "$lastName": repliedTo.from_user.last_name,
+    }
+    for key, value in options.items():
+        reply = reply.replace(key, escape(value))
 
     try:
         await bot.sendMessage(userID, reply)

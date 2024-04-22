@@ -4,7 +4,7 @@ from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
 from .. import Quran
 from ..database import db
-from ..helpers.decorators import onlyGroupAdmin
+from ..helpers.decorators import developersOrAdmins
 
 arabicStyles = {
     "1": "Uthmani",
@@ -69,7 +69,7 @@ Change your settings to your preference.
 
 
 # Will be called when the user is in a group
-@onlyGroupAdmin
+@developersOrAdmins
 async def updateSettingsForGroup(u: Update, c):
     """Sends the settings message to groups to change preferences (only for group admins)"""
 

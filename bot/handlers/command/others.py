@@ -1,7 +1,10 @@
-import time
 import html
+import json
+import time
 from telegram import Update
 from telegram.ext import CommandHandler
+
+from ..helpers.decorators import developersOrAdmins
 
 
 def escapeHTML(text: str):
@@ -68,7 +71,22 @@ Time Zone   : +00:00 UTC</b>
         await message.reply_html(reply)
 
 
+@developersOrAdmins
+async def showJson(u: Update, c):
+    """Show the json of the update"""
+
+    message = u.effective_message
+    reply = f"""
+<pre>
+{json.dumps(u.to_dict(), indent=2)}
+</pre>
+"""
+
+    await message.reply_html(reply)
+
+
 exportedHandlers = [
     CommandHandler("ping", pingCommand),
     CommandHandler("info", infoCommand),
+    CommandHandler("showJson", showJson),
 ]
