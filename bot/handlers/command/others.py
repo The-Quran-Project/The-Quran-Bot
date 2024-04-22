@@ -4,7 +4,7 @@ import time
 from telegram import Update
 from telegram.ext import CommandHandler
 
-from ..helpers.decorators import developersOrAdmins
+from ..helpers.decorators import onlyGroupAdmin
 
 
 def escapeHTML(text: str):
@@ -71,7 +71,7 @@ Time Zone   : +00:00 UTC</b>
         await message.reply_html(reply)
 
 
-@developersOrAdmins
+@onlyGroupAdmin(allowDev=True)
 async def showJson(u: Update, c):
     """Show the json of the update"""
 
