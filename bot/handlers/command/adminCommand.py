@@ -1,5 +1,6 @@
 import html
 
+
 from telegram.ext import CommandHandler, filters
 from telegram import (
     Bot,
@@ -174,6 +175,8 @@ Bio:
 @onlyDeveloper()
 async def evaluateCode(u: Update, c):
     """Evaluate an expression and send the output to admin"""
+    import os, sys, httpx, json, telegram, logging, asyncio, io, math, base64, hashlib, datetime, time
+
     bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id
