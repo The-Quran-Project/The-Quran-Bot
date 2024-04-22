@@ -35,8 +35,8 @@ def onlyGroupAdmin(func: Callable):
         if userID == 1087968824:  # Group Anonymous Bot
             return await func(u, c, *a, **k)
 
-        member = await c.bot.getChatMember(chatID, userID)
-        if member.status not in ("creator", "administrator"):
+        admins = [i.user.id for i in await u.effective_chat.get_administrators()]
+        if userID not in admins:
             return await u.effective_message.reply_html(
                 "<b>You must be an admin of the group to use this command</b>"
             )
