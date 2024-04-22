@@ -105,18 +105,20 @@ async def forwardMessage(u: Update, c):
 async def deleteMessage(u: Update, c):
     """Deletes a message"""
     message = u.effective_message
-    userID = u.effective_user.id
-    user = db.getUser(userID)
+    chatType = u.effective_chat.type
 
     if not message.reply_to_message:
-        # await message.reply_html("<b>Reply to a message</b>")
+        if chatType == "private":
+            await message.reply_html("<b>Reply to a message</b>")
         return
 
     try:
         await message.reply_to_message.delete()
         await message.delete()
     except Exception as e:
-        pass
+        if chatType == "private":
+            print(f"Error while deleting message: {e}")
+            raise e
 
 
 @onlyDeveloper()
