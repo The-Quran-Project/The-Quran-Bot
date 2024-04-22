@@ -17,7 +17,7 @@ def escapeHtml(text: str):
     return html.escape(str(text))
 
 
-@onlyDeveloper
+@onlyDeveloper()
 async def adminCommand(u: Update, c):
     """Sends a message to the user on how to use the bot"""
     message = u.effective_message
@@ -45,7 +45,7 @@ async def adminCommand(u: Update, c):
     await message.reply_html(reply, reply_markup=InlineKeyboardMarkup(buttons))
 
 
-@onlyDeveloper
+@onlyDeveloper()
 async def forwardMessage(u: Update, c):
     """Forwards a message to a chat or All chats"""
     message = u.effective_message
@@ -119,7 +119,7 @@ async def deleteMessage(u: Update, c):
         pass
 
 
-@onlyDeveloper
+@onlyDeveloper()
 async def getUser(u: Update, c):
     """Gets a user's details"""
     bot: Bot = c.bot
@@ -169,7 +169,7 @@ Bio:
 
 # Command:
 #     /eval expression
-@onlyDeveloper
+@onlyDeveloper()
 async def evaluateCode(u: Update, c):
     """Evaluate an expression and send the output to admin"""
     bot: Bot = c.bot

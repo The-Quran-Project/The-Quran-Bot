@@ -53,7 +53,7 @@ pattern = re.compile(
 
 
 # /schedule 11:49 pm - eng ara
-@onlyGroupAdmin
+@onlyGroupAdmin(allowDev=True)
 async def scheduleCommand(u: Update, c: ContextTypes.DEFAULT_TYPE):
     bot: Bot = c.bot
     message = u.effective_message
