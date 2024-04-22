@@ -233,7 +233,7 @@ Minute should be less than 60.
             if hour >= 12:
                 hour -= 12
     return f"{hour:02d}:{minute:02d}"  # 24-hour format
-    return {"hour": hour, "minute": minute}
+    # return {"hour": hour, "minute": minute}
 
 
 exportedHandlers = [
