@@ -24,6 +24,12 @@ async def handleErrors(u: Update, c: CallbackContext):
     tbList = traceback.format_exception(None, c.error, c.error.__traceback__)
     tbString = "".join(tbList)
 
+    # check if the error has telegram.error.BadRequest: User not found error
+    if "User not found" in str(c.error):
+        return await u.effective_message.reply_html(
+            "<b>Couldn't check if you are an Admin or not due to Telegram side error</b>. \n<code>telegram.error.BadRequest: User not found</code>\nContact @Roboter403 if this error persists."
+        )
+
     messageSendingError = ""
     if "Message is not modified" in str(c.error):
         return print(f"Error: {c.error}")
@@ -83,3 +89,5 @@ async def handleErrors(u: Update, c: CallbackContext):
             )
         except Exception as e:
             print(f"Error while sending error report to {admin}: {e}")
+
+        return  # Send error to one admin only
