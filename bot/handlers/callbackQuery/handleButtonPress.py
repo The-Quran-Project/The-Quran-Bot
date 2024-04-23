@@ -5,9 +5,9 @@ from telegram import Update, Bot, InlineKeyboardMarkup
 from .. import Quran
 from .. import Constants
 from ..database import db
+from .handleSchedule import handleSchedule
 from .handleAdminButtonPress import handleAdminButtonPress
 from .handleSettingsButtonPress import handleSettingsButtonPress
-from .handleSchedule import handleSchedule
 from ..helpers import getAyahReply, getAyahReplyFromPreference, getAyahButton
 
 
@@ -30,7 +30,7 @@ async def handleButtonPress(u: Update, c):
     valid_commands = ("surahName", "prev", "next")
     if (
         isGroup
-        and messageOwnerID.isdigit()
+        and messageOwnerID.isdecimal()
         and len(messageOwnerID) >= 9
         and int(messageOwnerID) != groupAnonymousBot
         and str(userID) != messageOwnerID

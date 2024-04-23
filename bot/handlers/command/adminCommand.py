@@ -58,7 +58,7 @@ async def forwardMessage(u: Update, c):
         return
 
     chatID = message.text.split()[1]
-    if chatID[1:].isdigit():  # ignore the '-' if it's a group
+    if chatID[1:].isdecimal():  # ignore the '-' if it's a group
         try:
             await message.reply_to_message.forward(chatID)
             await message.reply_html("<b>Message forwarded</b>")
@@ -131,7 +131,7 @@ async def getUser(u: Update, c):
     user = db.getUser(userID)
 
     chatID = message.text.split()[1]
-    if not chatID[1:].isdigit():
+    if not chatID[1:].isdecimal():
         await message.reply_html("<b>Invalid chatID</b>")
         return
 

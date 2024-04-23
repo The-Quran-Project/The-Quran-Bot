@@ -1,6 +1,6 @@
 from .. import Quran
-from .getAyahReply import getAyahReply, getAyahReplyFromPreference
 from .getAyahButton import getAyahButton
+from .getAyahReply import getAyahReply, getAyahReplyFromPreference
 
 
 validFormat = """
@@ -14,7 +14,7 @@ surahNo : ayahNo
 
 def getValidReply(userID, text, language=None, restrictedLangs: list = None):
     text = text.strip()
-    if text.isdigit() and 1 <= int(text) <= 114:  # if only surah number is given
+    if text.isdecimal() and 1 <= int(text) <= 114:  # if only surah number is given
         surahNo = int(text)
         ayahNo = 1
         surah = Quran.getSurahNameFromNumber(surahNo)

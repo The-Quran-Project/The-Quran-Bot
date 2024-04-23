@@ -64,7 +64,7 @@ async def handleInlineQuery(u: Update, c):
     surahNo = surahNo.strip()
     ayahNo = ayahNo.strip()
 
-    if not (surahNo.isdigit() and ayahNo.isdigit()):
+    if not (surahNo.isdecimal() and ayahNo.isdecimal()):
         res = [
             inQuery(
                 id=uuid4(),
