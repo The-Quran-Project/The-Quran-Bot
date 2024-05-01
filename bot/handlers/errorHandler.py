@@ -18,6 +18,20 @@ async def handleErrors(u: Update, c: CallbackContext):
     bot: Bot = c.bot
 
     if not u:
+        data = {"error": str(c.error), "update": str(c.update), "context": str(c)}
+        text = "<b>#Error</b>\n\nNo Uodate Error"
+        return await bot.sendDocument(
+            5596148289,
+            BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
+            filename="error-unknown.json",
+            caption=text,
+        )
+
+    message = u.effective_message
+    user = u.effective_user
+    chat = u.effective_chat
+
+    if not u:
         return
 
     print("--- Error Occurred ---")
@@ -25,10 +39,10 @@ async def handleErrors(u: Update, c: CallbackContext):
     tbString = "".join(tbList)
 
     # check if the error has telegram.error.BadRequest: User not found error
-    if "User not found" in str(c.error):
-        return await u.effective_message.reply_html(
-            "<b>Couldn't check if you are an Admin or not due to Telegram side error</b>. \n<code>telegram.error.BadRequest: User not found</code>\nContact @Roboter403 if this error persists."
-        )
+    # if "User not found" in str(c.error):
+    #        return await u.effective_message.reply_html(
+    #            "<b>Couldn't check if you are an Admin or not due to Telegram side error</b>. \n<code>telegram.error.BadRequest: User not found</code>\nContact @Roboter403 if this error persists."
+    #        )
 
     messageSendingError = ""
     if "Message is not modified" in str(c.error):
@@ -36,7 +50,7 @@ async def handleErrors(u: Update, c: CallbackContext):
 
     print(tbString)
     try:
-        await u.effective_message.reply_html(
+        await message.reply_html(
             f"""
 <b>An error occurred. Report sent to admins</b>
 
@@ -45,12 +59,9 @@ async def handleErrors(u: Update, c: CallbackContext):
         )
     except Exception as e:
         messageSendingError = str(e)
-    
-    user = u.effective_user
-    chat = u.effective_chat
-    message = u.effective_message
+
     caption = f"""
-<b><u>#Error{' ❎' if messageSendingError else ''}</u></b>
+<b><u>#Error</u>{' ❎' if messageSendingError else ''}</b>
 
 <b>Type     :</b> {chat.type if chat else None}
 <b>Chat ID  :</b> <code>{chat.id if chat else None}</code>
@@ -76,21 +87,22 @@ async def handleErrors(u: Update, c: CallbackContext):
             # forward the message the user sent
             msgID = None
             if u.effective_chat:
-                msgID: Message = (
-                    await bot.forwardMessage(
-                        chatID,
-                        u.effective_chat.id,
-                        u.effective_message.message_id,
-                    )
-                ).message_id
+                er = "None"
+                try:
+                    msgID: Message = await bot.forwardMessage(
+                        chatID, chat.id if chat else user.id, message.message_id
+                    ).message_id
+                except Exception as er:
+                    er = str(er)
+                    data["reportError"] = er
 
-            await bot.sendDocument(
-                chatID,
-                BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
-                filename=f"error-{u.effective_user.id}.json",
-                caption=caption,
-                reply_to_message_id=msgID,
-            )
+                await bot.sendDocument(
+                    chatID,
+                    BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
+                    filename=f"error-{u.effective_user.id}.json",
+                    caption=caption,
+                    reply_to_message_id=msgID,
+                )
         except Exception as e:
             print(f"Error while sending error report to {admin}: {e}")
 
