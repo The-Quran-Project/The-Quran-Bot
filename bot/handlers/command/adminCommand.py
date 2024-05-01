@@ -180,8 +180,7 @@ async def evaluateCode(u: Update, c):
     bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id
-    user = db.getUser(userID)
-
+  
     text = message.text[5:].strip()
     print(text)
 
@@ -218,10 +217,22 @@ async def evaluateCode(u: Update, c):
     await message.reply_html(reply)
 
 
+
+@onlyDeveloper()
+async def raiseError(u: Update, c):
+    """Gets a user's details"""
+    bot: Bot = c.bot
+    message = u.effective_message
+    await message.reply_html("<b>Raising...</b>")
+    raise IndexError("Meow")
+    
+    
+    
 exportedHandlers = [
     CommandHandler("admin", adminCommand),
     CommandHandler("forward", forwardMessage),
     CommandHandler("getUser", getUser),
     CommandHandler("eval", evaluateCode),
     CommandHandler("delete", deleteMessage),
-]
+    CommandHandler("error", raiseError)
+] 
