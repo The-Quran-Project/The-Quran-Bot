@@ -22,7 +22,7 @@ async def handleErrors(u: Update, c: CallbackContext):
 
     if not u:
         data = {"error": errorString, "update": str(c.update), "context": str(c)}
-        text = "<b>#Error</b>\n\nNo Uodate Error"
+        text = "<b>#Error</b>\n\nNo Update Error"
         return await bot.sendDocument(
             5596148289,
             BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
