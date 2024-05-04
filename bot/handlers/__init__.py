@@ -27,10 +27,13 @@ from .command import handlers as commandHandlers
 from .message import handlers as messageHandlers
 from .inlineQuery import handlers as inlineQueryHandlers
 from .callbackQuery import handlers as callbackQueryHandlers
+from .removeServiceMessages import handlers as removeChatMemberJoinMessages
+
 
 exportedHandlers = [
     *commandHandlers,
     *messageHandlers,
     *inlineQueryHandlers,
     *callbackQueryHandlers,
+    *removeChatMemberJoinMessages,
 ]
