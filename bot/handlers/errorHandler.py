@@ -16,9 +16,12 @@ async def handleErrors(u: Update, c: CallbackContext):
     """Handles all the errors raised in the bot"""
 
     bot: Bot = c.bot
+    errorString = str(c.error)
+    if "terminated" in errorString:
+        return
 
     if not u:
-        data = {"error": str(c.error), "update": str(c.update), "context": str(c)}
+        data = {"error": errorString, "update": str(c.update), "context": str(c)}
         text = "<b>#Error</b>\n\nNo Uodate Error"
         return await bot.sendDocument(
             5596148289,
@@ -39,13 +42,13 @@ async def handleErrors(u: Update, c: CallbackContext):
     tbString = "".join(tbList)
 
     # check if the error has telegram.error.BadRequest: User not found error
-    # if "User not found" in str(c.error):
+    # if "User not found" in errorString:
     #        return await u.effective_message.reply_html(
     #            "<b>Couldn't check if you are an Admin or not due to Telegram side error</b>. \n<code>telegram.error.BadRequest: User not found</code>\nContact @Roboter403 if this error persists."
     #        )
 
     messageSendingError = ""
-    if "Message is not modified" in str(c.error):
+    if "Message is not modified" in errorString:
         return print(f"Error: {c.error}")
 
     print(tbString)
@@ -55,7 +58,7 @@ async def handleErrors(u: Update, c: CallbackContext):
 <b>An error occurred. Report sent to admins</b>
 
 <b>Error:</b>
-<code>{escape(str(c.error))}</code>"""
+<code>{escape(errorString)}</code>"""
         )
     except Exception as e:
         messageSendingError = str(e)
@@ -76,7 +79,7 @@ async def handleErrors(u: Update, c: CallbackContext):
 
     admins = db.getAllAdmins()
     data = {
-        "error_message": str(c.error),
+        "error_message": errorString,
         "error": tbString.replace("\\n", "\n"),
         "update": u.to_dict(),
         "sendingError": messageSendingError,
@@ -106,4 +109,4 @@ async def handleErrors(u: Update, c: CallbackContext):
         except Exception as e:
             print(f"Error while sending error report to {admin}: {e}")
 
-        return  # Send error to one admin only 
+        return  # Send error to one admin only
