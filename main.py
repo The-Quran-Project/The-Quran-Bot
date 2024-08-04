@@ -1,13 +1,11 @@
 import os
-import multiprocessing
 
 from dotenv import load_dotenv
 
 from bot import startBot
-from bot.utils import checkOnInterval
-from bot.utils import checkVersion
 from bot.utils import runFlask
 from bot.utils import startLogger
+from bot.utils import checkVersion
 
 load_dotenv()
 
@@ -15,7 +13,6 @@ LOCAL = os.environ.get("LOCAL")
 
 
 if __name__ == "__main__":
-    multiprocessing.Process(target=checkOnInterval).start()
     if not LOCAL:
         runFlask()
 
