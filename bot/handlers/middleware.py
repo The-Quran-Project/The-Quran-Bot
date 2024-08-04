@@ -15,7 +15,7 @@ async def middleware(u: Update, c):
 
     # print(u.to_json())
 
-    if u.channel_post:
+    if u.channel_post or u.edited_channel_post:
         db.addChannel(u.effective_chat.id)
         return
 
