@@ -12,7 +12,7 @@ def escape(text: any):
     return html.escape(str(text))
 
 
-async def handleErrors(u: Update, c: CallbackContext):
+async def handleErrors(u: Update | None, c: CallbackContext):
     """Handles all the errors raised in the bot"""
 
     bot: Bot = c.bot
@@ -33,9 +33,6 @@ async def handleErrors(u: Update, c: CallbackContext):
     message = u.effective_message
     user = u.effective_user
     chat = u.effective_chat
-
-    if not u:
-        return
 
     print("--- Error Occurred ---")
     tbList = traceback.format_exception(None, c.error, c.error.__traceback__)
@@ -89,7 +86,7 @@ async def handleErrors(u: Update, c: CallbackContext):
         return await bot.sendDocument(
             5596148289,
             BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
-            filename=f"error-{u.effective_user.id}.json",
+            filename=f"error-{user.id if user else 12345}.json",
             caption=caption,
             reply_to_message_id=msgID,
         )
@@ -112,7 +109,7 @@ async def handleErrors(u: Update, c: CallbackContext):
             await bot.sendDocument(
                 chatID,
                 BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
-                filename=f"error-{u.effective_user.id}.json",
+                filename=f"error-{user.id if user else 12345}.json",
                 caption=caption,
                 reply_to_message_id=msgID,
             )
