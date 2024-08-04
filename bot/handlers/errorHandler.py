@@ -84,29 +84,37 @@ async def handleErrors(u: Update, c: CallbackContext):
         "update": u.to_dict(),
         "sendingError": messageSendingError,
     }
+
+    if not u.effective_chat:
+        return await bot.sendDocument(
+            5596148289,
+            BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
+            filename=f"error-{u.effective_user.id}.json",
+            caption=caption,
+            reply_to_message_id=msgID,
+        )
+
     for admin in admins:
         chatID = admin
         try:
-            # forward the message the user sent
             msgID = None
-            if u.effective_chat:
-                er = "None"
-                try:
-                    msgID: Message = await bot.forwardMessage(
+            er = "None"
+            try:
+                msgID: Message = (
+                    await bot.forwardMessage(
                         chatID, chat.id if chat else user.id, message.message_id
-                    ).message_id
-                except Exception as er:
-                    er = str(er)
-                    data["reportError"] = er
+                    )
+                ).message_id
+            except Exception as er:
+                er = str(er)
+                data["reportError"] = er
 
-                await bot.sendDocument(
-                    chatID,
-                    BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
-                    filename=f"error-{u.effective_user.id}.json",
-                    caption=caption,
-                    reply_to_message_id=msgID,
-                )
+            await bot.sendDocument(
+                chatID,
+                BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
+                filename=f"error-{u.effective_user.id}.json",
+                caption=caption,
+                reply_to_message_id=msgID,
+            )
         except Exception as e:
             print(f"Error while sending error report to {admin}: {e}")
-
-        return  # Send error to one admin only
