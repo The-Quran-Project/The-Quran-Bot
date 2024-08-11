@@ -13,8 +13,8 @@ LOCAL = os.environ.get("LOCAL")
 
 
 if __name__ == "__main__":
-    if not LOCAL:
-        runFlask()
+    # if not LOCAL:
+    #     runFlask()
 
     checkVersion()
     startLogger(__name__)
