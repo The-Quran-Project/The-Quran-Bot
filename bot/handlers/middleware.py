@@ -20,9 +20,6 @@ async def middleware(u: Update, c):
         return
 
     userID = u.effective_user.id
-    if userID == 5596148289:
-        await u.effective_message.reply_text("No")
-        return
     chatID = u.effective_chat.id
     isGroup = u.effective_chat.type in ("group", "supergroup")
 
