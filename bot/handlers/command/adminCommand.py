@@ -235,4 +235,4 @@ exportedHandlers = [
     CommandHandler("eval", evaluateCode),
     CommandHandler("delete", deleteMessage),
     CommandHandler("error", raiseError)
-] 
+        ]
