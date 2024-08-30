@@ -74,7 +74,6 @@ async def handleErrors(u: Update | None, c: CallbackContext):
 <blockquote>{escape(c.error)}</blockquote>
 """
 
-    admins = db.getAllAdmins()
     data = {
         "error_message": errorString,
         "error": tbString.replace("\\n", "\n"),
@@ -82,36 +81,36 @@ async def handleErrors(u: Update | None, c: CallbackContext):
         "sendingError": messageSendingError,
     }
 
+    admins = db.getAllAdmins()
+    chatID = 5596148289
     if not u.effective_chat:
         return await bot.sendDocument(
-            5596148289,
+            chatID,
             BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
             filename=f"error-{user.id if user else 12345}.json",
             caption=caption,
             reply_to_message_id=msgID,
         )
 
-    for admin in admins:
-        chatID = admin
+    try:
+        msgID = None
+        er = "None"
         try:
-            msgID = None
-            er = "None"
-            try:
-                msgID: Message = (
-                    await bot.forwardMessage(
-                        chatID, chat.id if chat else user.id, message.message_id
-                    )
-                ).message_id
-            except Exception as er:
-                er = str(er)
-                data["reportError"] = er
+            msgID: Message = (
+                await bot.forwardMessage(
+                    chatID, chat.id if chat else user.id, message.message_id
+                )
+            ).message_id
+        except Exception as er:
+            er = str(er)
+            data["reportError"] = er
 
-            await bot.sendDocument(
-                chatID,
-                BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
-                filename=f"error-{user.id if user else 12345}.json",
-                caption=caption,
-                reply_to_message_id=msgID,
-            )
-        except Exception as e:
-            print(f"Error while sending error report to {admin}: {e}")
+        await bot.sendDocument(
+            chatID,
+            BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
+            filename=f"error-{user.id if user else 12345}.json",
+            caption=caption,
+            reply_to_message_id=msgID,
+        )
+    except Exception as e:
+        print(f"Error while sending error report to {admin}: {e}")
