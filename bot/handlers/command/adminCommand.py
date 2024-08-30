@@ -182,8 +182,8 @@ async def evaluateCode(u: Update, c):
     userID = u.effective_user.id
   
     text = message.text[5:].strip()
-    print(text)
-
+    if "help" in text:
+        return # TODO: Fix
     e2 = None
     try:
         try:
@@ -235,4 +235,4 @@ exportedHandlers = [
     CommandHandler("eval", evaluateCode),
     CommandHandler("delete", deleteMessage),
     CommandHandler("error", raiseError)
-] 
+        ]

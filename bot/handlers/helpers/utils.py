@@ -1,5 +1,5 @@
 class LimitedStack:
-    def __init__(self, length: int, /, div: int = 13):
+    def __init__(self, length: int, div: int = 13):
         self.div = div
         self.halfDiv = div // 2
 
