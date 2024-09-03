@@ -1,15 +1,12 @@
 start = """
 Assalamu Alaikum <b>{firstName}!</b>
 
-This bot will give you verses from the Al-Quran.
-
-It can give you the <b>Arabic</b> or <b>English</b> text and also the <b>Audio</b> of each ayah.
-
 See, /use to know how to use this bot.
 
 This bot is <a href="{repoURL}">open-source</a>. Your contribution can make it more helpful for the Ummah.
 
-The Arabic, English and Tafsir's were taken from quran.com
+<b>All the data were taken from quran.com</b>
+The tafsir used here is from <a href="https://quran.com/1:1/tafsirs/en-tafisr-ibn-kathir">Ibn Kathir</a>
 """
 
 help = """
