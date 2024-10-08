@@ -12,6 +12,27 @@ def escape(text: any):
     return html.escape(str(text))
 
 
+predefinedErrors = {
+    "Not enough rights to send text messages to the chat": """
+It seems like I don't have enough rights to send messages in <b>"$GROUPNAME"</b>. Tell the admins to give me the permission to send messages in the chat.
+
+<b>How to fix:</b>
+1. Make sure that the bot is not restricted/muted in the chat.
+2. Bot has proper permissions to send messages in the chat.
+
+This message is sent to you because the bot doesn't have enough rights to send messages in that chat.
+""",
+    "Message can't be deleted for everyone": """
+It seems like I don't have enough rights to delete messages in this chat. Tell the admins to give me the permission to delete messages in this chat.
+
+Otherwise, you can delete the message manually.
+""",
+    "Not enough rights to send music to the chat": """
+I don't have enough rights to send the audio file in the chat. Tell the admins to give me the permission to send audio files in this chat.
+""",
+}
+
+
 async def handleErrors(u: Update | None, c: CallbackContext):
     """Handles all the errors raised in the bot"""
 
@@ -48,8 +69,17 @@ async def handleErrors(u: Update | None, c: CallbackContext):
     if "Message is not modified" in errorString:
         return print(f"Error: {c.error}")
 
+    if predefinedErrors.get(errorString):
+        reply = predefinedErrors[errorString].replace("$GROUPNAME", escape(chat.title))
+        await message.reply_html(reply)
+        return
+
     print(tbString)
+
     try:
+        if "flood control" in errorString.lower():
+            raise Exception("Self Flood Controlled")
+
         await message.reply_html(
             f"""
 <b>An error occurred. Report sent to admins</b>
@@ -76,35 +106,14 @@ async def handleErrors(u: Update | None, c: CallbackContext):
 
     data = {
         "error_message": errorString,
-        "error": tbString.replace("\\n", "\n"),
+        "error": tbString,
         "update": u.to_dict(),
         "sendingError": messageSendingError,
     }
 
-    admins = db.getAllAdmins()
-    chatID = 5596148289
+    # chatID = 5596148289
+    chatID = -1002245250917  # Error Reporting Group
     if not u.effective_chat:
-        return await bot.sendDocument(
-            chatID,
-            BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
-            filename=f"error-{user.id if user else 12345}.json",
-            caption=caption,
-            reply_to_message_id=msgID,
-        )
-
-    try:
-        msgID = None
-        er = "None"
-        try:
-            msgID: Message = (
-                await bot.forwardMessage(
-                    chatID, chat.id if chat else user.id, message.message_id
-                )
-            ).message_id
-        except Exception as er:
-            er = str(er)
-            data["reportError"] = er
-
         await bot.sendDocument(
             chatID,
             BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
@@ -112,5 +121,22 @@ async def handleErrors(u: Update | None, c: CallbackContext):
             caption=caption,
             reply_to_message_id=msgID,
         )
-    except Exception as e:
-        print(f"Error while sending error report to {admin}: {e}")
+        return None
+
+    try:
+        msgID: Message = (
+            await bot.forwardMessage(
+                chatID, chat.id if chat else user.id, message.message_id
+            )
+        ).message_id
+    except Exception as er:
+        er = str(er)
+        data["reportError"] = er
+
+    await bot.sendDocument(
+        chatID,
+        BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
+        filename=f"error-{user.id if user else 12345}.json",
+        caption=caption,
+        reply_to_message_id=msgID,
+    )
