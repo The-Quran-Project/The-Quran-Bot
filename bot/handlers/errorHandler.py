@@ -113,13 +113,14 @@ async def handleErrors(u: Update | None, c: CallbackContext):
 
     # chatID = 5596148289
     chatID = -1002245250917  # Error Reporting Group
+    msgID = None
+    
     if not u.effective_chat:
         await bot.sendDocument(
             chatID,
             BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
             filename=f"error-{user.id if user else 12345}.json",
             caption=caption,
-            reply_to_message_id=msgID,
         )
         return None
 
