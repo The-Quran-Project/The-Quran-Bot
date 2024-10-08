@@ -205,6 +205,16 @@ async def _validateTime(message, text: str):
     minute = int(data["minute"])
     ampm = data["ampm"] and data["ampm"].strip().lower() or None
 
+    if not ampm and hour > 23:
+        msg = f"""
+<b>Invalid time format.</b>
+Hour should be less than 24 when using 24-hour format.
+
+{validMethod}
+"""
+        await message.reply_html(msg)
+        return False
+
     if ampm and hour > 12:
         msg = f"""
 <b>Invalid time format.</b>
