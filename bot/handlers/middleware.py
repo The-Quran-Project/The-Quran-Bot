@@ -1,8 +1,6 @@
-import json
+from datetime import datetime, timezone
 
 from telegram import Update
-from telegram.ext import TypeHandler
-
 
 from .database import db
 from .command.updateSettings import updateSettings
@@ -19,14 +17,15 @@ async def middleware(u: Update, c):
         db.addChannel(u.effective_chat.id)
         return
 
+    utcTime = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     userID = u.effective_user.id
     chatID = u.effective_chat.id
     isGroup = u.effective_chat.type in ("group", "supergroup")
 
     user = db.getUser(userID)
 
-    db.updateUser(userID, {"lastMessageTime": u.message.date})
-    
+    db.updateUser(userID, {"lastMessageTime": utcTime})
+
     if not user:
         user = db.addUser(userID)
         # If user is new & in private chat, send update settings message
