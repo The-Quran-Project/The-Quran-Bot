@@ -13,8 +13,9 @@ from .helpers.utils import LimitedStack
 
 load_dotenv()
 
+LOCAL = os.environ.get("LOCAL")
 
-if os.environ.get("LOCAL"):
+if LOCAL:
     # For `pymongo.errors.ConfigurationError: cannot open /etc/resolv.conf`
     import dns.resolver
 
@@ -94,7 +95,10 @@ class Database:
     def __init__(self) -> None:
         uri = os.environ.get("MONGODB_URI")
         self.client = MongoClient(uri, server_api=ServerApi("1"))
-        self.db = self.client.quranbot
+        if not LOCAL:
+            self.db = self.client.quranbot
+        else:
+            self.db = self.client.quranbot_local
 
         self.defaultSettings = {
             "font": 1,  # 1 -> Uthmani, 2 -> Simple
@@ -251,8 +255,10 @@ class Database:
                     print("Error in queue:", e)
 
         end = time.time()
+        timeMs = (end - start) * 1000
         self.queue = []
-        print(f"Time taken: {end - start:.2f}s")
+        if timeMs > 100:
+            print(f"Time taken: {timeMs:.2f} ms")
 
     # TODO: keep count of all the requests handled per day
     # Run this in a separate thread or use a TypeHandler to run after the other handlers (group=3)
