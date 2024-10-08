@@ -33,16 +33,15 @@ def _addScheduleToTemp(
     )
 
 
-__length = len("/schedule ")
-
 validMethod = """\
 <b><u>Examples:</u></b>
 <code>/schedule 11:49 pm</code>
 <code>/schedule 11:49 am</code>
 <code>/schedule 23:49</code> (24-hour format)
+<code>/schedule 11:49 pm - ara eng urd</code> (Multiple languages)
 
 <b><i>Note:</i></b>
-Spaces doesn't matter.
+Spaces doesn't matter. And you can put the languages at the end with a hyphen.
 <code>11 : 49 pm</code> is same as <code>11:49pm</code>"""
 
 
@@ -59,9 +58,10 @@ async def scheduleCommand(u: Update, c: ContextTypes.DEFAULT_TYPE):
     message = u.effective_message
     chatID = u.effective_chat.id
 
-    splitted = message.text[__length:].lower().split("-")
+    splitted = " ".join(message.text.split()[1:]).lower().split('-')  # Remove the command
     text = splitted[0].strip()
     langs = splitted[1].split() if len(splitted) > 1 else []
+
 
     if not text:
         return await showSchedule(u, c)
