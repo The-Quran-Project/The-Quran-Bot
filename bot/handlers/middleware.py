@@ -23,14 +23,13 @@ async def middleware(u: Update, c):
     isGroup = u.effective_chat.type in ("group", "supergroup")
 
     user = db.getUser(userID)
-
-    db.updateUser(userID, {"lastMessageTime": utcTime})
-
     if not user:
         user = db.addUser(userID)
         # If user is new & in private chat, send update settings message
         if not isGroup and u.effective_chat.type == "channel":
             await updateSettings(u, c)
+
+    db.updateUser(userID, {"lastMessageTime": utcTime})
 
     chat = db.getChat(chatID)
 
