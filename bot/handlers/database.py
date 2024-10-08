@@ -201,9 +201,6 @@ class Database:
 
     def updateUser(self, userID: int, settings: dict):
         user = self.getUser(userID)
-        if not user:
-            user = self.addUser(userID)
-
         settings = {**user["settings"], **settings}
         self.localDB.updateUser(userID, settings)
         func = self.db.users.update_one
@@ -213,9 +210,6 @@ class Database:
 
     def updateChat(self, chatID: int, settings: dict):
         chat = self.getChat(chatID)
-        if not chat:
-            chat = self.addChat(chatID)
-
         settings = {**chat["settings"], **settings}
         settings["restrictedLangs"] = list(set(settings["restrictedLangs"]))
         self.localDB.updateChat(chatID, settings)
@@ -227,9 +221,6 @@ class Database:
 
     def updateChannel(self, channelID: int, settings: dict):
         channel = self.getChannel(channelID)
-        if not channel:
-            channel = self.addChannel(channelID)
-
         settings = {**channel["settings"], **settings}
         self.localDB.updateChannel(channelID, settings)
 
@@ -241,7 +232,7 @@ class Database:
     def runQueue(self):
         print("--- Running Queue ---\r", end="")
         start = time.time()
-
+        
         for func, value in self.queue:
             if isinstance(value, tuple):
                 try:
