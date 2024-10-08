@@ -1,5 +1,5 @@
 from telegram.ext import CallbackQueryHandler
-from telegram import Update, Bot, InlineKeyboardMarkup
+from telegram import Update, Bot, InlineKeyboardMarkup, ChatPermissions
 
 
 from .. import Quran
@@ -163,9 +163,9 @@ async def handleButtonPress(u: Update, c):
 
     elif method == "audio":
         if u.effective_chat.type in ("group", "supergroup"):  # for groups
-            permissions = await bot.getChatMember(chatID, bot.id)
+            permissions:ChatPermissions = await bot.getChatMember(chatID, bot.id)
             try:
-                if not permissions.can_send_audios:
+                if not permissions.can_send_audios: # If the bot can't send audio messages
                     return await query.answer(
                         "I don't have permission to send audio messages in this group",
                         show_alert=True,
