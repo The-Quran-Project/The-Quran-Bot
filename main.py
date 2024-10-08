@@ -10,10 +10,10 @@ from bot.utils import checkVersion
 load_dotenv()
 
 LOCAL = os.environ.get("LOCAL")
-
+STOP_FLASK = os.environ.get("STOP_FLASK")
 
 if __name__ == "__main__":
-    if not LOCAL:
+    if not LOCAL and not STOP_FLASK:
         runFlask()
 
     checkVersion()
