@@ -25,6 +25,8 @@ async def middleware(u: Update, c):
 
     user = db.getUser(userID)
 
+    db.updateUser(userID, {"lastMessageTime": u.message.date})
+    
     if not user:
         user = db.addUser(userID)
         # If user is new & in private chat, send update settings message
