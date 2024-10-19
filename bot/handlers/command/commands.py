@@ -4,10 +4,10 @@ from telegram.ext import CommandHandler, MessageHandler, filters
 from telegram import Update, Message, InlineKeyboardButton, InlineKeyboardMarkup
 
 
-from .. import Quran
-from ..database import db
-from .. import Constants, replies
-from ..helpers import (
+from bot.handlers.database import db
+from bot.handlers import Quran
+from bot.handlers import Constants, replies
+from bot.handlers.helpers import (
     getRandomAyah,
     getValidReply,
     getSurahAudio,
@@ -262,7 +262,7 @@ async def audioCommand(u: Update, c):
     onlySurah = x.get("onlySurah")  # True if only Surah is provided
     surahNo = x["surahNo"]
     ayahNo = x["ayahNo"]
-    
+
     if onlySurah:
         audioFileID = getSurahAudio(surahNo)
         await message.reply_audio(audioFileID)

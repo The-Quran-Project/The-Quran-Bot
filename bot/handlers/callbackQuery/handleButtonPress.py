@@ -2,13 +2,18 @@ from telegram.ext import CallbackQueryHandler
 from telegram import Update, Bot, InlineKeyboardMarkup, ChatPermissions
 
 
-from .. import Quran
-from .. import Constants
-from ..database import db
-from .handleSchedule import handleSchedule
-from .handleAdminButtonPress import handleAdminButtonPress
-from .handleSettingsButtonPress import handleSettingsButtonPress
-from ..helpers import getAyahReply, getAyahReplyFromPreference, getAyahButton
+from bot.quran import Quran
+from bot.handlers import Constants
+from bot.handlers.database import db
+from bot.handlers.callbackQuery.handleSchedule import handleSchedule
+from bot.handlers.callbackQuery.handleAdminButtonPress import handleAdminButtonPress
+from bot.handlers.callbackQuery.handleSettingsButtonPress import (
+    handleSettingsButtonPress,
+)
+from bot.handlers.helpers import getAyahReply, getAyahReplyFromPreference, getAyahButton
+from bot.utils import getLogger
+
+logger = getLogger(__name__)
 
 
 async def handleButtonPress(u: Update, c):
@@ -173,7 +178,7 @@ async def handleButtonPress(u: Update, c):
                         show_alert=True,
                     )
             except Exception as e:
-                print(f"In audio button: {e}")
+                logger.error(f"In audio button: {e}")
 
             allowAudio = chat["settings"]["allowAudio"]
             if not allowAudio:

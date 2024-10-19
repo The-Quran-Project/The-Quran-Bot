@@ -1,6 +1,6 @@
-from .. import Quran
-from .getAyahButton import getAyahButton
-from .getAyahReply import getAyahReply, getAyahReplyFromPreference
+from bot.handlers import Quran
+from bot.handlers.helpers.getAyahButton import getAyahButton
+from bot.handlers.helpers.getAyahReply import getAyahReply, getAyahReplyFromPreference
 
 
 validFormat = """

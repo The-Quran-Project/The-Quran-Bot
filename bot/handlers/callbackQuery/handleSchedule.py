@@ -2,8 +2,7 @@ from telegram.ext import CallbackQueryHandler
 from telegram import Update, Bot, InlineKeyboardMarkup
 
 
-from .. import Quran
-from ..database import db
+from bot.handlers.database import db
 
 
 async def handleSchedule(u: Update, c):

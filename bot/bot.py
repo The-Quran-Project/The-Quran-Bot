@@ -6,9 +6,8 @@ from dotenv import load_dotenv
 from telegram import Update, constants
 from datetime import datetime, timezone
 
-from .handlers.database import db
-from .handlers.sendScheduled import jobSendScheduled
-from .handlers import exportedHandlers, handleErrors, middleware
+from bot.handlers.sendScheduled import jobSendScheduled
+from bot.handlers import exportedHandlers, handleErrors, middleware
 
 
 # Load Environment Variables
@@ -46,6 +45,7 @@ def runBot(token):
     loop = asyncio.get_event_loop()
 
     msg = f"<b>Bot started at {datetime.now(timezone.utc).strftime('%d %B %Y, %H:%M:%S %A UTC')} 🚀</b>"
+    print(msg[3:-4])
     loop.run_until_complete(app.bot.sendMessage(5596148289, msg))
 
     app.run_polling()

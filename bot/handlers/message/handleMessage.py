@@ -4,10 +4,10 @@ import string
 from telegram.ext import MessageHandler, filters
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 
-from .. import Quran
-from ..database import db
-from ..helpers import getValidReply
-from .replyToErrorMessage import replyToErrorMessage
+from bot.handlers.database import db
+from bot.handlers import Quran
+from bot.handlers.helpers import getValidReply
+from bot.handlers.message.replyToErrorMessage import replyToErrorMessage
 
 
 ADMINS = db.admins

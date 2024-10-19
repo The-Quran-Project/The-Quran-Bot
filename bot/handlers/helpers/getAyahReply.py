@@ -1,5 +1,5 @@
-from .. import Quran, replies
-from ..database import db
+from bot.handlers.database import db
+from bot.handlers import Quran, replies
 
 
 def useTemplate(title, ayah, lang, restrictedLangs):

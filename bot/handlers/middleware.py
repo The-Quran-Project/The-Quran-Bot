@@ -2,8 +2,8 @@ from datetime import datetime, timezone
 
 from telegram import Update
 
-from .database import db
-from .command.updateSettings import updateSettings
+from bot.handlers.database import db
+from bot.handlers.command.updateSettings import updateSettings
 
 
 async def middleware(u: Update, c):

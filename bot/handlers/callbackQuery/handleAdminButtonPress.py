@@ -3,7 +3,7 @@ import json
 from io import BytesIO
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 
-from ..database import db
+from bot.handlers.database import db
 
 
 async def handleAdminButtonPress(u: Update, c):

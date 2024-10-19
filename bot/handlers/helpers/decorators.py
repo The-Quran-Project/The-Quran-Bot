@@ -3,7 +3,7 @@ from typing import Callable
 
 from telegram import Update, Message, Bot
 
-from ..database import db
+from bot.handlers.database import db
 
 developers = db.admins
 

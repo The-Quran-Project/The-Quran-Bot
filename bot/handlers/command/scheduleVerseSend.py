@@ -1,9 +1,9 @@
 import re
 import time
 
-from .. import Quran
-from ..database import db
-from ..helpers.decorators import onlyGroupAdmin
+from bot.handlers.database import db
+from bot.handlers import Quran
+from bot.handlers.helpers.decorators import onlyGroupAdmin
 
 from datetime import datetime, tzinfo
 from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup

@@ -1,6 +1,6 @@
 from telegram import InlineKeyboardButton
 
-from ...quran import QuranClass
+from bot.quran import QuranClass
 
 
 def splitListIntoChunks(listToSplit: list, chunkSize: int = 3):

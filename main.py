@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 from bot import startBot
 from bot.utils import runFlask
-from bot.utils import startLogger
+from bot.utils import getLogger
 from bot.utils import checkVersion
 from bot.utils import getArguments
 
@@ -19,7 +19,7 @@ if __name__ == "__main__":
         runFlask()
 
     checkVersion()
-    startLogger(__name__)
+    logger = startLogger(__name__)
 
     # Infinite loop to restart the bot in case of any errors
     while 1:
@@ -32,4 +32,4 @@ if __name__ == "__main__":
             if LOCAL:
                 raise e
 
-            print("Error:", e)
+            logger.info("Error:", e)

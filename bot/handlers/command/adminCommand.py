@@ -9,9 +9,12 @@ from telegram import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
 )
-from ..database import db
-from ..replies import adminCommands
-from ..helpers.decorators import onlyDeveloper
+from bot.handlers.database import db
+from bot.handlers.replies import adminCommands
+from bot.handlers.helpers.decorators import onlyDeveloper
+from bot.utils import getLogger
+
+logger = getLogger(__name__)
 
 
 def escapeHtml(text: str):
@@ -81,7 +84,7 @@ async def forwardMessage(u: Update, c):
                 success += 1
 
             except Exception as e:
-                print(f"Error while forwarding to {userID}: {e}")
+                logger.error(f"Error while forwarding to {userID}: {e}")
                 with open("errors.txt", "a") as f:
                     f.write(f"{userID}\n")
 
@@ -118,7 +121,7 @@ async def deleteMessage(u: Update, c):
         await message.delete()
     except Exception as e:
         if chatType == "private":
-            print(f"Error while deleting message: {e}")
+            logger.error(f"Error while deleting message: {e}")
             raise e
 
 
@@ -188,7 +191,7 @@ async def evaluateCode(u: Update, c):
     try:
         try:
             output = await eval(text)
-            print(output)
+            logger.info(output)
         except Exception as e:
             output = eval(text)
             e2 = str(e)

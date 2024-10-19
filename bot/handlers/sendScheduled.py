@@ -6,9 +6,12 @@ from telegram.error import *
 from telegram import Update, Bot
 from telegram.ext import Application, JobQueue, filters, ContextTypes
 
-from . import Quran
-from .database import db
+from bot.handlers import Quran
+from bot.handlers.database import db
 from datetime import datetime
+from bot.utils import getLogger
+
+logger = getLogger(__name__)
 
 
 async def jobSendScheduled(context: ContextTypes.DEFAULT_TYPE):
@@ -16,7 +19,6 @@ async def jobSendScheduled(context: ContextTypes.DEFAULT_TYPE):
     bot: Bot = context.bot
     collection = db.db.schedules
 
-    print("Checking schedules...")
     schedules = collection.find()
     for schedule in schedules:
         try:
@@ -29,18 +31,18 @@ async def jobSendScheduled(context: ContextTypes.DEFAULT_TYPE):
             hour, minute = int(hour), int(minute)
             nowHour, nowMinute = datetime.utcnow().strftime("%H:%M").split(":")
             nowHour, nowMinute = int(nowHour), int(nowMinute)
-            print(
+            logger.info(
                 f"Chat ID: {chatID}, Time: {runTime}, Now Time: {nowHour}:{nowMinute}"
             )
 
             if hour == nowHour and (0 <= nowMinute - minute <= 5):
-                print("Sending scheduled verse...")
+                logger.info("Sending scheduled verse...")
                 lastSent = schedule.get("lastSent")
                 if lastSent:
                     lastSent = datetime.strptime(lastSent, "%d:%m:%Y %H:%M:%S")
                     diff = datetime.utcnow() - lastSent
                     if diff.total_seconds() < 11 * 60:
-                        print("Skipping due to last sent.")
+                        logger.info("Skipping due to last sent.")
                         continue
 
                 langs = schedule["langs"]
@@ -70,24 +72,24 @@ Ayah  : <b>{ayahNo} out of {totalAyah}</b>
                         {"_id": chatID}, {"$set": {"lastSent": currentTime}}
                     )
                 except ChatMigrated as e:
-                    print(f"ChatMigrated: {e}")
+                    logger.info(f"ChatMigrated: {e}")
                     newChatID = e.new_chat_id
                     collection.update_one({"_id": chatID}, {"$set": {"_id": newChatID}})
                     try:
-                        print(f"Sending to new chat ID: {newChatID}")
+                        logger.info(f"Sending to new chat ID: {newChatID}")
                         await bot.sendMessage(newChatID, msg, message_thread_id=topicID)
                         collection.update_one(
                             {"_id": newChatID}, {"$set": {"lastSent": currentTime}}
                         )
                     except Exception as e:
-                        print(f"Failing to send to new chat ID: {newChatID} - {e}")
+                        logger.error(f"Failing to send to new chat ID: {newChatID} - {e}")
 
                 except Forbidden as e:
-                    print(f"Forbidden: {e}")
+                    logger.error(f"Forbidden: {e}")
                     collection.update_one({"_id": chatID}, {"$set": {"enabled": False}})
 
                 except Exception as e:
-                    print(f"Error: {e}")
+                    logger.error(f"Error: {e}")
 
                 await asyncio.sleep(0.1)
 
@@ -95,6 +97,6 @@ Ayah  : <b>{ayahNo} out of {totalAyah}</b>
             dueNextMinute = 60 - int(datetime.utcnow().strftime("%S"))
             # await asyncio.sleep(dueNextMinute - 1)
         except Exception as e:
-            print(f"Error: {e}")
+            logger.error(f"Error: {e}")
             continue
-    print("Done checking schedules.")
+    logger.info("Done checking schedules.")

@@ -9,11 +9,16 @@ from collections.abc import Iterable
 from pymongo.server_api import ServerApi
 from pymongo.mongo_client import MongoClient
 
-from .helpers.utils import LimitedStack
+from bot.handlers.helpers.utils import LimitedStack
+from bot.utils import getArguments
+from bot.utils import getLogger
+
 
 load_dotenv()
 
-LOCAL = os.environ.get("LOCAL")
+logger = getLogger(__name__)
+ARGS = getArguments()
+LOCAL = os.environ.get("LOCAL") or ARGS.ARG_LOCAL
 
 if LOCAL:
     # For `pymongo.errors.ConfigurationError: cannot open /etc/resolv.conf`
@@ -31,7 +36,7 @@ class _LocalDB:
         self.chats = list(chats)
         self.channels = list(channels)
         self.admins = [i["_id"] for i in self.users if i.get("is_admin")]
-        print(f"LocalDB: {len(self.users)} users, {len(self.chats)} chats")
+        logger.info(f"LocalDB: {len(self.users)} users, {len(self.chats)} chats")
 
     def findUser(self, userID: int) -> dict:
         return next((i for i in self.users if i["_id"] == userID), None)
@@ -135,10 +140,13 @@ class Database:
                 try:
                     scheduleModule.run_pending()
                 except Exception as e:
-                    print("Error in scheduled tasks:", e)
+                    logger.info("Error in scheduled tasks:", e)
                 time.sleep(1)
 
-        threading.Thread(target=runScheduledTasks).start()
+        if not ARGS.ARG_STOP_THREAD:
+            threading.Thread(target=runScheduledTasks).start()
+        else:
+            logger.warning("Database thread is stopped by user")
 
     @property
     def admins(self):
@@ -230,26 +238,26 @@ class Database:
         return None
 
     def runQueue(self):
-        print("--- Running Queue ---\r", end="")
+        logger.info("--- Running Queue ---")
         start = time.time()
-        
+
         for func, value in self.queue:
             if isinstance(value, tuple):
                 try:
                     func(*value)
                 except Exception as e:
-                    print("Error in queue:", e)
+                    logger.info("Error in queue:", e)
             else:
                 try:
                     func(value)
                 except Exception as e:
-                    print("Error in queue:", e)
+                    logger.info("Error in queue:", e)
 
         end = time.time()
         timeMs = (end - start) * 1000
         self.queue = []
         if timeMs > 100:
-            print(f"Time taken: {timeMs:.2f} ms")
+            logger.info(f"Time taken: {timeMs:.2f} ms")
 
     # TODO: keep count of all the requests handled per day
     # Run this in a separate thread or use a TypeHandler to run after the other handlers (group=3)

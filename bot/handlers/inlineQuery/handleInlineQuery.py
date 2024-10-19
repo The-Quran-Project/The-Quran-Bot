@@ -8,9 +8,9 @@ from telegram import (
 )
 from telegram.ext import InlineQueryHandler
 
-from .. import Quran
-from ..database import db
-from ..helpers import getAyahReplyFromPreference
+from bot.handlers.database import db
+from bot.handlers import Quran
+from bot.handlers.helpers import getAyahReplyFromPreference
 
 
 async def handleInlineQuery(u: Update, c):

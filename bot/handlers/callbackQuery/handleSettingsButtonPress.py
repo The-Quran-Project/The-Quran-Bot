@@ -1,7 +1,7 @@
 from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
-from ..database import db
-from .. import Quran
+from bot.handlers.database import db
+from bot.handlers import Quran
 
 
 arabicStyles = {

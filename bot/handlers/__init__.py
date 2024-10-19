@@ -1,9 +1,9 @@
-from ..quran import QuranClass
+from bot.quran import QuranClass
 
 # Import after the class definition to avoid circular import
 Quran = QuranClass()
 
-from .helpers import generateSurahButtons
+from bot.handlers.helpers import generateSurahButtons
 
 
 class Constants:

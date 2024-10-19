@@ -1,8 +1,8 @@
 import secrets
 
-from .. import Quran
-from .getAyahButton import getAyahButton
-from .getAyahReply import getAyahReplyFromPreference
+from bot.handlers import Quran
+from bot.handlers.helpers.getAyahButton import getAyahButton
+from bot.handlers.helpers.getAyahReply import getAyahReplyFromPreference
 
 
 def getRandomAyah(userID):

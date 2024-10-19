@@ -3,10 +3,13 @@ import json
 import traceback
 
 from io import BytesIO
-from .database import db
+from bot.handlers.database import db
 from telegram.ext import CallbackContext
 from telegram import Update, Bot, Message
+from bot.utils import getLogger
 
+
+logger = getLogger(__name__)
 
 def escape(text: any):
     return html.escape(str(text))
@@ -55,7 +58,7 @@ async def handleErrors(u: Update | None, c: CallbackContext):
     user = u.effective_user
     chat = u.effective_chat
 
-    print("--- Error Occurred ---")
+    logger.info("--- Error Occurred ---")
     tbList = traceback.format_exception(None, c.error, c.error.__traceback__)
     tbString = "".join(tbList)
 
@@ -67,7 +70,8 @@ async def handleErrors(u: Update | None, c: CallbackContext):
 
     messageSendingError = ""
     if "Message is not modified" in errorString:
-        return print(f"Error: {c.error}")
+        logger.error(f"Error: {c.error}")
+        return
 
     if predefinedErrors.get(errorString):
         reply = predefinedErrors[errorString].replace("$GROUPNAME", escape(chat.title))

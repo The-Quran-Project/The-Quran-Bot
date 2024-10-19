@@ -4,7 +4,7 @@ import time
 from telegram import Update
 from telegram.ext import CommandHandler
 
-from ..helpers.decorators import onlyGroupAdmin
+from bot.handlers.helpers.decorators import onlyGroupAdmin
 
 
 def escapeHTML(text: str):
