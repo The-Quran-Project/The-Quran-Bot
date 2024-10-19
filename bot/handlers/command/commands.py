@@ -192,12 +192,17 @@ async def getTranslationCommand(u: Update, c):
         reply = f"""
 <b>❌ Invalid Language ❌</b>
 
-If you want to suggest a language, please say it in the <a href="https://t.me/AlQuranDiscussion">discussion group</a>.
-
 Available languages are:
 <blockquote>\
 {', '.join(availableLanguages)}
 </blockquote>
+
+You can also use the language abbr. For example,
+<code>en</code> for English
+<code>en2</code> for Mufti Taqi Usmani
+<code>ar</code> for Arabic
+
+If you want to use a language that is not listed, please suggest it in the <a href="https://t.me/AlQuranDiscussion">discussion group</a>.
 """
         await message.reply_html(reply)
         return
