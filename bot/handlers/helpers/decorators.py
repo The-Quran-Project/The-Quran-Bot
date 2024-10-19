@@ -29,7 +29,7 @@ def onlyDeveloper(notifyNonAdminUsers: bool = True):
                 if not notifyNonAdminUsers:
                     return
                 return await u.effective_message.reply_html(
-                    "<b>You are not authorized to use this command</b>"
+                    "<b>You are not authorized to use this command. Only the bot admins can use it.</b>"
                 )
             return await func(u, c, *a, **k)
 
@@ -72,7 +72,8 @@ def onlyGroupAdmin(allowDev: bool = False, notifyNonAdminUsers: bool = True):
                 if not notifyNonAdminUsers:
                     return
                 return await u.effective_message.reply_html(
-                    "<b>You must be an admin of the group to use this command</b>"
+                    "<b>You must be a group admin of the group to use this command</b>."
+                    "But you can use this command in your private chat. Go to @AlFurqanRobot and use this command."
                 )
             return await func(u, c, *a, **k)
 
