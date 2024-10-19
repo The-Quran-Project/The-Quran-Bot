@@ -78,4 +78,4 @@ def onlyGroupAdmin(allowDev: bool = False, notifyNonAdminUsers: bool = True):
 
         return wrapper
 
-    return outerWrapper 
+    return outerWrapper

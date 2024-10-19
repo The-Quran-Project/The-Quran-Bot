@@ -102,6 +102,8 @@ async def handleErrors(u: Update | None, c: CallbackContext):
 <b>Timestamp  :</b> <code>{message.date} UTC</code>
 <b>Error:</b>
 <blockquote>{escape(c.error)}</blockquote>
+
+Reply to this message to send a message to the user. (Only Text) [Supports Formatting]
 """
 
     data = {
@@ -114,7 +116,7 @@ async def handleErrors(u: Update | None, c: CallbackContext):
     # chatID = 5596148289
     chatID = -1002245250917  # Error Reporting Group
     msgID = None
-    
+
     if not u.effective_chat:
         await bot.sendDocument(
             chatID,

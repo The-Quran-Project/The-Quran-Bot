@@ -70,8 +70,10 @@ Didn't include {otherTitle} translation as it would exceed the character limit o
 
 But you can use `/{other} {surahNo}:{ayahNo}` to get the specific translation.
 """
-            return reply
-        reply += useTemplate(otherTitle, ayah[other], otherLanguage, restrictedLangs)
+        else:
+            reply += useTemplate(
+                otherTitle, ayah[other], otherLanguage, restrictedLangs
+            )
 
     if showTafsir:
         tafsir = ayah.tafsir

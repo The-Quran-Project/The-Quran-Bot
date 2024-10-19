@@ -58,10 +58,11 @@ async def scheduleCommand(u: Update, c: ContextTypes.DEFAULT_TYPE):
     message = u.effective_message
     chatID = u.effective_chat.id
 
-    splitted = " ".join(message.text.split()[1:]).lower().split('-')  # Remove the command
+    splitted = (
+        " ".join(message.text.split()[1:]).lower().split("-")
+    )  # Remove the command
     text = splitted[0].strip()
     langs = splitted[1].split() if len(splitted) > 1 else []
-
 
     if not text:
         return await showSchedule(u, c)

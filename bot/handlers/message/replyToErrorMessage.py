@@ -22,9 +22,7 @@ async def replyToErrorMessage(u: Update, c: CallbackContext):
     ):
         return False
 
-    # `filename` = error-<userID>.json
-    # - you thought about regex?
-    # - Nope! Not happening ❄
+    # you thought about regex to get the userID? Nope! Not happening 😪
     userID = repliedTo.document.file_name[6:-5]
     htmlText = message.text_html
 

@@ -26,7 +26,7 @@ async def handleMessage(u: Update, c):
     text = message.text
     buttons = None
 
-    if userID in ADMINS and u.effective_chat.type == "private":
+    if userID in ADMINS:  # Admins can reply to the error messages
         res = await replyToErrorMessage(u, c)
         if res:
             return
