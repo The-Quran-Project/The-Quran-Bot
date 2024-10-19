@@ -19,7 +19,7 @@ if __name__ == "__main__":
         runFlask()
 
     checkVersion()
-    logger = startLogger(__name__)
+    logger = getLogger(__name__)
 
     # Infinite loop to restart the bot in case of any errors
     while 1:

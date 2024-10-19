@@ -2,7 +2,7 @@ from telegram.ext import CallbackQueryHandler
 from telegram import Update, Bot, InlineKeyboardMarkup, ChatPermissions
 
 
-from bot.quran import Quran
+from bot.handlers import Quran
 from bot.handlers import Constants
 from bot.handlers.database import db
 from bot.handlers.callbackQuery.handleSchedule import handleSchedule
