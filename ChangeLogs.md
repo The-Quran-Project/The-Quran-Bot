@@ -2,24 +2,39 @@
 
 **Latests are on top**
 
+## 15) 20th October, 2024
+
+- Bot can now send the audio of a Full Surah.
+  - Example: `/audio 1` will send the audio of Surah no. 1, Al-Fatihah.
+- Dev Feature:
+  - Developer can pass arguments from terminal.
+    - Try out `python main.py --help` to see the available options.
+- Other minor bug fixes and improvements.
+
+## 14) 19th October, 2024
+
+- Bug fix: If the user has 3 selected translations and asks for a verse that is long enough to exceed `4092` character limit, bot sent an error message.
+  - Now, the bot will send the verse in with the first 2 translations only. And mention the user that the verse is too long to send with all the translations.
+
+> Did some minor changes throughout this period. But, I forgot to keep the logs. Sorry for that.
 
 ## 14) 22nd April, 2024
+
 - `/schedule` command bug fixed. Now, the bot will send the scheduled verse at the exact time.
 - `/schedule` command will now send the verse in the group where the command was sent.
 - `/delete` admin command added to delete a message sent by the bot.
 - `/showJson` admin command added. It'll show the JSON data of the group.
 - Refactor decorators to make the code more readable and maintainable.
 
-
 ## 13) 19th April, 2024
+
 - `/schedule` command added. Now, you can schedule a verse to be sent at a specific time of every day.
 
-
 ## 12) 5th April, 2024
+
 - Integrate custom local database logic to make database operations faster and more efficient.
 - Add **Russian** translation of the Quran. Now, the bot supports 9 languages.
 - Other minor bug fixes and improvements.
-
 
 ## 11) 16rd February, 2024
 
