@@ -2,5 +2,5 @@ from .getAyahButton import getAyahButton
 from .getRandomAyah import getRandomAyah
 from .generateSurahButtons import generateSurahButtons
 from .getAyahReply import getAyahReply, getAyahReplyFromPreference
-
-from .getValidReply import getValidReply
+from .getValidReply import getValidReply, isValidFormat
+from .getSurahAudio import getSurahAudio

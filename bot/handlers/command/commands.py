@@ -7,7 +7,13 @@ from telegram import Update, Message, InlineKeyboardButton, InlineKeyboardMarkup
 from .. import Quran
 from ..database import db
 from .. import Constants, replies
-from ..helpers import getRandomAyah, getValidReply
+from ..helpers import (
+    getRandomAyah,
+    getValidReply,
+    getSurahAudio,
+    isValidFormat,
+    getAyahButton,
+)
 
 
 def escapeHTML(text: str) -> str:
@@ -247,22 +253,26 @@ async def audioCommand(u: Update, c):
     userID = u.effective_user.id
     text = message.text[6:].strip()  # 6 is the length of "/audio"
 
-    x = getValidReply(userID, text)
-    buttons = x["buttons"]
-
-    if not buttons:
-        await message.reply_html(x["text"])
+    x = isValidFormat(text)
+    ok = x["ok"]
+    if not ok:
+        await message.reply_html(x["message"])
         return
 
-    if ":" not in text != 2:
-        text += ":1"
-    surah, ayah = text.split(":")
-    surah = surah.strip()
-    ayah = ayah.strip()
+    onlySurah = x.get("onlySurah")  # True if only Surah is provided
+    surahNo = x["surahNo"]
+    ayahNo = x["ayahNo"]
+    
+    if onlySurah:
+        audioFileID = getSurahAudio(surahNo)
+        await message.reply_audio(audioFileID)
+        return
+
+    preferredReciter = db.getUser(userID)["settings"]["reciter"]
 
     await message.reply_audio(
-        f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{
-            surah}_{ayah}.mp3"""
+        f"""https://quranaudio.pages.dev/{preferredReciter}/{
+            surahNo}_{ayahNo}.mp3"""
     )
 
 
@@ -273,20 +283,15 @@ async def tafsirCommand(u: Update, c):
     userID = u.effective_user.id
     text = message.text[7:].strip()  # 7 is the length of "/tafsir"
 
-    x = getValidReply(userID, text)
-    buttons = x["buttons"]
-
-    if not buttons:
-        await message.reply_html(x["text"])
+    x = isValidFormat(text)
+    if x["ok"] == False:
+        await message.reply_html(x["message"])
         return
 
-    if ":" not in text != 2:
-        text += ":1"
-    surah, ayah = text.split(":")
-    surah = surah.strip()
-    ayah = ayah.strip()
-
-    tafsir = Quran.getAyah(surah, ayah).tafsir
+    surahNo = x["surahNo"]
+    ayahNo = x["ayahNo"]
+    buttons = getAyahButton(surahNo, ayahNo, userID)
+    tafsir = Quran.getAyah(surahNo, ayahNo).tafsir
     reply = f"<b>Tafsir:</b> <a href='{tafsir}'>Telegraph</a>"
 
     disablePreviewForGroups = False
