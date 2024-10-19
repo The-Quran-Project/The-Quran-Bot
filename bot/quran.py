@@ -204,6 +204,8 @@ class QuranClass:
         text = text.lower()
         if text == "en2":
             return "english_2"  # Mufti Taqi Usmani
+        if text == "english2":
+            return "english_2"
         if text == "bn":
             return "bengali"
 
