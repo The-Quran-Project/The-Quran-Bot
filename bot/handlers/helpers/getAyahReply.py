@@ -63,6 +63,14 @@ Ayah  : <b>{ayahNo} out of {totalAyah}</b>
             secondaryTitle, ayah[secondary], secondaryLanguage, restrictedLangs
         )
     if other:
+        # check if adding this will cross 4092 characters limit
+        if len(reply) + len(ayah[other]) > 4092:
+            reply += f"""
+Didn't include {otherTitle} translation as it would exceed the character limit of Telegram.
+
+But you can use `/{other} {surahNo}:{ayahNo}` to get the specific translation.
+"""
+            return reply
         reply += useTemplate(otherTitle, ayah[other], otherLanguage, restrictedLangs)
 
     if showTafsir:
