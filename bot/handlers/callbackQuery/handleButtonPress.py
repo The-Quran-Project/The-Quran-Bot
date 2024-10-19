@@ -173,7 +173,7 @@ async def handleButtonPress(u: Update, c):
                         show_alert=True,
                     )
             except Exception as e:
-                print(e)
+                print(f"In audio button: {e}")
 
             allowAudio = chat["settings"]["allowAudio"]
             if not allowAudio:

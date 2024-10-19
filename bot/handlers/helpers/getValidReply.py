@@ -12,65 +12,76 @@ surahNo : ayahNo
 </pre>"""
 
 
-def getValidReply(userID, text, language=None, restrictedLangs: list = None):
-    text = text.strip()
-    if text.isdecimal() and 1 <= int(text) <= 114:  # if only surah number is given
-        surahNo = int(text)
-        ayahNo = 1
-        surah = Quran.getSurahNameFromNumber(surahNo)
-        ayahCount = Quran.getAyahNumberCount(surahNo)
-
-        if language:
-            reply = getAyahReply(surahNo, ayahNo, language)
-        else:
-            print("getAyahReplyFromPreference")
-            reply = getAyahReplyFromPreference(
-                surahNo, ayahNo, userID, restrictedLangs=restrictedLangs
-            )
-
-        buttons = getAyahButton(surahNo, ayahNo, userID, language)
-
-        return {"text": reply, "buttons": buttons}
-
+def isValidFormat(text):
     sep = text.split(":")
+    if text.isdecimal() and 1 <= int(text) <= 114:  # if only surah number is given
+        return {
+            "ok": "True",
+            "message": None,
+            "surahNo": int(text),
+            "ayahNo": 1,
+            "onlySurah": True,
+        }
+
     if len(sep) != 2:
-        reply = "<b>Your format is not correct.</b>" + validFormat
-        reply = {"text": reply, "buttons": None}
-        return reply
+        return {
+            "ok": False,
+            "message": "<b>Your format is not correct.</b>" + validFormat,
+        }
 
     surahNo, ayahNo = sep
     surahNo = surahNo.strip()
     ayahNo = ayahNo.strip()
 
     if not (surahNo.isdecimal() and ayahNo.isdecimal()):
-        reply = "<b>Surah and Ayah number must be integers</b>" + validFormat
-
-        return {"text": reply, "buttons": None, "send": True}
+        return {
+            "ok": False,
+            "message": "<b>Surah and Ayah number must be integers</b>" + validFormat,
+        }
 
     surahNo = int(surahNo)
 
     if not 1 <= surahNo <= 114:
-        reply = "<b>Surah number needs to be between <i>1</i> to <i>114</i>.</b>"
-        return {"text": reply, "buttons": None, "send": True}
+        return {
+            "ok": False,
+            "message": "<b>Surah number needs to be between <i>1</i> to <i>114</i>.</b>",
+        }
 
-    surah = Quran.getSurahNameFromNumber(surahNo)
-    ayahCount = Quran.getAyahNumberCount(surahNo)
+    surahNo = int(surahNo)
     ayahNo = int(ayahNo)
+    ayahCount = Quran.getAyahNumberCount(surahNo)
 
     if not 1 <= ayahNo <= ayahCount:
-        reply = f"""
-<b>Surah {surah} has {ayahCount} ayahs only.</b>
+        return {
+            "ok": False,
+            "message": f"""
+<b>Surah {Quran.getSurahNameFromNumber(surahNo)} has {ayahCount} ayahs only.</b>
+You gave ayah no. {ayahNo}""",
+        }
 
-But you gave ayah no. {ayahNo}
-"""
+    return {
+        "ok": True,
+        "message": None,
+        "surahNo": surahNo,
+        "ayahNo": ayahNo,
+    }
 
-        return {"text": reply, "buttons": None, "send": True}
 
+def getValidReply(userID, text, language=None, restrictedLangs: list = None):
+    text = text.strip()
+
+    x = isValidFormat(text)
+    if x["ok"] == False:
+        return {"text": x["message"], "buttons": None}
+
+    surahNo = x["surahNo"]
+    ayahNo = x["ayahNo"]
     if language:
-        reply = getAyahReply(surahNo, ayahNo, language=language)
+        reply = getAyahReply(surahNo, ayahNo, language)
     else:
-        reply = getAyahReplyFromPreference(surahNo, ayahNo, userID, restrictedLangs)
-
-    buttons = getAyahButton(surahNo, ayahNo, userID, language=language)
+        reply = getAyahReplyFromPreference(
+            surahNo, ayahNo, userID, restrictedLangs=restrictedLangs
+        )
+    buttons = getAyahButton(surahNo, ayahNo, userID, language)
 
     return {"text": reply, "buttons": buttons}
