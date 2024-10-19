@@ -264,7 +264,7 @@ async def audioCommand(u: Update, c):
     ayahNo = x["ayahNo"]
 
     if onlySurah:
-        audioFileID = getSurahAudio(surahNo)
+        audioFileID = getSurahAudio(surahNo, userID)
         await message.reply_audio(audioFileID)
         return
 
