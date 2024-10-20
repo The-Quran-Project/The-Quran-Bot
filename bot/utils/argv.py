@@ -30,6 +30,17 @@ parser.add_argument(
     default=0,
 )
 
+
+parser.add_argument(
+    "-fm",
+    "--fix-mongo",
+    help="use dns resolver for pymongo (1=true, 0=false)",
+    type=int,
+    required=False,
+    default=0,
+)
+
+
 arguments = parser.parse_args()
 
 
@@ -37,6 +48,7 @@ class Obj:
     ARG_LOCAL = arguments.local
     ARG_STOP_FLASK = arguments.stop_flask
     ARG_STOP_THREAD = arguments.stop_thread
+    ARG_FIX_MONGO = arguments.fix_mongo
 
     def __init__(self):
         pass
