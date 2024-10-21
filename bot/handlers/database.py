@@ -20,7 +20,7 @@ logger = getLogger(__name__)
 ARGS = getArguments()
 LOCAL = os.environ.get("LOCAL") or ARGS.ARG_LOCAL
 
-if LOCAL:
+if LOCAL or ARGS.ARG_FIX_MONGO:
     # For `pymongo.errors.ConfigurationError: cannot open /etc/resolv.conf`
     import dns.resolver
 
