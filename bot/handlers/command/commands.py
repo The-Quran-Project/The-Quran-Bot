@@ -265,6 +265,7 @@ async def audioCommand(u: Update, c):
 
     if onlySurah:
         if userID != 5596148289:
+            print(userID)
             await message.reply_html("<b>Developer currently disabled this feature because of some problems, it'll be back soon</b>\nStay updated with @AlQuranUpdates")
             return
         
