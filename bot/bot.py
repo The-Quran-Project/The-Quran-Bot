@@ -17,7 +17,6 @@ load_dotenv()
 
 LOCAL = os.environ.get("LOCAL") or getArguments().ARG_LOCAL
 TOKEN = os.environ.get("TOKEN") if not LOCAL else os.environ.get("TEST")
-TOKEN = "6643208326:AAGoUhxF3JjaRolbMMSf6qLtMnEPP6s4rKA"
 
 def runBot(token):
     df = Defaults(parse_mode=constants.ParseMode.HTML, block=False, quote=True)
