@@ -1,5 +1,6 @@
 import os
 import asyncio
+import time
 
 from telegram.ext import *
 from dotenv import load_dotenv
@@ -8,13 +9,15 @@ from datetime import datetime, timezone
 
 from bot.handlers.sendScheduled import jobSendScheduled
 from bot.handlers import exportedHandlers, handleErrors, middleware
-
+from bot.utils import getArguments
 
 # Load Environment Variables
 load_dotenv()
-LOCAL = os.environ.get("LOCAL")
-TOKEN = os.environ.get("TOKEN") if not LOCAL else os.environ.get("TEST")
 
+
+LOCAL = os.environ.get("LOCAL") or getArguments().ARG_LOCAL
+TOKEN = os.environ.get("TOKEN") if not LOCAL else os.environ.get("TEST")
+TOKEN = "6643208326:AAGoUhxF3JjaRolbMMSf6qLtMnEPP6s4rKA"
 
 def runBot(token):
     df = Defaults(parse_mode=constants.ParseMode.HTML, block=False, quote=True)
@@ -54,7 +57,7 @@ def runBot(token):
 def startBot():
     if not TOKEN:
         print("Please put your bot token in `.env` file")
-        print()
+        exit()
         return
 
     if LOCAL:

@@ -28,12 +28,14 @@ async def middleware(u: Update, c):
         user = db.getUser(userID)
         if not user:
             user = db.addUser(userID)
-            # If user is new & in private chat, send update settings message
-            if not isGroup and chatType == "channel":
-                await updateSettings(u, c)
-        db.updateUser(userID, {"lastMessageTime": utcTime})
+            await updateSettings(u, c)
+        else:
+            # otherwise, update it. (new user's already have it)
+            db.updateUser(userID, {"lastMessageTime": utcTime})
 
     chat = db.getChat(chatID)
 
-    if isGroup and not chat:  # for groups
-        chat = db.addChat(chatID)
+    if isGroup:  # for new groups
+        if not chat:
+            chat = db.addChat(chatID)
+        db.updateChat(chatID, {"lastMessageTime": utcTime})

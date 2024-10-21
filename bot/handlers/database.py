@@ -3,6 +3,7 @@ import time
 import asyncio
 import threading
 import schedule as scheduleModule
+from datetime import datetime, timezone
 
 from dotenv import load_dotenv
 from collections.abc import Iterable
@@ -181,7 +182,8 @@ class Database:
         return res
 
     def addUser(self, userID: int):
-        user = {"_id": userID, "settings": self.defaultSettings}
+        utcTime = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        user = {"_id": userID, "settings": self.defaultSettings, "lastMessageTime": utcTime}
         self.localDB.addUser(user)
 
         func = self.db.users.insert_one
@@ -190,7 +192,8 @@ class Database:
         return user
 
     def addChat(self, chatID: int):
-        chat = {"_id": chatID, "settings": self.defaultGroupSettings}
+        utcTime = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        chat = {"_id": chatID, "settings": self.defaultGroupSettings, "lastMessageTime": utcTime}
         self.localDB.addChat(chat)
 
         func = self.db.chats.insert_one

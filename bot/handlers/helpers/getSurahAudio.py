@@ -15,6 +15,10 @@ for i in _reciters:
 
 
 def getSurahAudio(surah: int, userID: int) -> str:
-    preferredReciter = int(db.getUser(userID)["settings"]["reciter"])
+    user = db.getUser(userID)
+    if not user:
+        user = db.addUser(userID)
+        
+    preferredReciter = int(user["settings"]["reciter"])
     return _data[preferredReciter][int(surah) - 1]
 
