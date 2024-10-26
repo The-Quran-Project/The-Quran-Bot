@@ -190,9 +190,15 @@ async def handleButtonPress(u: Update, c):
             surahNo, ayahNo = map(int, queryData.split()[1:-1])
         except ValueError:
             surahNo, ayahNo = map(int, queryData.split()[1:])
-
+        
+        user = db.getUser(userID)
+        if user:
+            reciter = user["settings"]["reciter"]
+        else:
+            reciter = 1
+            
         await message.reply_audio(
-            f"""https://quranaudio.pages.dev/{db.getUser(userID)["settings"]["reciter"]}/{
+            f"""https://quranaudio.pages.dev/{reciter}/{
                 surahNo}_{ayahNo}.mp3"""
         )
         return await query.answer()
