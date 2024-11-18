@@ -25,6 +25,9 @@ def getAyahReplyFromPreference(surahNo, ayahNo, userID, restrictedLangs=None):
     totalAyah = Quran.getAyahNumberCount(surahNo)
 
     user = db.getUser(userID)
+    if not user:
+        user = db.addUser(userID)
+     
     settings = user["settings"]
     primaryLanguage = settings["primary"]
     secondaryLanguage = settings["secondary"]
