@@ -10,3 +10,5 @@ test*
 users.json
 realUsers.json
 *.zip
+realUsers.*
+activeUsers.json

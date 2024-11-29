@@ -78,16 +78,13 @@ baqarah
 </b>
 """
 
-    for i in text.lower().replace(" ", ""):
-        if i not in string.ascii_lowercase:
-            return {"reply": defaultReply, "buttons": None}
 
     res: list = Quran.searchSurah(text)
     if not res:
         return {"reply": defaultReply, "buttons": None}
 
     buttons = []
-    for surah, number in res:
+    for number, surah in res:
         buttons.append(
             InlineKeyboardButton(
                 f"{number} {surah}", callback_data=f"selectedSurah {number}"

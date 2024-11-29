@@ -2,6 +2,8 @@ import os
 import json
 import secrets
 
+from bot.utils.searchSurah import fuzzySearchSurah
+
 
 """
 Structure of json files in Data folder:
@@ -163,39 +165,7 @@ class QuranClass:
         return len(self.DATA["english_2"][surahNo - 1])
 
     def searchSurah(self, string):
-        matching_strings = []
-        exact_match = False
-        string_list = sorted(self.SURAH_NAMES)
-
-        for s in string_list:
-            a = s.split("-")[-1].lower()
-            b = string.lower()
-            c = b.replace("k", "q")
-            if b == a:
-                exact_match = True
-                matching_strings = [s]
-                break
-            elif a.replace("'", "").strip() in string.lower():
-                matching_strings.append(s)
-            elif c == a:
-                matching_strings.append(s)
-
-        if not exact_match:
-            for s in string_list:
-                s_lower = s.split("-")[-1].lower()
-                string_lower = string.lower()
-                if all(c in s_lower for c in string_lower):
-                    matching_strings.append(s)
-                elif all(c in string_lower for c in s_lower):
-                    matching_strings.append(s)
-        matching_strings = list({i: 0 for i in matching_strings})[:3]
-
-        data = [
-            [surah, self.SURAH_NAMES.index(surah) + 1] for surah in matching_strings
-        ]
-        data.sort(key=lambda x: x[1])
-
-        return data
+        return fuzzySearchSurah(string)
 
     def detectLanguage(self, text: str):
         if not text:
