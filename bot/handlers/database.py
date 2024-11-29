@@ -255,9 +255,10 @@ class Database:
         return None
 
     def updateActiveUsers(self, userID: int):
-        func = lambda values: self.db.activeUsers.update_one(values, upsert=True)
-        value = ({"_id": "users"}, {"$addToSet": {"list": userID}})
-        self.queue.append((func, value))
+        func = lambda: self.db.activeUsers.update_one(
+            {"_id": "users"}, {"$addToSet": {"list": userID}}, upsert=True
+        )
+        self.queue.append(func)
         return None
 
     def getActiveUsers(self):

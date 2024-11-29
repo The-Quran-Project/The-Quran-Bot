@@ -111,8 +111,7 @@ Progress: {progress}%
             f.write("")
             g.write("")
 
-        for count, user in enumerate(users, 1):
-            userID = user["_id"]
+        for count, userID in enumerate(users, 1):
             try:
                 await message.reply_to_message.forward(userID)
                 success += 1
