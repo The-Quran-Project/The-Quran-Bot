@@ -262,6 +262,10 @@ class Database:
 
     def getActiveUsers(self):
         users = self.db.activeUsers.find_one({"_id": "users"})
+        if not users:
+            self.db.activeUsers.insert_one({"_id": "users", "list": []})
+
+        users = self.db.activeUsers.find_one({"_id": "users"})
         return users["list"]
 
     def runQueue(self):

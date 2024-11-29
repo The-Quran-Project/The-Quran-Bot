@@ -104,6 +104,13 @@ Progress: {progress}%
         m = await message.reply_text(
             reply.format(total=len(users), success=success, failed=errors, progress=0)
         )
+        if not users:
+            return await m.edit_text("No user to forward to!")
+
+        with open("success.txt", "w") as f, open("errors.txt", "w") as g:
+            f.write("")
+            g.write("")
+
         for count, user in enumerate(users, 1):
             userID = user["_id"]
             try:
@@ -150,11 +157,6 @@ Progress: {progress}%
             open("errors.txt", "rb"),
             caption=f"<b>Errors</b>\nCount: <code>{errors} / {len(users)}</code>",
         )
-        try:
-            os.remove("success.txt")
-            os.remove("errors.txt")
-        except Exception as e:
-            logger.error(f"Failed to remove success.txt and errors.txt - {e}")
         return
 
     await message.reply_html("<b>Invalid chatID</b>")
