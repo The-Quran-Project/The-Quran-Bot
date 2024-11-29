@@ -66,6 +66,18 @@ async def handleAdminButtonPress(u: Update, c):
                 file, caption=f"Total Admins: {len(allAdmins)}"
             )
 
+    elif data[1] == "active":
+        activeUsers = db.getActiveUsers()
+        if data[2] == "len":
+            await query.answer(str(len(activeUsers)))
+        elif data[2] == "all":
+            await query.answer("Sending all active users")
+            file = BytesIO(str(activeUsers).encode())
+            file.name = "activeUsers.json"
+            await query.message.reply_document(
+                file, caption=f"Total Active Users: {len(activeUsers)}"
+            )
+
     # elif data[1] == "broadcast":
     #     await query.answer("Sending broadcast message")
     #     await query.message.reply_text("Enter the message to broadcast")

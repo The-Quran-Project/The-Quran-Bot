@@ -44,6 +44,10 @@ async def adminCommand(u: Update, c):
             InlineKeyboardButton("Admins Len", callback_data="admin admins len"),
             InlineKeyboardButton("Get Admins", callback_data="admin admins all"),
         ],
+        [
+            InlineKeyboardButton("Active Users Len", callback_data="admin active len"),
+            InlineKeyboardButton("Get Active Users", callback_data="admin active all"),
+        ],
     ]
     reply = f"""
 <u><b>Admin Panel</b></u>
@@ -94,7 +98,7 @@ Progress: {progress}%
 """
 
     if chatID == "all":
-        users = db.getActiveUsers() # send message to the active users only
+        users = db.getActiveUsers()  # send message to the active users only
         success = 0
         errors = 0
         m = await message.reply_text(
