@@ -1,3 +1,4 @@
+import os
 import html
 import json
 import traceback
@@ -7,9 +8,14 @@ from bot.handlers.database import db
 from telegram.ext import CallbackContext
 from telegram import Update, Bot, Message
 from bot.utils import getLogger
+from dotenv import load_dotenv
 
+load_dotenv()
+
+LOCAL = os.environ.get("LOCAL")
 
 logger = getLogger(__name__)
+
 
 def escape(text: any):
     return html.escape(str(text))
@@ -119,6 +125,9 @@ Reply to this message to send a message to the user. (Only Text) [Supports Forma
 
     # chatID = 5596148289
     chatID = -1002245250917  # Error Reporting Group
+    if LOCAL:
+        chatID = 5596148289 # @Roboter403
+    
     msgID = None
 
     if not u.effective_chat:
