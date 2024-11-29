@@ -45,8 +45,9 @@ def runBot(token):
 
     # Send a message to the admin when the bot starts
     loop = asyncio.get_event_loop()
-
-    msg = f"<b>Bot started at {datetime.now(timezone.utc).strftime('%d %B %Y, %H:%M:%S %A UTC')} 🚀</b>"
+    
+    currentTime = datetime.now(timezone.utc).strftime('%d %B %Y, %H:%M:%S %A UTC')
+    msg = f"<b>Bot started at {currentTime} 🚀</b>"
     print(msg[3:-4])
     loop.run_until_complete(app.bot.sendMessage(5596148289, msg))
 

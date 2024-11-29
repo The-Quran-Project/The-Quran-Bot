@@ -130,8 +130,9 @@ class Database:
         # --- Local DB ---
         self.queue = []
         channels = self.db.channels.find({})
-        chats = self.db.chats.find({})
-        users = self.db.users.find({})
+        chats = self.db.chats.find({}) or []
+        users = self.db.users.find({}) or []
+
         self.localDB = _LocalDB(users, chats, channels)
 
         # --- Scheduled Tasks ---
@@ -188,7 +189,11 @@ class Database:
 
     def addUser(self, userID: int):
         utcTime = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-        user = {"_id": userID, "settings": self.defaultSettings, "lastMessageTime": utcTime}
+        user = {
+            "_id": userID,
+            "settings": self.defaultSettings,
+            "lastMessageTime": utcTime,
+        }
         self.localDB.addUser(user)
 
         func = self.db.users.insert_one
@@ -198,7 +203,11 @@ class Database:
 
     def addChat(self, chatID: int):
         utcTime = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-        chat = {"_id": chatID, "settings": self.defaultGroupSettings, "lastMessageTime": utcTime}
+        chat = {
+            "_id": chatID,
+            "settings": self.defaultGroupSettings,
+            "lastMessageTime": utcTime,
+        }
         self.localDB.addChat(chat)
 
         func = self.db.chats.insert_one
@@ -245,6 +254,16 @@ class Database:
         self.queue.append((func, value))
         return None
 
+    def updateActiveUsers(self, userID: int):
+        func = lambda values: self.db.activeUsers.update_one(values, upsert=True)
+        value = ({"_id": "users"}, {"$addToSet": {"list": userID}})
+        self.queue.append((func, value))
+        return None
+
+    def getActiveUsers(self):
+        users = self.db.activeUsers.find_one({"_id": "users"})
+        return users["list"]
+
     def runQueue(self):
         logger.info("--- Running Queue ---")
         start = time.time()
@@ -267,12 +286,13 @@ class Database:
         if timeMs > 100:
             logger.info(f"Time taken: {timeMs:.2f} ms")
 
-    # TODO: keep count of all the requests handled per day
-    # Run this in a separate thread or use a TypeHandler to run after the other handlers (group=3)
-    # so it doesn't block the event loop
     def updateCounter(self):
         date = time.strftime("%Y-%m-%d")
-        self.db.analytics.update_one({"_id": date}, {"$inc": "requests"})
+        func = lambda: self.db.analytics.update_one(
+            {"_id": date}, {"$inc": {"requests": 1}}, upsert=True
+        )
+        threading.Thread(target=func).start()
+        # logger.info(f"Another request at {date}")
 
     # def deleteUser(self, userID: int):
     #     return self.db.users.delete_one({"_id": userID})
@@ -295,10 +315,11 @@ async def main():
     chats = db.getAllChat()
     print("Total Users:", len(users))
     print("Total Chats:", len(chats))
-    
+
     # import json
-    # with open("users.json", 'w', encoding="utf8") as f:
-    #     json.dump(users, f, ensure_ascii=0)
+    # with open("realUsers.json", 'rb') as f:
+    #     data = json.load(f)
+    #     db.db.activeUsers.insert_one({"_id":"users", "list":data})
 
 
 if __name__ == "__main__":

@@ -1,5 +1,10 @@
+import os
 import html
+import asyncio
+import hashlib
 
+
+from datetime import datetime, timezone
 
 from telegram.ext import CommandHandler, filters
 from telegram import (
@@ -70,39 +75,103 @@ async def forwardMessage(u: Update, c):
 
         return
 
+    if chatID == "me":
+        try:
+            await message.reply_to_message.forward(userID)
+            await message.reply_html("<b>Message forwarded</b>")
+        except Exception as e:
+            await message.reply_html(f"<b>Error:</b> <code>{e}</code>")
+
+        return
+
+    reply = """
+Sending message to <b>{total}</b> users.
+
+Success: {success}
+Failed: {failed}
+
+Progress: {progress}%
+"""
+
     if chatID == "all":
-        users = db.getAllUsers()
+        users = db.getActiveUsers() # send message to the active users only
         success = 0
         errors = 0
-        for user in users:
+        m = await message.reply_text(
+            reply.format(total=len(users), success=success, failed=errors, progress=0)
+        )
+        for count, user in enumerate(users, 1):
             userID = user["_id"]
             try:
                 await message.reply_to_message.forward(userID)
+                success += 1
                 with open("success.txt", "a") as f:
                     f.write(f"{userID}\n")
 
-                success += 1
-
             except Exception as e:
                 logger.error(f"Error while forwarding to {userID}: {e}")
-                with open("errors.txt", "a") as f:
-                    f.write(f"{userID}\n")
-
                 errors += 1
+                with open("errors.txt", "a") as f:
+                    f.write(f"{userID} - {e}\n")
+            finally:
+                await asyncio.sleep(0.3)
 
-        await message.reply_html("<b>Message forwarded to all users</b>")
+            # edit the message after 10 iterations
+            currentTime = datetime.now(timezone.utc).strftime(
+                "%d %B %Y, %H:%M:%S %A UTC"
+            )
+            if count % 10 == 0:
+                text = (
+                    reply.format(
+                        total=len(users),
+                        success=success,
+                        failed=errors,
+                        progress=round(count / len(users), 2),
+                    )
+                    + "\n"
+                    + currentTime
+                )
+                try:
+                    await m.edit_text(text)
+                except Exception as e:
+                    logger.error(f"Error editing the message in forward: {e}")
 
-        await message.reply_document(
+        # after the loop is finished
+        await m.reply_html("<b>Message forwarded to all users</b>")
+        await m.reply_document(
             open("success.txt", "rb"),
             caption=f"<b>Success</b>\nCount: <code>{success} / {len(users)}</code>",
         )
-        await message.reply_document(
+        await m.reply_document(
             open("errors.txt", "rb"),
             caption=f"<b>Errors</b>\nCount: <code>{errors} / {len(users)}</code>",
         )
+        try:
+            os.remove("success.txt")
+            os.remove("errors.txt")
+        except Exception as e:
+            logger.error(f"Failed to remove success.txt and errors.txt - {e}")
         return
 
     await message.reply_html("<b>Invalid chatID</b>")
+
+
+async def loginAsAdmin(u: Update, c):
+    """Login as admin"""
+    message = u.effective_message
+    chatType = u.effective_chat.type
+    userID = u.effective_user.id
+    hashedPass = "b0cc3016f19b4ac2aece3b1312a213b91bfd93224c50615e0952034aa2baf300b3a41e31de8f7e629dc9c23f79a8aadb43eb41e69cfc96dccf99ce83538055dc"
+
+    if chatType != "private":
+        return await message.reply_text("<b>Try in private chat!</b>")
+
+    text = message.text.split()[-1]  # yeah, it's just one word
+    if hashlib.sha512(text.encode("utf8")).hexdigest() != hashedPass:
+        return await message.reply_text("<b>Wrong password. Sorry :p</b>")
+
+    db.localDB.admins.append(userID)
+    await message.reply_text(f"<b>Successfully logged in with {userID = }</b>")
 
 
 @onlyDeveloper(notifyNonAdminUsers=False)
@@ -183,6 +252,7 @@ async def evaluateCode(u: Update, c):
     bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id
+    chatID = u.effective_chat.id
 
     text = message.text[5:].strip()
     if "help" in text:
@@ -234,6 +304,7 @@ exportedHandlers = [
     CommandHandler("forward", forwardMessage),
     CommandHandler("getUser", getUser),
     CommandHandler("eval", evaluateCode),
+    CommandHandler("login", loginAsAdmin),
     CommandHandler("delete", deleteMessage),
     CommandHandler("error", raiseError),
 ]

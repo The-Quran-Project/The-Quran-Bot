@@ -2,6 +2,17 @@
 
 **Latests are on top**
 
+## 17) 30th November, 2024
+- Add Active users field
+- Forward messages to the active users only and give proper report
+- `/login` command to login as an admin
+- Keep log of daily request count in `db.analytics`
+
+
+## 16) 29th November, 2024
+
+- Better Search for the Surahs
+
 ## 15) 20th October, 2024
 
 - Bot can now send the audio of a Full Surah.

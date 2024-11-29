@@ -25,6 +25,7 @@ async def middleware(u: Update, c):
 
     # Only check for a new user in the private chat
     if userID == chatID:
+        db.updateActiveUsers(userID) # add a new active user to the `set`
         user = db.getUser(userID)
         if not user:
             user = db.addUser(userID)
@@ -39,3 +40,5 @@ async def middleware(u: Update, c):
         if not chat:
             chat = db.addChat(chatID)
         db.updateChat(chatID, {"lastMessageTime": utcTime})
+    
+    db.updateCounter() # Update counter for each day
