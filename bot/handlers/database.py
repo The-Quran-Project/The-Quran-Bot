@@ -1,4 +1,9 @@
+import sys
 import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
+
 import time
 import asyncio
 import threading
@@ -290,7 +295,10 @@ async def main():
     chats = db.getAllChat()
     print("Total Users:", len(users))
     print("Total Chats:", len(chats))
-    print(db.getAllAdmins())
+    
+    # import json
+    # with open("users.json", 'w', encoding="utf8") as f:
+    #     json.dump(users, f, ensure_ascii=0)
 
 
 if __name__ == "__main__":
