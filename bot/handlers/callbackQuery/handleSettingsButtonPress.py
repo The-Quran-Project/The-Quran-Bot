@@ -208,9 +208,28 @@ Current Setting: <b>{reciterNames[str(user['settings']['reciter'])]}</b>
 
 async def handleGroupSettingsButtonPress(u: Update, c):
     """Handles the settings buttons press in a group"""
+    bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id
+    chat = db.getChat(chatID)
+    settings = chat["settings"]
+    query = u.callback_query
+    query_data = query.data
+    originalUserID = int(query_data.split()[-1])
+    groupAdmins = [i.user.id for i in await u.effective_chat.get_administrators()]
+    groupAdmins.append(1087968824)  # Group Anonymous Bot
+
+    # print(userID, originalUserID, groupAdmins)
+
+    # if the user is not an admin and the original use is anonymous
+    if userID not in groupAdmins and originalUserID != 1087968824:
+        # if user is not the one who interacted
+        if userID != originalUserID:
+            return await query.answer(
+                "You are not an admin of this group.", show_alert=True
+            )
+
     homeStateGroup = [
         [
             InlineKeyboardButton(
@@ -233,11 +252,6 @@ async def handleGroupSettingsButtonPress(u: Update, c):
             InlineKeyboardButton("Close", callback_data=f"close {userID}"),
         ],
     ]
-
-    chat = db.getChat(chatID)
-    settings = chat["settings"]
-    query = u.callback_query
-    query_data = query.data
 
     query_data = query_data.split()[1:-1]
     method = query_data[0]
