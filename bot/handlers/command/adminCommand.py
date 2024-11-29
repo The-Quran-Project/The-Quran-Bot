@@ -136,7 +136,7 @@ Progress: {progress}%
                         total=len(users),
                         success=success,
                         failed=errors,
-                        progress=round(count / len(users), 2),
+                        progress=round(count / len(users) * 100, 2),
                     )
                     + "\n"
                     + currentTime
