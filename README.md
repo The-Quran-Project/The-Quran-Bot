@@ -33,6 +33,10 @@ If you are a developer and want to contribute to the project, follow these steps
 7. Make changes to the code and create a pull request with your changes.
 
 
-## License
+# Repo Activity
 
-The Al Quran Telegram Bot is open-source software licensed under the MIT license. See the [LICENSE](LICENSE) file for more information.
+![Alt](https://repobeats.axiom.co/api/embed/aa1b22df570a15211d4b201f1578dadb90463406.svg "Repobeats analytics image")
+
+# Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=The-Quran-Project/The-Quran-Bot&type=Date)](https://star-history.com/#The-Quran-Project/The-Quran-Bot&Date)
