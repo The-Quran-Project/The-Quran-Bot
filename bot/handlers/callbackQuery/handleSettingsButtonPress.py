@@ -118,7 +118,7 @@ Current Setting: <b>{Quran.getTitleLanguageFromAbbr(user['settings'][method])}</
             buttons = homeState
         else:
             user["settings"][setting] = query_data[2]
-            db.updateUser(userID, user["settings"])
+            db.updateUserSettings(userID, user["settings"])
             reply = f"Your preferred <b>{setting}</b> language has been set to <b>{title}</b>"
             buttons = homeState
 
@@ -141,7 +141,7 @@ Current Setting: <b>{arabicStyles[str(user['settings']['font'])]}</b>
             ]
         else:
             user["settings"]["font"] = int(query_data[1])
-            db.updateUser(userID, user["settings"])
+            db.updateUserSettings(userID, user["settings"])
             reply = f"Your preferred Arabic font style has been set to <b>{arabicStyles[str(user['settings']['font'])]}</b>"
             buttons = homeState
 
@@ -161,7 +161,7 @@ Current Setting: <b>{["No", "Yes"][user['settings']['showTafsir']]}</b>
             ]
         else:
             user["settings"]["showTafsir"] = int(query_data[1])
-            db.updateUser(userID, user["settings"])
+            db.updateUserSettings(userID, user["settings"])
             reply = f"Show Tafsir has been set to <b>{['No', 'Yes'][user['settings']['showTafsir']]}</b>"
             buttons = homeState
 
@@ -185,7 +185,7 @@ Current Setting: <b>{reciterNames[str(user['settings']['reciter'])]}</b>
             ]
         else:
             user["settings"]["reciter"] = int(query_data[1])
-            db.updateUser(userID, user["settings"])
+            db.updateUserSettings(userID, user["settings"])
             reply = f"Your preferred reciter has been set to <b>{reciterNames[str(user['settings']['reciter'])]}</b>"
             buttons = homeState
 

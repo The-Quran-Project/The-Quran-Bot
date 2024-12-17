@@ -25,6 +25,7 @@ load_dotenv()
 logger = getLogger(__name__)
 ARGS = getArguments()
 LOCAL = os.environ.get("LOCAL") or ARGS.ARG_LOCAL
+# LOCAL = False
 
 if LOCAL or ARGS.ARG_FIX_MONGO:
     # For `pymongo.errors.ConfigurationError: cannot open /etc/resolv.conf`
@@ -224,7 +225,16 @@ class Database:
         self.queue.append((func, value))
         return channel
 
-    def updateUser(self, userID: int, settings: dict):
+    def updateUser(self, userID: int, newData: dict):
+        user = self.getUser(userID)
+        data = {**user, **newData}
+        self.localDB.updateUser(userID, data)
+        func = self.db.users.update_one
+        value = ({"_id": userID}, {"$set": data})
+        self.queue.append((func, value))
+        return None
+
+    def updateUserSettings(self, userID: int, settings: dict):
         user = self.getUser(userID)
         settings = {**user["settings"], **settings}
         self.localDB.updateUser(userID, settings)
@@ -321,10 +331,10 @@ async def main():
     print("Total Users:", len(users))
     print("Total Chats:", len(chats))
 
-    # import json
-    # with open("realUsers.json", 'rb') as f:
-    #     data = json.load(f)
-    #     db.db.activeUsers.insert_one({"_id":"users", "list":data})
+    import json
+
+    with open("users.json", "w", encoding="utf8") as f:
+        json.dump(users, f, indent=3, ensure_ascii=False)
 
 
 if __name__ == "__main__":
