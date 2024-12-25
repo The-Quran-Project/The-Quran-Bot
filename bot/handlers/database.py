@@ -66,7 +66,15 @@ class _LocalDB:
         self.channels.append(channel)
         return None
 
-    def updateUser(self, userID: int, settings: dict) -> dict:
+    def updateUser(self, userID: int, data: dict) -> dict:
+        user = self.findUser(userID)
+        if not user:
+            user = self.addUser(userID)
+
+        user.update(data)
+        return user
+
+    def updateUserSettings(self, userID: int, settings: dict) -> dict:
         user = self.findUser(userID)
         if not user:
             user = self.addUser(userID)
@@ -74,7 +82,7 @@ class _LocalDB:
         user["settings"] = {**user["settings"], **settings}
         return user
 
-    def updateChat(self, chatID: int, settings: dict) -> dict:
+    def updateChatSettings(self, chatID: int, settings: dict) -> dict:
         chat = self.findChat(chatID)
         if not chat:
             chat = self.addChat(chatID)
@@ -237,17 +245,17 @@ class Database:
     def updateUserSettings(self, userID: int, settings: dict):
         user = self.getUser(userID)
         settings = {**user["settings"], **settings}
-        self.localDB.updateUser(userID, settings)
+        self.localDB.updateUserSettings(userID, settings)
         func = self.db.users.update_one
         value = ({"_id": userID}, {"$set": {"settings": settings}})
         self.queue.append((func, value))
         return None
 
-    def updateChat(self, chatID: int, settings: dict):
+    def updateChatSettings(self, chatID: int, settings: dict):
         chat = self.getChat(chatID)
         settings = {**chat["settings"], **settings}
         settings["restrictedLangs"] = list(set(settings["restrictedLangs"]))
-        self.localDB.updateChat(chatID, settings)
+        self.localDB.updateChatSettings(chatID, settings)
 
         func = self.db.chats.update_one
         value = ({"_id": chatID}, {"$set": {"settings": settings}})
@@ -293,7 +301,10 @@ class Database:
                 try:
                     func(value)
                 except Exception as e:
-                    logger.info("Error in queue:", e)
+                    logger.error("Error in queue:", e)
+                    logger.info(f"Func: {func}")
+                    logger.info(f"Value: {value}")
+                    logger.info("-" * 33)
 
         end = time.time()
         timeMs = (end - start) * 1000

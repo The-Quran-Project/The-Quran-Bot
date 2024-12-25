@@ -39,5 +39,5 @@ async def middleware(u: Update, c):
     if isGroup:  # for new groups
         if not chat:
             chat = db.addChat(chatID)
-        db.updateChat(chatID, {"lastMessageTime": utcTime})
+        db.updateChatSettings(chatID, {"lastMessageTime": utcTime})
     db.updateCounter()  # Update counter for each day

@@ -292,7 +292,7 @@ Current Setting: <b>{["No", "Yes"][settings['handleMessages']]}</b>
             ]
         else:
             settings["handleMessages"] = int(query_data[1])
-            db.updateChat(chatID, settings)
+            db.updateChatSettings(chatID, settings)
             reply = f"Handling messages has been set to <b>{['No', 'Yes'][settings['handleMessages']]}</b>"
             buttons = homeStateGroup
 
@@ -319,7 +319,7 @@ Current Setting: <b>{["No", "Yes"][settings['allowAudio']]}</b>
             ]
         else:
             settings["allowAudio"] = int(query_data[1])
-            db.updateChat(chatID, settings)
+            db.updateChatSettings(chatID, settings)
             reply = f"Allowing audio has been set to <b>{['No', 'Yes'][settings['allowAudio']]}</b>"
             buttons = homeStateGroup
 
@@ -348,7 +348,7 @@ The preview will be like <a href="https://telegra.ph/Tafsir-of-1-1-06-03-4">this
             ]
         else:
             settings["previewLink"] = int(query_data[1])
-            db.updateChat(chatID, settings)
+            db.updateChatSettings(chatID, settings)
             reply = f"Preview link has been set to <b>{['No', 'Yes'][settings['previewLink']]}</b>"
             buttons = homeStateGroup
 
@@ -391,7 +391,7 @@ The preview will be like <a href="https://telegra.ph/Tafsir-of-1-1-06-03-4">this
 
         settings["restrictedLangs"].append(langCode)
 
-        db.updateChat(chatID, settings)
+        db.updateChatSettings(chatID, settings)
 
         # -- Previous State --
         restrictedLangs = settings["restrictedLangs"]
@@ -431,7 +431,7 @@ The preview will be like <a href="https://telegra.ph/Tafsir-of-1-1-06-03-4">this
 
         settings["restrictedLangs"].remove(langCode)
 
-        db.updateChat(chatID, settings)
+        db.updateChatSettings(chatID, settings)
 
         # -- Previous State --
         restrictedLangs = settings["restrictedLangs"]
