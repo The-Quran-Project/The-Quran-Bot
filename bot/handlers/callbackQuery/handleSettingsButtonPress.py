@@ -48,15 +48,28 @@ async def handleSettingsButtonPress(u: Update, c):
         return await handleGroupSettingsButtonPress(u, c)
 
     user = db.getUser(userID)
+    settings = user["settings"]
+    primary = settings.get("primary")
+    secondary = settings.get("secondary")
+    other = settings.get("other")
+
 
     query = u.callback_query
     query_data = query.data
 
     query_data = query_data.split()[1:]
     method = query_data[0]
+    reply = None
 
     if method == "languages":
-        reply = "<b>Select your preferred languages by selecting any of the below:</b>"
+        reply = f"""
+<b>Select your preferred languages by selecting any of the below:</b>
+
+<b>Languages:</b>
+- <b>Primary</b>    : {Quran.detectLanguage(primary)}
+- <b>Secondary</b>  : {Quran.detectLanguage(secondary)}
+- <b>Other</b>      : {Quran.detectLanguage(other)}
+"""
         buttons = [
             [
                 InlineKeyboardButton("Primary", callback_data="settings primary"),
