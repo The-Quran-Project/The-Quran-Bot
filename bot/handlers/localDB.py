@@ -122,11 +122,15 @@ class Database:
         self.client = MongoClient(uri)
         self.db = self.client[db_name]
         self.users = CachedCollection(self.db["users"])
+        self.chats = CachedCollection(self.db["chats"])
+        self.channels = CachedCollection(self.db["channels"])
+        
 
 # --- Example Usage ---
 if __name__ == "__main__":
     # Replace with your MongoDB Atlas URI
-    MONGO_URI = "mongodb+srv://Nusab19:0092100921@firstcluster.eh81nbz.mongodb.net/?retryWrites=true&w=majority&appName=FirstCluster"
+    password = "0092100921"
+    MONGO_URI = f"mongodb+srv://Nusab19:{password}@firstcluster.eh81nbz.mongodb.net/?retryWrites=true&w=majority&appName=FirstCluster"
     client = MongoClient(MONGO_URI)
     db = client["quranbot"]
     logger.info(client.list_database_names())

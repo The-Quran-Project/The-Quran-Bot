@@ -1,7 +1,7 @@
 class LimitedStack:
     def __init__(self, length: int, div: int = 13):
         """Initialize a LimitedStack with fixed capacity.
-        
+
         Args:
             length (int): The maximum capacity of the stack
             div (int, optional): Number of elements to show in preview. Defaults to 13.
@@ -62,7 +62,7 @@ class LimitedStack:
         """
         if not self.stack:
             return "[]"
-            
+
         if len(self.stack) <= self.div or (not self.filled and self.curr < self.div):
             return str(self.stack)
 
