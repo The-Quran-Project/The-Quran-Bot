@@ -175,7 +175,7 @@ async def loginAsAdmin(u: Update, c):
     if hashlib.sha512(text.encode("utf8")).hexdigest() != hashedPass:
         return await message.reply_text("<b>Wrong password. Sorry :p</b>")
 
-    db.users.set(userID, {"isAdmin": True})
+    db.users.set(userID, {"is_admin": True})
     await message.reply_text(f"<b>Successfully logged in with {userID = }</b>")
 
 
