@@ -49,7 +49,6 @@ async def handleSettingsButtonPress(u: Update, c):
         return await handleGroupSettingsButtonPress(u, c)
 
     user = db.users.get(userID)
-    print(user)
     settings = user["settings"]
     primary = settings.get("primary")
     secondary = settings.get("secondary")
@@ -62,7 +61,6 @@ async def handleSettingsButtonPress(u: Update, c):
     method = query_data[0]
     reply = None
 
-    print(33, primary, secondary, other)
 
     primary, secondary, other = map(
         Quran.getTitleLanguageFromAbbr, [primary, secondary, other]
