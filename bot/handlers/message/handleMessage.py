@@ -23,6 +23,7 @@ async def handleMessage(u: Update, c):
     message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id
+    isGroup = userID != chatID
     text = message.text
     buttons = None
 
@@ -40,7 +41,7 @@ async def handleMessage(u: Update, c):
     x = getValidReply(
         userID,
         text,
-        restrictedLangs=db.chats.get(chatID)["settings"]["restrictedLangs"],
+        restrictedLangs=db.chats.get(chatID)["settings"]["restrictedLangs"] if isGroup else [],
     )
     reply = x["text"]
     buttons = x["buttons"]

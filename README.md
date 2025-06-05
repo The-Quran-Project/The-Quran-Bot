@@ -4,12 +4,15 @@
 
 
 # Al Quran Telegram Bot
-## For the Ummah, By the Ummah
+### For the Ummah, By the Ummah
 
 The Al Quran Telegram Bot is an open-source project that enables users to retrieve Arabic or English text, Tafsir and audio of each verse from the Quran.
 The bot can be easily integrated into Telegram, allowing users to access the verses from anywhere at any time.
 
 [ChangeLogs](ChangeLogs.md) [TODOs](TODO.md)
+
+
+You can also check out [Quran API](https://quranapi.pages.dev/). This bot and the API are interconnected.
 
 ## How to Use
 
@@ -35,10 +38,6 @@ If you are a developer and want to contribute to the project, follow these steps
 7. Run the bot locally by running `python main.py`.
 8. Make changes to the code and create a pull request with your changes.
 
-
-# Repo Activity
-
-![Alt](https://repobeats.axiom.co/api/embed/aa1b22df570a15211d4b201f1578dadb90463406.svg "Repobeats analytics image")
 
 # Star History
 
