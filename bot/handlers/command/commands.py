@@ -4,7 +4,7 @@ from telegram.ext import CommandHandler, MessageHandler, filters
 from telegram import Update, Message, InlineKeyboardButton, InlineKeyboardMarkup
 
 
-from bot.handlers.database import db
+from bot.handlers.localDB import db
 from bot.handlers import Quran
 from bot.handlers import Constants, replies
 from bot.handlers.helpers import (
@@ -130,7 +130,7 @@ async def surahCommand(u: Update, c):
     restrictedLangs = None
     # previewLink = True
     if userID != chatID:
-        settings = db.getChat(chatID)["settings"]
+        settings = db.chats.get(chatID)["settings"]
         restrictedLangs = settings["restrictedLangs"]
         # previewLink = settings["previewLink"]
 
@@ -158,7 +158,7 @@ async def getCommand(u: Update, c):
     restrictedLangs = None
     # previewLink = True
     if userID != chatID:
-        settings = db.getChat(chatID)["settings"]
+        settings = db.chats.get(chatID)["settings"]
         restrictedLangs = settings["restrictedLangs"]
         # previewLink = settings["previewLink"]
 
@@ -274,7 +274,7 @@ async def audioCommand(u: Update, c):
         await message.reply_audio(audioFileID)
         return
 
-    preferredReciter = db.getUser(userID)["settings"]["reciter"]
+    preferredReciter = db.users.get(userID)["settings"]["reciter"]
 
     await message.reply_audio(
         f"""https://quranaudio.pages.dev/{preferredReciter}/{

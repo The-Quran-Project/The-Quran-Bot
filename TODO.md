@@ -1,6 +1,3 @@
 # What to do next?
 
-
-- Code Refactoring
-  - [ ] Implement active users in the database
-
+- Add a `interactions` field in the end of the message in groups. This way, it'll be easy to see who is clicking and sending the messages.

@@ -1,4 +1,4 @@
-from bot.handlers.database import db
+from bot.handlers.localDB import db
 from bot.handlers import Quran, replies
 
 
@@ -24,7 +24,7 @@ def getAyahReplyFromPreference(surahNo, ayahNo, userID, restrictedLangs=None):
     ayah = Quran.getAyah(surahNo, ayahNo)
     totalAyah = Quran.getAyahNumberCount(surahNo)
 
-    user = db.getUser(userID)
+    user = db.users.get(userID)
     if not user:
         user = db.addUser(userID)
 

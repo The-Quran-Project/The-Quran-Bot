@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 from telegram import Update
 
-from bot.handlers.database import db
+from bot.handlers.localDB import db
 from bot.handlers.command.updateSettings import updateSettings
 
 
@@ -25,19 +25,19 @@ async def middleware(u: Update, c):
 
     # Only check for a new user in the private chat
     if userID == chatID:
-        db.updateActiveUsers(userID)  # add a new active user to the `set`
-        user = db.getUser(userID)
+        user = db.users.get(userID)
         if not user:
             user = db.addUser(userID)
             await updateSettings(u, c)
         else:
             # otherwise, update it. (new user's already have it)
-            db.updateUser(userID, {"lastMessageTime": utcTime})
+            db.users.set(userID, {"lastMessageTime": utcTime})
 
-    chat = db.getChat(chatID)
+    chat = db.chats.get(chatID)
 
     if isGroup:  # for new groups
         if not chat:
             chat = db.addChat(chatID)
-        db.updateChatSettings(chatID, {"lastMessageTime": utcTime})
-    db.updateCounter()  # Update counter for each day
+        db.chats.set(chatID, {"lastMessageTime": utcTime})
+
+    db.updateCounter()  # Update request count for each day

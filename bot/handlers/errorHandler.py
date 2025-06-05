@@ -4,7 +4,7 @@ import json
 import traceback
 
 from io import BytesIO
-from bot.handlers.localDB import CachedCollection
+from bot.handlers.localDB import db
 from telegram.ext import CallbackContext
 from telegram import Update, Bot, Message
 from bot.utils import getLogger

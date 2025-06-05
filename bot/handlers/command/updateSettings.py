@@ -2,7 +2,7 @@ from telegram.ext import CommandHandler
 from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
 
-from bot.handlers.database import db
+from bot.handlers.localDB import db
 from bot.handlers import Quran
 from bot.handlers.helpers.decorators import onlyGroupAdmin
 
@@ -24,7 +24,7 @@ async def updateSettings(u: Update, c):
     if u.effective_chat.type in ("group", "supergroup"):  # if group
         return await updateSettingsForGroup(u, c)
 
-    user = db.getUser(userID)
+    user = db.users.get(userID)
 
     settings = user["settings"]
 
@@ -78,7 +78,7 @@ async def updateSettingsForGroup(u: Update, c):
     userID = u.effective_user.id
     chatID = u.effective_chat.id
 
-    chat = db.getChat(chatID)
+    chat = db.chats.get(chatID)
 
     settings = chat["settings"]
     handleMessages = settings["handleMessages"]

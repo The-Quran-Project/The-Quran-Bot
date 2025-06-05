@@ -2,6 +2,13 @@
 
 **Latests are on top**
 
+
+## 18) 5th June, 2025
+- Reimplement the local cached mongodb database with much simpler logic.
+- Fix bug where `x:y` to get the verse was not restricting the restricted languages.
+- Possible fix for `/schedule` verses. For some reason, they sometimes miss.
+
+
 ## 17) 30th November, 2024
 - Add Active users field
 - Forward messages to the active users only and give proper report

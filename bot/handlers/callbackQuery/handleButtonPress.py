@@ -4,7 +4,7 @@ from telegram import Update, Bot, InlineKeyboardMarkup, ChatPermissions
 
 from bot.handlers import Quran
 from bot.handlers import Constants
-from bot.handlers.database import db
+from bot.handlers.localDB import db
 from bot.handlers.callbackQuery.handleSchedule import handleSchedule
 from bot.handlers.callbackQuery.handleAdminButtonPress import handleAdminButtonPress
 from bot.handlers.callbackQuery.handleSettingsButtonPress import (
@@ -47,7 +47,7 @@ async def handleButtonPress(u: Update, c):
 
     previewLink = False
     if isGroup:
-        chat = db.getChat(chatID)
+        chat = db.chats.get(chatID)
         previewLink = chat["settings"]["previewLink"]
 
     if method == "selectedSurah":
@@ -120,7 +120,7 @@ async def handleButtonPress(u: Update, c):
         else:
             restrictedLangs = None
             if userID != chatID:
-                restrictedLangs = db.getChat(chatID)["settings"]["restrictedLangs"]
+                restrictedLangs = db.chats.get(chatID)["settings"]["restrictedLangs"]
 
             reply = getAyahReplyFromPreference(
                 surahNo, ayahNo, userID, restrictedLangs=restrictedLangs
@@ -159,7 +159,7 @@ async def handleButtonPress(u: Update, c):
         else:
             restrictedLangs = None
             if userID != chatID:
-                restrictedLangs = db.getChat(chatID)["settings"]["restrictedLangs"]
+                restrictedLangs = db.chats.get(chatID)["settings"]["restrictedLangs"]
 
             reply = getAyahReplyFromPreference(
                 surahNo, ayahNo, userID, restrictedLangs=restrictedLangs
@@ -191,7 +191,7 @@ async def handleButtonPress(u: Update, c):
         except ValueError:
             surahNo, ayahNo = map(int, queryData.split()[1:])
 
-        user = db.getUser(userID)
+        user = db.users.get(userID)
         if user:
             reciter = user["settings"]["reciter"]
         else:

@@ -1,5 +1,5 @@
 import json
-from bot.handlers.database import db
+from bot.handlers.localDB import db
 
 
 path = "bot/Data/audio/{reciterNo}.txt"
@@ -13,7 +13,7 @@ for i in _reciters:
 
 
 def getSurahAudio(surah: int, userID: int) -> str:
-    user = db.getUser(userID)
+    user = db.users.get(userID)
     if not user:
         user = db.addUser(userID)
 

@@ -4,13 +4,13 @@ import string
 from telegram.ext import MessageHandler, filters
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 
-from bot.handlers.database import db
+from bot.handlers.localDB import db
 from bot.handlers import Quran
 from bot.handlers.helpers import getValidReply
 from bot.handlers.message.replyToErrorMessage import replyToErrorMessage
 
 
-ADMINS = db.admins
+ADMINS = db.getAdmins()
 
 
 def escapeHTML(text: str):
@@ -37,19 +37,23 @@ async def handleMessage(u: Update, c):
     if text.startswith("/"):
         return  # Ignore commands
 
-    x = getValidReply(userID, text)
+    x = getValidReply(
+        userID,
+        text,
+        restrictedLangs=db.chats.get(chatID)["settings"]["restrictedLangs"],
+    )
     reply = x["text"]
     buttons = x["buttons"]
 
     if userID != chatID:
-        chat = db.getChat(chatID)
+        chat = db.chats.get(chatID)
         handleMessages = chat["settings"]["handleMessages"]
         previewLink = chat["settings"]["previewLink"]
         if buttons and handleMessages:
             await message.reply_html(
                 reply,
                 reply_markup=buttons,
-                disable_web_page_preview=bool(1 - previewLink),
+                disable_web_page_preview=not bool(previewLink),
             )
         return  # Don't send the message to the group unless settings are enabled
 

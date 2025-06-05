@@ -1,6 +1,7 @@
 from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
-from bot.handlers.database import db
+from bot.handlers.localDB import db
+
 from bot.handlers import Quran
 
 
@@ -47,7 +48,8 @@ async def handleSettingsButtonPress(u: Update, c):
     if isGroup:
         return await handleGroupSettingsButtonPress(u, c)
 
-    user = db.getUser(userID)
+    user = db.users.get(userID)
+    print(user)
     settings = user["settings"]
     primary = settings.get("primary")
     secondary = settings.get("secondary")
@@ -60,14 +62,20 @@ async def handleSettingsButtonPress(u: Update, c):
     method = query_data[0]
     reply = None
 
+    print(33, primary, secondary, other)
+
+    primary, secondary, other = map(
+        Quran.getTitleLanguageFromAbbr, [primary, secondary, other]
+    )
+
     if method == "languages":
         reply = f"""
 <b>Select your preferred languages by selecting any of the below:</b>
 
 <b>Languages:</b>
-- <b>Primary</b>    : {Quran.detectLanguage(primary)}
-- <b>Secondary</b>  : {Quran.detectLanguage(secondary)}
-- <b>Other</b>      : {Quran.detectLanguage(other)}
+- <b>Primary</b>    : {primary}
+- <b>Secondary</b>  : {secondary}
+- <b>Other</b>      : {other}
 """
         buttons = [
             [
@@ -130,8 +138,18 @@ Current Setting: <b>{Quran.getTitleLanguageFromAbbr(user['settings'][method])}</
             buttons = homeState
         else:
             user["settings"][setting] = query_data[2]
-            db.updateUserSettings(userID, user["settings"])
-            reply = f"Your preferred <b>{setting}</b> language has been set to <b>{title}</b>"
+            db.users.updateSettings(userID, user["settings"])
+
+            await query.answer(f"{setting} language has been set to {title}")
+
+            reply = settingsStateText.format(
+                primary=Quran.getTitleLanguageFromAbbr(user["settings"]["primary"]),
+                secondary=Quran.getTitleLanguageFromAbbr(user["settings"]["secondary"]),
+                other=Quran.getTitleLanguageFromAbbr(user["settings"]["other"]),
+                font=arabicStyles[str(user["settings"]["font"])],
+                showTafsir=["No", "Yes"][user["settings"]["showTafsir"]],
+                reciter=reciterNames[str(user["settings"]["reciter"])],
+            )
             buttons = homeState
 
     elif method == "font":
@@ -153,8 +171,20 @@ Current Setting: <b>{arabicStyles[str(user['settings']['font'])]}</b>
             ]
         else:
             user["settings"]["font"] = int(query_data[1])
-            db.updateUserSettings(userID, user["settings"])
-            reply = f"Your preferred Arabic font style has been set to <b>{arabicStyles[str(user['settings']['font'])]}</b>"
+            db.users.updateSettings(userID, user["settings"])
+            await query.answer(
+                f"Arabic font style has been set to {arabicStyles[str(user['settings']['font'])]}"
+            )
+
+            reply = settingsStateText.format(
+                primary=Quran.getTitleLanguageFromAbbr(user["settings"]["primary"]),
+                secondary=Quran.getTitleLanguageFromAbbr(user["settings"]["secondary"]),
+                other=Quran.getTitleLanguageFromAbbr(user["settings"]["other"]),
+                font=arabicStyles[str(user["settings"]["font"])],
+                showTafsir=["No", "Yes"][user["settings"]["showTafsir"]],
+                reciter=reciterNames[str(user["settings"]["reciter"])],
+            )
+            buttons = homeState
             buttons = homeState
 
     elif method == "showTafsir":
@@ -173,7 +203,7 @@ Current Setting: <b>{["No", "Yes"][user['settings']['showTafsir']]}</b>
             ]
         else:
             user["settings"]["showTafsir"] = int(query_data[1])
-            db.updateUserSettings(userID, user["settings"])
+            db.users.updateSettings(userID, user["settings"])
             reply = f"Show Tafsir has been set to <b>{['No', 'Yes'][user['settings']['showTafsir']]}</b>"
             buttons = homeState
 
@@ -197,8 +227,20 @@ Current Setting: <b>{reciterNames[str(user['settings']['reciter'])]}</b>
             ]
         else:
             user["settings"]["reciter"] = int(query_data[1])
-            db.updateUserSettings(userID, user["settings"])
-            reply = f"Your preferred reciter has been set to <b>{reciterNames[str(user['settings']['reciter'])]}</b>"
+            db.users.updateSettings(userID, user["settings"])
+            await query.answer(
+                f"Reciter has been set to {reciterNames[str(user['settings']['reciter'])]}"
+            )
+
+            reply = settingsStateText.format(
+                primary=Quran.getTitleLanguageFromAbbr(user["settings"]["primary"]),
+                secondary=Quran.getTitleLanguageFromAbbr(user["settings"]["secondary"]),
+                other=Quran.getTitleLanguageFromAbbr(user["settings"]["other"]),
+                font=arabicStyles[str(user["settings"]["font"])],
+                showTafsir=["No", "Yes"][user["settings"]["showTafsir"]],
+                reciter=reciterNames[str(user["settings"]["reciter"])],
+            )
+            buttons = homeState
             buttons = homeState
 
     elif method == "home":
@@ -224,7 +266,7 @@ async def handleGroupSettingsButtonPress(u: Update, c):
     message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id
-    chat = db.getChat(chatID)
+    chat = db.chats.get(chatID)
     settings = chat["settings"]
     query = u.callback_query
     query_data = query.data
@@ -276,7 +318,7 @@ async def handleGroupSettingsButtonPress(u: Update, c):
 Current Setting: <b>{["No", "Yes"][settings['handleMessages']]}</b>
 
 <b>Yes</b>: Members can send `x:y` to get the ayah
-<b>No</b>: Members needs to send send `/get x:y` to get the ayah
+<b>No</b>: Members need to send send `/get x:y` to get the ayah
 """
             buttons = [
                 [
@@ -291,7 +333,7 @@ Current Setting: <b>{["No", "Yes"][settings['handleMessages']]}</b>
             ]
         else:
             settings["handleMessages"] = int(query_data[1])
-            db.updateChatSettings(chatID, settings)
+            db.chats.updateSettings(chatID, settings)
             reply = f"Handling messages has been set to <b>{['No', 'Yes'][settings['handleMessages']]}</b>"
             buttons = homeStateGroup
 
@@ -318,7 +360,7 @@ Current Setting: <b>{["No", "Yes"][settings['allowAudio']]}</b>
             ]
         else:
             settings["allowAudio"] = int(query_data[1])
-            db.updateChatSettings(chatID, settings)
+            db.chats.updateSettings(chatID, settings)
             reply = f"Allowing audio has been set to <b>{['No', 'Yes'][settings['allowAudio']]}</b>"
             buttons = homeStateGroup
 
@@ -347,7 +389,7 @@ The preview will be like <a href="https://telegra.ph/Tafsir-of-1-1-06-03-4">this
             ]
         else:
             settings["previewLink"] = int(query_data[1])
-            db.updateChatSettings(chatID, settings)
+            db.chats.updateSettings(chatID, settings)
             reply = f"Preview link has been set to <b>{['No', 'Yes'][settings['previewLink']]}</b>"
             buttons = homeStateGroup
 
@@ -382,7 +424,7 @@ The preview will be like <a href="https://telegra.ph/Tafsir-of-1-1-06-03-4">this
     elif method == "restrict":
         langCode = query_data[1]
         allLangs = dict(Quran.getLanguages())
-        settings = db.getChat(chatID)["settings"]
+        settings = db.chats.get(chatID)["settings"]
         if langCode in settings["restrictedLangs"]:
             return await query.answer(f"{allLangs[langCode]} is already restricted.")
 
@@ -390,7 +432,7 @@ The preview will be like <a href="https://telegra.ph/Tafsir-of-1-1-06-03-4">this
 
         settings["restrictedLangs"].append(langCode)
 
-        db.updateChatSettings(chatID, settings)
+        db.chats.updateSettings(chatID, settings)
 
         # -- Previous State --
         restrictedLangs = settings["restrictedLangs"]
@@ -422,7 +464,7 @@ The preview will be like <a href="https://telegra.ph/Tafsir-of-1-1-06-03-4">this
     elif method == "unrestrict":
         langCode = query_data[1]
         allLangs = dict(Quran.getLanguages())
-        settings = db.getChat(chatID)["settings"]
+        settings = db.chats.get(chatID)["settings"]
         if langCode not in settings["restrictedLangs"]:
             return await query.answer(f"{allLangs[langCode]} is not restricted.")
 
@@ -430,7 +472,7 @@ The preview will be like <a href="https://telegra.ph/Tafsir-of-1-1-06-03-4">this
 
         settings["restrictedLangs"].remove(langCode)
 
-        db.updateChatSettings(chatID, settings)
+        db.chats.updateSettings(chatID, settings)
 
         # -- Previous State --
         restrictedLangs = settings["restrictedLangs"]

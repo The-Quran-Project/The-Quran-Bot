@@ -3,7 +3,7 @@ import json
 from io import BytesIO
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 
-from bot.handlers.database import db
+from bot.handlers.localDB import db
 
 
 async def handleAdminButtonPress(u: Update, c):
@@ -13,7 +13,7 @@ async def handleAdminButtonPress(u: Update, c):
     chatID = u.effective_chat.id
     isGroup = u.effective_chat.type in ("group", "supergroup")
 
-    user = db.getUser(userID)
+    user = db.users.get(userID)
 
     query = u.callback_query
     queryData = query.data
@@ -25,15 +25,11 @@ async def handleAdminButtonPress(u: Update, c):
     data = queryData.split()
 
     if data[1] == "users":
+        allUsers = db.users.getAll()
         if data[2] == "len":
-            await query.answer(
-                f"There are {len(db.getAllUsers())} users", show_alert=True
-            )
+            await query.answer(f"There are {len(allUsers)} users", show_alert=True)
         elif data[2] == "all":
             await query.answer("Sending all users")
-            # send a json file of all users. don't save the file in local disk
-            # save it in buffer and send it
-            allUsers = db.getAllUsers()
             file = BytesIO(json.dumps(allUsers).encode())
             file.name = "users.json"
             await query.message.reply_document(
@@ -41,13 +37,11 @@ async def handleAdminButtonPress(u: Update, c):
             )
 
     elif data[1] == "chats":
+        allChats = db.chats.getAll()
         if data[2] == "len":
-            await query.answer(
-                f"There are {len(db.getAllChat())} chats", show_alert=True
-            )
+            await query.answer(f"There are {len(allChats)} chats", show_alert=True)
         elif data[2] == "all":
             await query.answer("Sending all chats")
-            allChats = db.getAllChat()
             file = BytesIO(json.dumps(allChats).encode())
             file.name = "chats.json"
             await query.message.reply_document(
@@ -55,11 +49,11 @@ async def handleAdminButtonPress(u: Update, c):
             )
 
     elif data[1] == "admins":
+        allAdmins = db.getAdmins()
         if data[2] == "len":
-            await query.answer(str(len(db.getAllAdmins())))
+            await query.answer(str(len(allAdmins)))
         elif data[2] == "all":
             await query.answer("Sending all admins")
-            allAdmins = db.getAllAdmins()
             file = BytesIO(str(allAdmins).encode())
             file.name = "admins.json"
             await query.message.reply_document(
@@ -77,10 +71,3 @@ async def handleAdminButtonPress(u: Update, c):
             await query.message.reply_document(
                 file, caption=f"Total Active Users: {len(activeUsers)}"
             )
-
-    # elif data[1] == "broadcast":
-    #     await query.answer("Sending broadcast message")
-    #     await query.message.reply_text("Enter the message to broadcast")
-    #     await c.wait_for("message")
-    #     await query.message.reply_text("Broadcasting message")
-    #     await query.message.reply_text("Message sent to all users")

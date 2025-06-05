@@ -3,9 +3,9 @@ from typing import Callable
 
 from telegram import Update, Message, Bot
 
-from bot.handlers.database import db
+from bot.handlers.localDB import db
 
-developers = db.admins
+developers = db.getAdmins()
 
 
 def onlyDeveloper(notifyNonAdminUsers: bool = True):

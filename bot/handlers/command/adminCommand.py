@@ -14,7 +14,7 @@ from telegram import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
 )
-from bot.handlers.database import db
+from bot.handlers.localDB import db
 from bot.handlers.replies import adminCommands
 from bot.handlers.helpers.decorators import onlyDeveloper
 from bot.utils import getLogger
@@ -63,7 +63,7 @@ async def forwardMessage(u: Update, c):
     """Forwards a message to a chat or All chats"""
     message = u.effective_message
     userID = u.effective_user.id
-    user = db.getUser(userID)
+    user = db.users.get(userID)
 
     if not message.reply_to_message:
         await message.reply_html("<b>Reply to a message</b>")
@@ -175,7 +175,7 @@ async def loginAsAdmin(u: Update, c):
     if hashlib.sha512(text.encode("utf8")).hexdigest() != hashedPass:
         return await message.reply_text("<b>Wrong password. Sorry :p</b>")
 
-    db.localDB.admins.append(userID)
+    db.users.set(userID, {"isAdmin": True})
     await message.reply_text(f"<b>Successfully logged in with {userID = }</b>")
 
 
@@ -205,7 +205,7 @@ async def getUser(u: Update, c):
     bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id
-    user = db.getUser(userID)
+    user = db.users.get(userID)
 
     chatID = message.text.split()[1]
     if not chatID[1:].isdecimal():

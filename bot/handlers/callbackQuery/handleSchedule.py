@@ -1,12 +1,22 @@
-from telegram.ext import CallbackQueryHandler
+from typing import Optional, Tuple, List
+
 from telegram import Update, Bot, InlineKeyboardMarkup
+from telegram.ext import ContextTypes
+
+from bot.handlers.localDB import db
+from bot.utils import getLogger
+
+logger = getLogger(__name__)
 
 
-from bot.handlers.database import db
+async def handleSchedule(u: Update, c: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle schedule-related callback queries.
 
-
-async def handleSchedule(u: Update, c):
-    """Handles all the buttons presses / callback queries"""
+    Supported actions:
+    - delete: Remove the schedule
+    - enable: Enable the schedule
+    - disable: Disable the schedule
+    """
     bot: Bot = c.bot
     message = u.effective_message
     chatID = u.effective_chat.id
@@ -14,23 +24,45 @@ async def handleSchedule(u: Update, c):
     query = u.callback_query
     queryData = query.data
     method = queryData.split()[1]
-    reply = buttons = None
+    reply = None
+    buttons = None
 
-    collection = db.db.schedules
-    if method == "delete":
-        reply = "Schedule deleted successfully."
-        collection.delete_one({"_id": chatID})
+    try:
+        if method == "delete":
+            reply = "Schedule deleted successfully."
+            success = db.scheduleOp(chatID, "delete")
+            if not success:
+                reply = "No schedule found to delete."
 
-    elif method == "enable":
-        reply = "Schedule enabled successfully."
-        collection.update_one({"_id": chatID}, {"$set": {"enabled": True}})
+        elif method == "enable":
+            reply = "Schedule enabled successfully."
+            result = db.scheduleOp(chatID, "update", {"enabled": True})
+            if not result:
+                reply = "Failed to enable schedule. Schedule not found."
 
-    elif method == "disable":
-        reply = "Schedule disabled successfully."
-        collection.update_one({"_id": chatID}, {"$set": {"enabled": False}})
+        elif method == "disable":
+            reply = "Schedule disabled successfully."
+            result = db.scheduleOp(chatID, "update", {"enabled": False})
+            if not result:
+                reply = "Failed to disable schedule. Schedule not found."
 
-    if not reply:
-        return await query.answer("Maybe it was an old message?", show_alert=True)
+        else:
+            # Unknown method
+            return await query.answer("Unknown schedule operation.", show_alert=True)
 
-    # await query.answer()
-    await message.edit_text(reply, reply_markup=InlineKeyboardMarkup(buttons or []))
+        if not reply:
+            return await query.answer(
+                "Operation failed. Maybe it was an old message?", show_alert=True
+            )
+
+        # Acknowledge the callback query
+        await query.answer()
+
+        # Update the message with the result
+        await message.edit_text(reply, reply_markup=InlineKeyboardMarkup(buttons or []))
+
+    except Exception as e:
+        logger.error(f"Error handling schedule callback for chat {chatID}: {e}")
+        await query.answer(
+            "An error occurred while processing your request.", show_alert=True
+        )

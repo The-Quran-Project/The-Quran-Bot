@@ -34,7 +34,7 @@ def runBot(token):
     )
 
     if not LOCAL:
-        app.job_queue.run_repeating(jobSendScheduled, 30, name="scheduledMessages")
+        app.job_queue.run_repeating(jobSendScheduled, 60, name="scheduledMessages")
 
     app.add_handler(
         TypeHandler(Update, middleware), group=-19

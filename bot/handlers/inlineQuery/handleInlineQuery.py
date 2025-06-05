@@ -8,7 +8,7 @@ from telegram import (
 )
 from telegram.ext import InlineQueryHandler
 
-from bot.handlers.database import db
+from bot.handlers.localDB import db
 from bot.handlers import Quran
 from bot.handlers.helpers import getAyahReplyFromPreference
 
@@ -18,7 +18,7 @@ async def handleInlineQuery(u: Update, c):
     query = u.inline_query.query
     inQuery = InlineQueryResultArticle
     userID = u.effective_user.id
-    user = db.getUser(userID)
+    user = db.users.get(userID)
 
     if not user:
         db.addUser(userID)

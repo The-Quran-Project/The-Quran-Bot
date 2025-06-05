@@ -6,7 +6,7 @@ from telegram import Bot
 from telegram.ext import ContextTypes
 
 from bot.handlers import Quran
-from bot.handlers.database import db
+from bot.handlers.localDB import db
 from datetime import datetime, timezone
 from bot.utils import getLogger
 
@@ -16,17 +16,16 @@ logger = getLogger(__name__)
 async def jobSendScheduled(context: ContextTypes.DEFAULT_TYPE):
     """Send scheduled verses."""
     bot: Bot = context.bot
-    collection = db.db.schedules
 
-    schedules = collection.find()
-    logger.dump(schedules)
-    print(schedules)
+    # Statistics tracking
+    stats = {"total": 0, "success": 0, "fail": 0, "skipped": 0}
 
+    # Use the scheduleOp method to get all active schedules
+    schedules = db.scheduleOp(None, "getActive")
+    stats["total"] = len(schedules)
+    print()
     for schedule in schedules:
         try:
-            if not schedule.get("enabled"):
-                continue
-
             chatID = schedule["_id"]
             runTime = schedule["time"]
             hour, minute = runTime.split(":")
@@ -34,27 +33,43 @@ async def jobSendScheduled(context: ContextTypes.DEFAULT_TYPE):
             nowHour, nowMinute = datetime.now(timezone.utc).strftime("%H:%M").split(":")
             nowHour, nowMinute = int(nowHour), int(nowMinute)
 
-            if hour == nowHour and (0 <= nowMinute - minute <= 5):
-                logger.info("Sending scheduled verse...")
-                logger.info(
-                    f"Chat ID: {chatID}, Time: {runTime}, Now Time: {nowHour}:{nowMinute}"
-                )
+            # Check if we're within 2 minutes after the scheduled time
+            # This prevents multiple sends while allowing for timing flexibility
+            time_diff = (nowHour * 60 + nowMinute) - (hour * 60 + minute)
+
+            # Handle day boundary (e.g., scheduled at 23:30, current time 00:30)
+            if time_diff < -12 * 60:  # More than 12 hours behind, likely next day
+                time_diff += 24 * 60
+            elif time_diff > 12 * 60:  # More than 12 hours ahead, likely previous day
+                time_diff -= 24 * 60
+
+            if 0 <= time_diff <= 2:
+                logger.info(f"Sending scheduled verse to chat {chatID} at {runTime}")
+
                 lastSent = schedule.get("lastSent")
                 if lastSent:
+                    # Convert lastSent string to timezone-aware datetime
                     lastSent = datetime.strptime(lastSent, "%d:%m:%Y %H:%M:%S")
+                    lastSent = lastSent.replace(tzinfo=timezone.utc)
                     diff = datetime.now(timezone.utc) - lastSent
-                    if diff.total_seconds() < 11 * 60:
-                        logger.info("Skipping due to last sent.")
+                    # Check if already sent today (within last 23 hours to handle day boundary)
+                    if diff.total_seconds() < 23 * 60 * 60:
+                        logger.info(f"Skipping chat {chatID} due to recent send")
+                        stats["skipped"] += 1
                         continue
 
                 langs = schedule["langs"]
                 topicID = schedule.get("topicID")
+
+                # Get random verse
                 res = Quran.random()
                 verse = res["verse"]
                 surahNo = res["surahNo"]
                 ayahNo = res["ayahNo"]
                 totalAyah = res["totalAyah"]
                 surah = Quran.getSurahNameFromNumber(surahNo)
+
+                # Format message
                 msg = f"""
 <b>Random Scheduled Verse</b>
 Surah : <b>{surah} ({surahNo})</b>
@@ -67,40 +82,51 @@ Ayah  : <b>{ayahNo} out of {totalAyah}</b>
 <u><b>{title}</b></u>
 <blockquote>{ayah}</blockquote>
     """
-                currentTime = datetime.now().strftime("%d:%m:%Y %H:%M:%S")
+
                 try:
                     await bot.sendMessage(chatID, msg, message_thread_id=topicID)
-                    collection.update_one(
-                        {"_id": chatID}, {"$set": {"lastSent": currentTime}}
-                    )
+                    # Update lastSent timestamp
+                    db.scheduleOp(chatID, "updateLastSent")
+                    stats["success"] += 1
+
                 except ChatMigrated as e:
-                    logger.info(f"ChatMigrated: {e}")
+                    logger.info(f"Chat migrated: {chatID} → {e.new_chat_id}")
                     newChatID = e.new_chat_id
-                    collection.update_one({"_id": chatID}, {"$set": {"_id": newChatID}})
+                    # Update chat ID in database
+                    db.scheduleOp(chatID, "update", {"_id": newChatID})
+
                     try:
-                        logger.info(f"Sending to new chat ID: {newChatID}")
                         await bot.sendMessage(newChatID, msg, message_thread_id=topicID)
-                        collection.update_one(
-                            {"_id": newChatID}, {"$set": {"lastSent": currentTime}}
-                        )
+                        db.scheduleOp(newChatID, "updateLastSent")
+                        stats["success"] += 1
                     except Exception as e:
                         logger.error(
-                            f"Failing to send to new chat ID: {newChatID} - {e}"
+                            f"Failed to send to migrated chat {newChatID}: {e}"
                         )
+                        stats["fail"] += 1
 
                 except Forbidden as e:
-                    logger.error(f"Forbidden: {e}")
-                    collection.update_one({"_id": chatID}, {"$set": {"enabled": False}})
+                    logger.error(f"Forbidden error for chat {chatID}: {e}")
+                    # Disable schedule when bot is removed from chat
+                    db.scheduleOp(chatID, "update", {"enabled": False})
+                    stats["fail"] += 1
 
                 except Exception as e:
-                    logger.error(f"Error: {e}")
+                    logger.error(f"Error sending to chat {chatID}: {e}")
+                    stats["fail"] += 1
 
+                # Small delay between sends
                 await asyncio.sleep(0.1)
 
-            # sleep for dueNextMinute seconds
-            dueNextMinute = 60 - int(datetime.now(timezone.utc).strftime("%S"))
-            # await asyncio.sleep(dueNextMinute - 1)
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(
+                f"Error processing schedule for chat {schedule.get('_id', 'unknown')}: {e}"
+            )
+            stats["fail"] += 1
             continue
-    logger.info("Done checking schedules.")
+
+    # Print statistics
+    logger.info(
+        f"Schedule statistics - Total: {stats['total']}, Success: {stats['success']}, Failed: {stats['fail']}, Skipped: {stats['skipped']}"
+    )
+    logger.info("Finished checking schedules.")
