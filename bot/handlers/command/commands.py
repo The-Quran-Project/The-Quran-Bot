@@ -264,10 +264,12 @@ async def audioCommand(u: Update, c):
     ayahNo = x["ayahNo"]
 
     if onlySurah:
-        if 1==2 and userID != 5596148289:
-            await message.reply_html("<b>Developer currently disabled this feature because of some problems, it'll be back soon</b>\nStay updated with @AlQuranUpdates")
+        if 1 == 2 and userID != 5596148289:
+            await message.reply_html(
+                "<b>Developer currently disabled this feature because of some problems, it'll be back soon</b>\nStay updated with @AlQuranUpdates"
+            )
             return
-        
+
         audioFileID = getSurahAudio(surahNo, userID)
         await message.reply_audio(audioFileID)
         return

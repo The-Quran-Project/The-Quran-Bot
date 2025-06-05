@@ -27,7 +27,7 @@ def getAyahReplyFromPreference(surahNo, ayahNo, userID, restrictedLangs=None):
     user = db.getUser(userID)
     if not user:
         user = db.addUser(userID)
-     
+
     settings = user["settings"]
     primaryLanguage = settings["primary"]
     secondaryLanguage = settings["secondary"]

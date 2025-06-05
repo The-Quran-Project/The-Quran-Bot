@@ -53,7 +53,6 @@ async def handleSettingsButtonPress(u: Update, c):
     secondary = settings.get("secondary")
     other = settings.get("other")
 
-
     query = u.callback_query
     query_data = query.data
 

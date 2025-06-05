@@ -11,11 +11,9 @@ import schedule as scheduleModule
 from datetime import datetime, timezone
 
 from dotenv import load_dotenv
-from collections.abc import Iterable
 from pymongo.server_api import ServerApi
 from pymongo.mongo_client import MongoClient
 
-from bot.handlers.helpers.utils import LimitedStack
 from bot.utils import getArguments
 from bot.utils import getLogger
 

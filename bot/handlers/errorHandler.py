@@ -5,6 +5,7 @@ import traceback
 
 from io import BytesIO
 from bot.handlers.database import db
+from bot.handlers.localDB import CachedCollection
 from telegram.ext import CallbackContext
 from telegram import Update, Bot, Message
 from bot.utils import getLogger
@@ -126,8 +127,8 @@ Reply to this message to send a message to the user. (Only Text) [Supports Forma
     # chatID = 5596148289
     chatID = -1002245250917  # Error Reporting Group
     if LOCAL:
-        chatID = 5596148289 # @Roboter403
-    
+        chatID = 5596148289  # @Roboter403
+
     msgID = None
 
     if not u.effective_chat:

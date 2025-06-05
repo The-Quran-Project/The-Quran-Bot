@@ -18,6 +18,7 @@ load_dotenv()
 LOCAL = os.environ.get("LOCAL") or getArguments().ARG_LOCAL
 TOKEN = os.environ.get("TOKEN") if not LOCAL else os.environ.get("TEST")
 
+
 def runBot(token):
     df = Defaults(parse_mode=constants.ParseMode.HTML, block=False, quote=True)
 
@@ -33,7 +34,7 @@ def runBot(token):
     )
 
     if not LOCAL:
-        app.job_queue.run_repeating(jobSendScheduled, 60, name="scheduledMessages")
+        app.job_queue.run_repeating(jobSendScheduled, 30, name="scheduledMessages")
 
     app.add_handler(
         TypeHandler(Update, middleware), group=-19
@@ -45,8 +46,8 @@ def runBot(token):
 
     # Send a message to the admin when the bot starts
     loop = asyncio.get_event_loop()
-    
-    currentTime = datetime.now(timezone.utc).strftime('%d %B %Y, %H:%M:%S %A UTC')
+
+    currentTime = datetime.now(timezone.utc).strftime("%d %B %Y, %H:%M:%S %A UTC")
     msg = f"<b>Bot started at {currentTime} 🚀</b>"
     print(msg[3:-4])
     loop.run_until_complete(app.bot.sendMessage(5596148289, msg))

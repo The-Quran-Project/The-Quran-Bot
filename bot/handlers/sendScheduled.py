@@ -1,10 +1,9 @@
-import time
 import asyncio
 
 
 from telegram.error import *
-from telegram import Update, Bot
-from telegram.ext import Application, JobQueue, filters, ContextTypes
+from telegram import Bot
+from telegram.ext import ContextTypes
 
 from bot.handlers import Quran
 from bot.handlers.database import db
@@ -20,6 +19,9 @@ async def jobSendScheduled(context: ContextTypes.DEFAULT_TYPE):
     collection = db.db.schedules
 
     schedules = collection.find()
+    logger.dump(schedules)
+    print(schedules)
+
     for schedule in schedules:
         try:
             if not schedule.get("enabled"):

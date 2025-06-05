@@ -78,7 +78,6 @@ baqarah
 </b>
 """
 
-
     res: list = Quran.searchSurah(text)
     if not res:
         return {"reply": defaultReply, "buttons": None}

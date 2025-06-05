@@ -2,7 +2,7 @@ from fuzzywuzzy import process
 import re
 
 # I could just read the surah names from the json file
-# Maybe I'll do it later 
+# Maybe I'll do it later
 
 surahNames = [
     "Al-Fatihah",
@@ -123,8 +123,8 @@ surahNames = [
 
 
 def cleanText(text: str) -> str:
-    text = re.sub(r'^(al |an )', '', text, flags=re.IGNORECASE)
-    return re.sub(r'[^a-zA-Z]', '', text).lower()
+    text = re.sub(r"^(al |an )", "", text, flags=re.IGNORECASE)
+    return re.sub(r"[^a-zA-Z]", "", text).lower()
 
 
 cleanedSurahNames = [cleanText(surah) for surah in surahNames]
@@ -137,7 +137,7 @@ def fuzzySearchSurah(query: str) -> list[str]:
         if surah.endswith(query):
             firstSuggestion = surah
             break
-    
+
     matches = process.extract(cleanedQuery, cleanedSurahNames, limit=3)
     matches = [i[0] for i in matches]
 
@@ -148,7 +148,7 @@ def fuzzySearchSurah(query: str) -> list[str]:
                 k.append(x)
         matches = k[:3]
 
-    numbers = [cleanedSurahNames.index(match)+1 for match in matches]
-    names = [surahNames[i-1] for i in numbers]
+    numbers = [cleanedSurahNames.index(match) + 1 for match in matches]
+    names = [surahNames[i - 1] for i in numbers]
 
     return zip(numbers, names)
