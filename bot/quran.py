@@ -34,6 +34,7 @@ class objectify:
     kurdish: str
     persian: str
     russian: str
+    uzbek: str
     tafsir: str
 
     def __init__(self, entries):
@@ -50,7 +51,7 @@ DIR_PATH = (
 
 
 class QuranClass:
-    languages = "arabic english_1 english_2 bengali urdu hindi german kurdish persian russian".split()
+    languages = "arabic english_1 english_2 bengali urdu hindi german kurdish persian russian uzbek".split()
     abbreviations = {
         "arabic": "ar",
         "english_1": "en",
@@ -62,6 +63,7 @@ class QuranClass:
         "kurdish": "ku",
         "persian": "pe",
         "russian": "ru",
+        "uzbek": "uz",
     }
 
     titleLanguages = {
@@ -75,6 +77,7 @@ class QuranClass:
         "ku": "Kurdish",
         "pe": "Persian",
         "ru": "Russian",
+        "uz": "Uzbek",
     }
 
     DATA = {}
@@ -114,6 +117,7 @@ class QuranClass:
             - `kurdish`  : The Kurdish translation
             - `persian`  : The Persian translation
             - `russian`  : The Russian translation
+            - `uzbek`   : The Uzbek translation
             - `tafsir`   : The telegra.ph link of the tafsir of that verse.
         """
 
@@ -178,6 +182,9 @@ class QuranClass:
             return "english_2"
         if text == "bn":
             return "bengali"
+
+        # print(f"Detecting language for: {text}")
+        # print(f"Available languages: {self.languages}")
 
         for lang in self.languages:
             if lang.startswith(text):

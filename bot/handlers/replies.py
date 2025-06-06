@@ -5,8 +5,8 @@ See, /use to know how to use this bot.
 
 This bot is <a href="{repoURL}">open-source</a>. Your contribution can make it more helpful for the Ummah.
 
-<b>All the data were taken from quran.com</b>
-The tafsir used here is from <a href="https://quran.com/1:1/tafsirs/en-tafisr-ibn-kathir">Ibn Kathir</a>
+For any feedback, discuss in here: @AlQuranDiscussion.
+Get the latest updates of the bot: @AlQuranUpdates
 """
 
 help = """
@@ -63,8 +63,9 @@ Al Quran Bot is a bot that can give you verses from the Al-Quran. It is a non-pr
 
 <u><b>Credits:</b></u>
 - The Translations and Tafsirs were taken from <a href="https://quran.com">quran.com</a>
+- The tafsir used here is from <a href="https://quran.com/1:1/tafsirs/en-tafisr-ibn-kathir">Ibn Kathir</a>
 - The recitations were taken from <a href="https://everyayah.com">everyayah.com</a>
-- The bot is hosted on <a href="https://render.com">Render</a>
+- The bot is hosted on <a href="http://koyeb.com/">Koyeb</a>
 - The bot is written in Python3 using the <a href="https://t.me/pythontelegrambotgroup">python-telegram-bot</a> library
 - The bot is maintained by @Roboter403 and @Nusab19
 """
