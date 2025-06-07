@@ -3,6 +3,7 @@ from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
 
 from bot.handlers.localDB import db
+from bot.handlers.defaults import reciterNames
 from bot.handlers import Quran
 from bot.handlers.helpers.decorators import onlyGroupAdmin
 
@@ -10,8 +11,6 @@ arabicStyles = {
     "1": "Uthmani",
     "2": "Simple",
 }
-
-reciterNames = {"1": "Mishary Rashid Al-Afasy", "2": "Abu Bakr Al-Shatri"}
 
 
 async def updateSettings(u: Update, c):

@@ -10,7 +10,12 @@ from bot.handlers.callbackQuery.handleAdminButtonPress import handleAdminButtonP
 from bot.handlers.callbackQuery.handleSettingsButtonPress import (
     handleSettingsButtonPress,
 )
-from bot.handlers.helpers import getAyahReply, getAyahReplyFromPreference, getAyahButton
+from bot.handlers.helpers import (
+    getAudioUrlOrID,
+    getAyahReply,
+    getAyahReplyFromPreference,
+    getAyahButton,
+)
 from bot.utils import getLogger
 
 logger = getLogger(__name__)
@@ -197,10 +202,9 @@ async def handleButtonPress(u: Update, c):
         else:
             reciter = 1
 
-        await message.reply_audio(
-            f"""https://quranaudio.pages.dev/{reciter}/{
-                surahNo}_{ayahNo}.mp3"""
-        )
+        urlOrFileID = getAudioUrlOrID(reciter, surahNo, ayahNo)
+
+        await message.reply_audio(urlOrFileID)
         return await query.answer()
 
     if method == "settings":

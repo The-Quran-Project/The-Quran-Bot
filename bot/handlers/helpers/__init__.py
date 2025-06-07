@@ -3,4 +3,4 @@ from .getRandomAyah import getRandomAyah
 from .generateSurahButtons import generateSurahButtons
 from .getAyahReply import getAyahReply, getAyahReplyFromPreference
 from .getValidReply import getValidReply, isValidFormat
-from .getSurahAudio import getSurahAudio
+from .getAudioUrlOrID import getAudioUrlOrID

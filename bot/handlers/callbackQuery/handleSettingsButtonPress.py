@@ -1,7 +1,7 @@
 from telegram import Update, Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.handlers.localDB import db
-
+from bot.handlers.defaults import reciterNames
 from bot.handlers import Quran
 
 
@@ -9,8 +9,6 @@ arabicStyles = {
     "1": "Uthmani",
     "2": "Simple",
 }
-
-reciterNames = {"1": "Mishary Rashid Al-Afasy", "2": "Abu Bakr Al-Shatri"}
 
 
 settingsStateText = """
@@ -48,6 +46,17 @@ async def handleSettingsButtonPress(u: Update, c):
     if isGroup:
         return await handleGroupSettingsButtonPress(u, c)
 
+    def getHomeState():
+        reply = settingsStateText.format(
+            primary=Quran.getTitleLanguageFromAbbr(user["settings"]["primary"]),
+            secondary=Quran.getTitleLanguageFromAbbr(user["settings"]["secondary"]),
+            other=Quran.getTitleLanguageFromAbbr(user["settings"]["other"]),
+            font=arabicStyles[str(user["settings"]["font"])],
+            showTafsir=["No", "Yes"][user["settings"]["showTafsir"]],
+            reciter=reciterNames[str(user["settings"]["reciter"])],
+        )
+        return reply, homeState
+
     user = db.users.get(userID)
     settings = user["settings"]
     primary = settings.get("primary")
@@ -60,7 +69,6 @@ async def handleSettingsButtonPress(u: Update, c):
     query_data = query_data.split()[1:]
     method = query_data[0]
     reply = None
-
 
     primary, secondary, other = map(
         Quran.getTitleLanguageFromAbbr, [primary, secondary, other]
@@ -138,17 +146,8 @@ Current Setting: <b>{Quran.getTitleLanguageFromAbbr(user['settings'][method])}</
             user["settings"][setting] = query_data[2]
             db.users.updateSettings(userID, user["settings"])
 
+            reply, buttons = getHomeState()
             await query.answer(f"{setting} language has been set to {title}")
-
-            reply = settingsStateText.format(
-                primary=Quran.getTitleLanguageFromAbbr(user["settings"]["primary"]),
-                secondary=Quran.getTitleLanguageFromAbbr(user["settings"]["secondary"]),
-                other=Quran.getTitleLanguageFromAbbr(user["settings"]["other"]),
-                font=arabicStyles[str(user["settings"]["font"])],
-                showTafsir=["No", "Yes"][user["settings"]["showTafsir"]],
-                reciter=reciterNames[str(user["settings"]["reciter"])],
-            )
-            buttons = homeState
 
     elif method == "font":
         if len(query_data) == 1:
@@ -170,20 +169,11 @@ Current Setting: <b>{arabicStyles[str(user['settings']['font'])]}</b>
         else:
             user["settings"]["font"] = int(query_data[1])
             db.users.updateSettings(userID, user["settings"])
+
+            reply, buttons = getHomeState()
             await query.answer(
                 f"Arabic font style has been set to {arabicStyles[str(user['settings']['font'])]}"
             )
-
-            reply = settingsStateText.format(
-                primary=Quran.getTitleLanguageFromAbbr(user["settings"]["primary"]),
-                secondary=Quran.getTitleLanguageFromAbbr(user["settings"]["secondary"]),
-                other=Quran.getTitleLanguageFromAbbr(user["settings"]["other"]),
-                font=arabicStyles[str(user["settings"]["font"])],
-                showTafsir=["No", "Yes"][user["settings"]["showTafsir"]],
-                reciter=reciterNames[str(user["settings"]["reciter"])],
-            )
-            buttons = homeState
-            buttons = homeState
 
     elif method == "showTafsir":
         if len(query_data) == 1:
@@ -202,8 +192,11 @@ Current Setting: <b>{["No", "Yes"][user['settings']['showTafsir']]}</b>
         else:
             user["settings"]["showTafsir"] = int(query_data[1])
             db.users.updateSettings(userID, user["settings"])
-            reply = f"Show Tafsir has been set to <b>{['No', 'Yes'][user['settings']['showTafsir']]}</b>"
-            buttons = homeState
+
+            reply, buttons = getHomeState()
+            await query.answer(
+                f"Show Tafsir has been set to {['No', 'Yes'][user['settings']['showTafsir']]}"
+            )
 
     elif method == "reciter":
         if len(query_data) == 1:
@@ -212,46 +205,46 @@ Current Setting: <b>{["No", "Yes"][user['settings']['showTafsir']]}</b>
 
 Current Setting: <b>{reciterNames[str(user['settings']['reciter'])]}</b>
 """
-            buttons = [
-                [
-                    InlineKeyboardButton(
-                        "Mishary Rashid Al-Afasy", callback_data="settings reciter 1"
-                    ),
-                    InlineKeyboardButton(
-                        "Abu Bakr Al-Shatri", callback_data="settings reciter 2"
-                    ),
-                ],
-                [InlineKeyboardButton("Back", callback_data="settings home")],
+
+            reciterButtons = [
+                InlineKeyboardButton(name, callback_data=f"settings reciter {i}")
+                for i, name in reciterNames.items()
             ]
+
+            buttons = []
+            for i in range(0, len(reciterButtons), 2):
+                buttons.append(reciterButtons[i : i + 2])
+
+            buttons.append(
+                [InlineKeyboardButton("Back", callback_data="settings home")]
+            )
+
+            # will be like this:
+
+            # buttons = [
+            #     [
+            #         InlineKeyboardButton(
+            #             "Mishary Rashid Al-Afasy", callback_data="settings reciter 1"
+            #         ),
+            #         InlineKeyboardButton(
+            #             "Abu Bakr Al-Shatri", callback_data="settings reciter 2"
+            #         ),
+            #     ],
+            #     [InlineKeyboardButton("Back", callback_data="settings home")],
+            # ]
         else:
             user["settings"]["reciter"] = int(query_data[1])
             db.users.updateSettings(userID, user["settings"])
+
+            reply, buttons = getHomeState()
             await query.answer(
                 f"Reciter has been set to {reciterNames[str(user['settings']['reciter'])]}"
             )
 
-            reply = settingsStateText.format(
-                primary=Quran.getTitleLanguageFromAbbr(user["settings"]["primary"]),
-                secondary=Quran.getTitleLanguageFromAbbr(user["settings"]["secondary"]),
-                other=Quran.getTitleLanguageFromAbbr(user["settings"]["other"]),
-                font=arabicStyles[str(user["settings"]["font"])],
-                showTafsir=["No", "Yes"][user["settings"]["showTafsir"]],
-                reciter=reciterNames[str(user["settings"]["reciter"])],
-            )
-            buttons = homeState
-            buttons = homeState
-
     elif method == "home":
-        reply = settingsStateText.format(
-            primary=Quran.getTitleLanguageFromAbbr(user["settings"]["primary"]),
-            secondary=Quran.getTitleLanguageFromAbbr(user["settings"]["secondary"]),
-            other=Quran.getTitleLanguageFromAbbr(user["settings"]["other"]),
-            font=arabicStyles[str(user["settings"]["font"])],
-            showTafsir=["No", "Yes"][user["settings"]["showTafsir"]],
-            reciter=reciterNames[str(user["settings"]["reciter"])],
-        )
-        buttons = homeState
+        reply, buttons = getHomeState()
 
+    
     if not reply:
         return await query.answer("Maybe it was an old message?", show_alert=True)
 

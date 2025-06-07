@@ -10,11 +10,9 @@ from bot.handlers.defaults import (
 import threading
 import time
 import os
-import json
 from datetime import datetime
 from typing import Dict, List, Any, Optional, Union
 
-from pymongo.collection import Collection
 from bot.utils.log import getLogger
 
 load_dotenv()

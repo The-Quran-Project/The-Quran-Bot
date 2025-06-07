@@ -1,5 +1,6 @@
 import html
 
+import telegram
 from telegram.ext import CommandHandler, MessageHandler, filters
 from telegram import Update, Message, InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -10,7 +11,7 @@ from bot.handlers import Constants, replies
 from bot.handlers.helpers import (
     getRandomAyah,
     getValidReply,
-    getSurahAudio,
+    getAudioUrlOrID,
     isValidFormat,
     getAyahButton,
 )
@@ -263,23 +264,24 @@ async def audioCommand(u: Update, c):
     surahNo = x["surahNo"]
     ayahNo = x["ayahNo"]
 
-    if onlySurah:
-        if 1 == 2 and userID != 5596148289:
-            await message.reply_html(
-                "<b>Developer currently disabled this feature because of some problems, it'll be back soon</b>\nStay updated with @AlQuranUpdates"
-            )
-            return
-
-        audioFileID = getSurahAudio(surahNo, userID)
-        await message.reply_audio(audioFileID)
-        return
-
     preferredReciter = db.users.get(userID)["settings"]["reciter"]
+    ayahPref = None if onlySurah else ayahNo
+    urlOrFileID = getAudioUrlOrID(preferredReciter, surahNo, ayahPref)
 
-    await message.reply_audio(
-        f"""https://quranaudio.pages.dev/{preferredReciter}/{
-            surahNo}_{ayahNo}.mp3"""
-    )
+    try:
+        await message.reply_audio(urlOrFileID)
+    except telegram.error.BadRequest as e:
+        if str(e) == "Wrong file identifier/http url specified":
+            # If the file ID is invalid, send the URL instead
+            # This will happen if you're running your own instance of the bot
+            # NOTE: This will also raise an error when the file size is more than 20MB
+            urlOrFileID = getAudioUrlOrID(
+                preferredReciter, surahNo, ayahPref, forceUrl=True
+            )
+            await message.reply_html(
+                "<b>Main Audio File is not available. Sending from the backup...</b>"
+            )
+            await message.reply_audio(urlOrFileID)
 
 
 # Command:  /tafsir

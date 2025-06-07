@@ -2,6 +2,15 @@
 
 **Latests are on top**
 
+## 19) 8th June, 2025
+- Add `uzbek` translation
+- Add 3 more reciters. Now it supports all reciters from [Quran API](https://quranapi.pages.dev/getting-started/available-reciters)
+  - Mishary Rashid Al Afasy
+  - Abu Bakr Al Shatri
+  - Nasser Al Qatami
+  - Yasser Al Dosari
+  - Hani Ar Rifai
+
 
 ## 18) 5th June, 2025
 - Reimplement the local cached mongodb database with much simpler logic.
