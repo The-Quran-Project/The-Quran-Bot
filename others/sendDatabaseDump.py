@@ -14,8 +14,6 @@ MONGO_URI = os.getenv("MONGO_URI")
 DB_NAME = "quranbot"
 
 
-# print(f"Bot Token: {len(BOT_TOKEN)} characters")
-# print(f"MongoDB URI: {len(MONGO_URI)} characters")
 
 def custom_serializer(obj):
     """Convert datetime and ObjectId to a serializable format."""
@@ -69,7 +67,7 @@ def send_file_telegram(file_info):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     caption = f"""\
-<b>Database:</b> <code>{DB_NAME}</code> of @@AlFurqanRobot
+<b>Database:</b> <code>{DB_NAME}</code> of @AlFurqanRobot
 
 📅 Time: <b>{timestamp}</b>
 📂 Collections: <b>{file_info['collections_count']}</b>
