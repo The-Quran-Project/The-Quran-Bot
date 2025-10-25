@@ -3,8 +3,18 @@ import json
 import time
 from telegram import Update
 from telegram.ext import CommandHandler
-
+from datetime import datetime
 from bot.handlers.helpers.decorators import onlyGroupAdmin
+
+
+currentTimeUTC = datetime.utcnow().strftime("%d-%m-%Y %H:%M:%S")
+
+async def getVersion(u: Update, c):
+    """Check the bot's version that's running"""
+
+    message = u.effective_message
+    await message.reply_html(f"<b>Version:</b> <code>{currentTimeUTC}</code>")
+
 
 
 def escapeHTML(text: str):
@@ -89,4 +99,5 @@ exportedHandlers = [
     CommandHandler("ping", pingCommand),
     CommandHandler("info", infoCommand),
     CommandHandler("showJson", showJson),
+    CommandHandler("version", getVersion),
 ]
