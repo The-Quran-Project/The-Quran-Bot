@@ -375,22 +375,20 @@ db = Database("quranbot")
 # --- Example Usage ---
 if __name__ == "__main__":
     # Replace with your MongoDB Atlas URI
-    password = "0092100921"
-    MONGO_URI = f"mongodb+srv://Nusab19:{password}@firstcluster.eh81nbz.mongodb.net/?retryWrites=true&w=majority&appName=FirstCluster"
-    client = MongoClient(MONGO_URI)
-    dbtest = client["quranbot"]
-    logger.info(client.list_database_names())
+    # client = MongoClient(MONGO_URI)
+    # dbtest = client["quranbot"]
+    # logger.info(client.list_database_names())
 
-    users = CachedCollection(dbtest["users"])
-    users.set(212, {"name": "Ali", "language": "en"})
-    logger.info(f"User 1: {users.get(1)}")
+    # users = CachedCollection(dbtest["users"])
+    # users.set(212, {"name": "Ali", "language": "en"})
+    # logger.info(f"User 1: {users.get(1)}")
 
-    users.set(222, {"name": "Fatima", "language": "ar"})
-    logger.info(f"User 2: {users.get(2)}")
+    # users.set(222, {"name": "Fatima", "language": "ar"})
+    # logger.info(f"User 2: {users.get(2)}")
 
-    logger.info(users.get(1))
-    logger.info(users.get(212))
-    logger.info(users.get(222))
+    # logger.info(users.get(1))
+    # logger.info(users.get(212))
+    # logger.info(users.get(222))
 
     # users.flush()  # Optional, or use start_auto_flush() for automatic background flush
 
@@ -398,3 +396,4 @@ if __name__ == "__main__":
     # users.start_auto_flush(30)
 
     logger.info("Done.")
+
