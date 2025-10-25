@@ -1,0 +1,30 @@
+name: MongoDB Export and Upload
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/59 * * * *"
+
+jobs:
+  export-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run MongoDB export script
+        working-directory: others
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: python sendDatabaseDump.py
