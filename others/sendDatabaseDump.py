@@ -1,8 +1,8 @@
+import io
 import os
 import json
 import pymongo
 import requests
-import io
 from dotenv import load_dotenv
 from datetime import datetime
 

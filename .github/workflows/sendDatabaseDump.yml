@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install python-dotenv pymongo requests
 
       - name: Run MongoDB export script
         working-directory: others
