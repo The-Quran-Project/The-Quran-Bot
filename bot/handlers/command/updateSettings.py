@@ -113,7 +113,7 @@ Change the settings of the group from here.
                 "Preview Link", callback_data=f"settings previewLink {userID}"
             ),
             InlineKeyboardButton(
-                "Allowed Languages",
+                "Restricted Languages",
                 callback_data=f"settings restrictedLangs {userID}",
             ),
         ],

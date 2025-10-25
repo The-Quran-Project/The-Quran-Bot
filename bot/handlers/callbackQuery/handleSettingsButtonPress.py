@@ -394,12 +394,12 @@ The preview will be like <a href="https://telegra.ph/Tafsir-of-1-1-06-03-4">this
         )
         buttons = [[]]
         for langCode, lang in allLangs:
-            isRstd = langCode in restrictedLangs
-            text = f"{'❌' if isRstd else '✅'} {lang}"
+            isRestricted = langCode in restrictedLangs
+            text = f"{'❌' if isRestricted else '✅'} {lang}"
 
             # unrestrict if already restricted, else restrict
             callback_text = (
-                f"settings {'un' if isRstd else ''}restrict {langCode} {userID}"
+                f"settings {'un' if isRestricted else ''}restrict {langCode} {userID}"
             )
 
             button = InlineKeyboardButton(text, callback_data=callback_text)
@@ -422,8 +422,8 @@ The preview will be like <a href="https://telegra.ph/Tafsir-of-1-1-06-03-4">this
         await query.answer(f"You restricted {allLangs[langCode]}")
 
         settings["restrictedLangs"].append(langCode)
-
         db.chats.updateSettings(chatID, settings)
+
 
         # -- Previous State --
         restrictedLangs = settings["restrictedLangs"]
@@ -434,12 +434,12 @@ The preview will be like <a href="https://telegra.ph/Tafsir-of-1-1-06-03-4">this
         )
         buttons = [[]]
         for langCode, lang in allLangs.items():
-            isRstd = langCode in restrictedLangs
-            text = f"{'❌' if isRstd else '✅'} {lang}"
+            isRestricted = langCode in restrictedLangs
+            text = f"{'❌' if isRestricted else '✅'} {lang}"
 
             # unrestrict if already restricted, else restrict
             callback_text = (
-                f"settings {'un' if isRstd else ''}restrict {langCode} {userID}"
+                f"settings {'un' if isRestricted else ''}restrict {langCode} {userID}"
             )
 
             button = InlineKeyboardButton(text, callback_data=callback_text)
@@ -474,12 +474,12 @@ The preview will be like <a href="https://telegra.ph/Tafsir-of-1-1-06-03-4">this
         )
         buttons = [[]]
         for langCode, lang in allLangs.items():
-            isRstd = langCode in restrictedLangs
-            text = f"{'❌' if isRstd else '✅'} {lang}"
+            isRestricted = langCode in restrictedLangs
+            text = f"{'❌' if isRestricted else '✅'} {lang}"
 
             # unrestrict if already restricted, else restrict
             callback_text = (
-                f"settings {'un' if isRstd else ''}restrict {langCode} {userID}"
+                f"settings {'un' if isRestricted else ''}restrict {langCode} {userID}"
             )
 
             button = InlineKeyboardButton(text, callback_data=callback_text)

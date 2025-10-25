@@ -136,6 +136,8 @@ class CachedCollection:
             self.set(_id, data)
             return data
 
+        # print(f"Updating settings for {_id}: {data}")
+
         self.cache[_id]["settings"].update(data)
         self.queue.append(
             UpdateOne(
@@ -370,30 +372,16 @@ class Database:
         self.analytics.set(date, analytics_doc)
 
 
-db = Database("quranbot")
+dbName = "quranbot" if not LOCAL else "quranbot-test"
+db = Database(dbName)
+print("Database connected:", dbName)
+
+# print(db.chats.get("-4643003263"))
+# exit(1)
 
 # --- Example Usage ---
 if __name__ == "__main__":
-    # Replace with your MongoDB Atlas URI
-    # client = MongoClient(MONGO_URI)
-    # dbtest = client["quranbot"]
-    # logger.info(client.list_database_names())
-
-    # users = CachedCollection(dbtest["users"])
-    # users.set(212, {"name": "Ali", "language": "en"})
-    # logger.info(f"User 1: {users.get(1)}")
-
-    # users.set(222, {"name": "Fatima", "language": "ar"})
-    # logger.info(f"User 2: {users.get(2)}")
-
-    # logger.info(users.get(1))
-    # logger.info(users.get(212))
-    # logger.info(users.get(222))
-
-    # users.flush()  # Optional, or use start_auto_flush() for automatic background flush
-
-    # Optional: background flush every 30 seconds
-    # users.start_auto_flush(30)
-
+    # db.chats.get("-4643003263")
+    
     logger.info("Done.")
 
