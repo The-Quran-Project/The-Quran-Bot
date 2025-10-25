@@ -14,6 +14,9 @@ MONGO_URI = os.getenv("MONGODB_URI")
 DB_NAME = "quranbot"
 
 
+print(f"Bot Token: {len(BOT_TOKEN)} characters")
+print(f"MongoDB URI: {len(MONGO_URI)} characters")
+
 def custom_serializer(obj):
     """Convert datetime and ObjectId to a serializable format."""
     if isinstance(obj, datetime):
