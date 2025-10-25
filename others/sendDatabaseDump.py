@@ -10,12 +10,12 @@ load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = "5596148289"
-MONGO_URI = os.getenv("MONGODB_URI")
+MONGO_URI = os.getenv("MONGO_URI")
 DB_NAME = "quranbot"
 
 
-print(f"Bot Token: {len(BOT_TOKEN)} characters")
-print(f"MongoDB URI: {len(MONGO_URI)} characters")
+# print(f"Bot Token: {len(BOT_TOKEN)} characters")
+# print(f"MongoDB URI: {len(MONGO_URI)} characters")
 
 def custom_serializer(obj):
     """Convert datetime and ObjectId to a serializable format."""

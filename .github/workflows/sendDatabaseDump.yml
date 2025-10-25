@@ -25,6 +25,6 @@ jobs:
       - name: Run MongoDB export script
         working-directory: others
         env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
         run: python sendDatabaseDump.py
