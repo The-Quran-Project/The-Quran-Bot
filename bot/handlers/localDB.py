@@ -382,6 +382,5 @@ print("Database connected:", dbName)
 # --- Example Usage ---
 if __name__ == "__main__":
     # db.chats.get("-4643003263")
-    
-    logger.info("Done.")
 
+    logger.info("Done.")

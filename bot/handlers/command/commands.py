@@ -264,24 +264,41 @@ async def audioCommand(u: Update, c):
     surahNo = x["surahNo"]
     ayahNo = x["ayahNo"]
 
-    preferredReciter = db.users.get(userID)["settings"]["reciter"]
+    reciter = db.users.get(userID)["settings"]["reciter"]
     ayahPref = None if onlySurah else ayahNo
-    urlOrFileID = getAudioUrlOrID(preferredReciter, surahNo, ayahPref)
+    urlOrFileID = getAudioUrlOrID(reciter, surahNo, ayahPref)
+    audioNavigation = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    "Previous",
+                    callback_data=f"prev_audio {surahNo} {ayahNo} {reciter} {userID}",
+                ),
+                InlineKeyboardButton(
+                    "Next",
+                    callback_data=f"next_audio {surahNo} {ayahNo} {reciter} {userID}",
+                ),
+            ],
+        ]
+    )
+    caption = f"<b>Audio of:</b> <code>{surahNo}:{ayahNo}</code>"
 
     try:
-        await message.reply_audio(urlOrFileID)
+        await message.reply_audio(
+            urlOrFileID, reply_markup=audioNavigation, caption=caption
+        )
     except telegram.error.BadRequest as e:
         if str(e) == "Wrong file identifier/http url specified":
             # If the file ID is invalid, send the URL instead
             # This will happen if you're running your own instance of the bot
             # NOTE: This will also raise an error when the file size is more than 20MB
-            urlOrFileID = getAudioUrlOrID(
-                preferredReciter, surahNo, ayahPref, forceUrl=True
-            )
+            urlOrFileID = getAudioUrlOrID(reciter, surahNo, ayahPref, forceUrl=True)
             await message.reply_html(
                 "<b>Main Audio File is not available. Sending from the backup...</b>"
             )
-            await message.reply_audio(urlOrFileID)
+            await message.reply_audio(
+                urlOrFileID, reply_markup=audioNavigation, caption=caption
+            )
 
 
 # Command:  /tafsir

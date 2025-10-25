@@ -1,8 +1,16 @@
 from telegram.ext import CallbackQueryHandler
-from telegram import Update, Bot, InlineKeyboardMarkup, ChatPermissions
+from telegram import (
+    InlineKeyboardButton,
+    InputMediaAudio,
+    Update,
+    Bot,
+    InlineKeyboardMarkup,
+    ChatPermissions,
+)
 
 
 from bot.handlers import Quran
+from bot.handlers.helpers import getPrevAyah, getNextAyah
 from bot.handlers import Constants
 from bot.handlers.localDB import db
 from bot.handlers.callbackQuery.handleSchedule import handleSchedule
@@ -92,36 +100,28 @@ async def handleButtonPress(u: Update, c):
         reply = message.text_html
         buttons = InlineKeyboardMarkup(Constants.allSurahInlineButtons[index - 1])
 
-    elif method == "prev_ayah":
-        # Go to Previous Ayah
+    elif method == "prev_ayah" or method == "next_ayah":
+        # Extract parameters from callback data
         values = queryData.split()[1:-1]
+        language = None
 
+        # Parse surah and ayah (and language if provided)
         if len(values) == 2:
             surahNo, ayahNo = map(int, values)
-            language = None
-        elif len(values) == 3:
-            # language is the abbreviation of the language
-            surahNo, ayahNo, language = values
-            surahNo = int(surahNo)
-            ayahNo = int(ayahNo)
-
-        if (
-            surahNo == ayahNo == 1
-        ):  # If the user is at the first ayah of the first surah
-            surahNo = 114  # Go to the last surah
-            ayahNo = 6
-
-        elif ayahNo == 1:
-            surahNo -= 1
-            ayahNo = Quran.getAyahNumberCount(surahNo)
         else:
-            ayahNo -= 1
+            surahNo, ayahNo, language = values
+            surahNo, ayahNo = int(surahNo), int(ayahNo)
 
+        # Determine next or previous ayah
+        if method == "prev_ayah":
+            surahNo, ayahNo = getPrevAyah(surahNo, ayahNo)
+        else:
+            surahNo, ayahNo = getNextAyah(surahNo, ayahNo)
+
+        # Get ayah reply and buttons (based on language or user preferences)
         if language:
             reply = getAyahReply(surahNo, ayahNo, language)
-            buttons = getAyahButton(
-                surahNo, ayahNo, userID, language
-            )  # language is the abbr
+            buttons = getAyahButton(surahNo, ayahNo, userID, language)
         else:
             restrictedLangs = None
             if userID != chatID:
@@ -132,44 +132,54 @@ async def handleButtonPress(u: Update, c):
             )
             buttons = getAyahButton(surahNo, ayahNo, userID)
 
-    elif method == "next_ayah":
-        # Go to Next Ayah
+    elif method == "prev_audio" or method == "next_audio":
+        # Extract parameters from callback data
         values = queryData.split()[1:-1]
+        surahNo, ayahNo, reciter = map(int, values)
 
-        if len(values) == 2:
-            surahNo, ayahNo = map(int, values)
-            language = None
-
-        elif len(values) == 3:
-            # language is the abbreviation of the language
-            surahNo, ayahNo, language = values
-            surahNo = int(surahNo)
-            ayahNo = int(ayahNo)
-
-        if surahNo == 114 and ayahNo == 6:
-            surahNo = 1
-            ayahNo = 1
-
-        elif ayahNo >= Quran.getAyahNumberCount(surahNo):
-            surahNo += 1
-            ayahNo = 1
+        # Determine next or previous audio
+        if method == "prev_audio":
+            surahNo, ayahNo = getPrevAyah(surahNo, ayahNo)
         else:
-            ayahNo += 1
+            surahNo, ayahNo = getNextAyah(surahNo, ayahNo)
 
-        if language:
-            reply = getAyahReply(surahNo, ayahNo, language)
-            buttons = getAyahButton(
-                surahNo, ayahNo, userID, language
-            )  # language is the abbr
-        else:
-            restrictedLangs = None
-            if userID != chatID:
-                restrictedLangs = db.chats.get(chatID)["settings"]["restrictedLangs"]
+        # Edit the audio message with the new audio
+        urlOrFileID = getAudioUrlOrID(reciter, surahNo, ayahNo)
+        audioNavigation = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        "Previous",
+                        callback_data=f"prev_audio {surahNo} {ayahNo} {reciter} {userID}",
+                    ),
+                    InlineKeyboardButton(
+                        "Next",
+                        callback_data=f"next_audio {surahNo} {ayahNo} {reciter} {userID}",
+                    ),
+                ],
+            ]
+        )
 
-            reply = getAyahReplyFromPreference(
-                surahNo, ayahNo, userID, restrictedLangs=restrictedLangs
+        caption = f"<b>Audio of:</b> <code>{surahNo}:{ayahNo}</code>"
+        try:
+            await message.edit_media(
+                media=InputMediaAudio(
+                    media=urlOrFileID,
+                    caption=caption,
+                ),
+                reply_markup=audioNavigation,
             )
-            buttons = getAyahButton(surahNo, ayahNo, userID)
+        except Exception as e:
+            # If editing fails, send as a new message
+            await message.reply_audio(
+                audio=urlOrFileID,
+                caption="<b>Message Edit Failed</b>\n" + caption,
+                reply_markup=audioNavigation,
+            )
+            raise Exception(f"Error editing media: {e}")
+        return await query.answer()
+
+    # ---------------------------------------------------------------------
 
     elif method == "audio":
         if u.effective_chat.type in ("group", "supergroup"):  # for groups
@@ -204,7 +214,25 @@ async def handleButtonPress(u: Update, c):
 
         urlOrFileID = getAudioUrlOrID(reciter, surahNo, ayahNo)
 
-        await message.reply_audio(urlOrFileID)
+        audioNavigation = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        "Previous",
+                        callback_data=f"prev_audio {surahNo} {ayahNo} {reciter} {userID}",
+                    ),
+                    InlineKeyboardButton(
+                        "Next",
+                        callback_data=f"next_audio {surahNo} {ayahNo} {reciter} {userID}",
+                    ),
+                ],
+            ]
+        )
+        caption = f"<b>Audio of:</b> <code>{surahNo}:{ayahNo}</code>"
+
+        await message.reply_audio(
+            urlOrFileID, reply_markup=audioNavigation, caption=caption
+        )
         return await query.answer()
 
     if method == "settings":

@@ -2,6 +2,14 @@
 
 **Latests are on top**
 
+
+## 20) 26th October, 2025
+- Add easier navigation in *audio* files too.
+- Fix bug where changing the `/settings` would change it globally for that user.
+  - https://t.me/AlQuranUpdates/38
+- Add `/version` command to see which version it is running.
+
+
 ## 19) 8th June, 2025
 - Add `uzbek` translation
 - Add 3 more reciters. Now it supports all reciters from [Quran API](https://quranapi.pages.dev/getting-started/available-reciters)
