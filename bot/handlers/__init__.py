@@ -18,6 +18,7 @@ class Constants:
     jazakAllah = (
         "CAACAgUAAxkBAAIBEmOtH-No3_xEGMh2YpM6ErBQ2BHHAAK4AwAC8Yq5VFbQH8fyZNceLAQ"
     )
+    botUsername = "AlFurqanRobot"
     allSurahInlineButtons = generateSurahButtons(Quran)
 
 

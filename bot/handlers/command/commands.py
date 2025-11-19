@@ -2,7 +2,7 @@ import html
 
 import telegram
 from telegram.ext import CommandHandler, MessageHandler, filters
-from telegram import Update, Message, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Bot, Update, InlineKeyboardButton, InlineKeyboardMarkup
 
 
 from bot.handlers.localDB import db
@@ -250,6 +250,7 @@ async def randomCommand(u: Update, c):
 # Command:  /audio
 async def audioCommand(u: Update, c):
     """Sends the audio of the ayah to the user"""
+    bot: Bot = c.bot
     message = u.effective_message
     userID = u.effective_user.id
     text = message.text[6:].strip()  # 6 is the length of "/audio"
@@ -260,28 +261,33 @@ async def audioCommand(u: Update, c):
         await message.reply_html(x["message"])
         return
 
-    onlySurah = x.get("onlySurah")  # True if only Surah is provided
+    onlySurah = int(x.get("onlySurah"))  # True if only Surah is provided
     surahNo = x["surahNo"]
     ayahNo = x["ayahNo"]
-
     reciter = db.users.get(userID)["settings"]["reciter"]
-    ayahPref = None if onlySurah else ayahNo
-    urlOrFileID = getAudioUrlOrID(reciter, surahNo, ayahPref)
+    forceUrl = bot.username != Constants.botUsername
+    urlOrFileID = getAudioUrlOrID(
+        surahNo, ayahNo, reciter, onlySurah=onlySurah, forceUrl=forceUrl
+    )
+
     audioNavigation = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
                     "Previous",
-                    callback_data=f"prev_audio {surahNo} {ayahNo} {reciter} {userID}",
+                    callback_data=f"prev_audio {surahNo} {ayahNo} {reciter} {onlySurah} {userID}",
                 ),
                 InlineKeyboardButton(
                     "Next",
-                    callback_data=f"next_audio {surahNo} {ayahNo} {reciter} {userID}",
+                    callback_data=f"next_audio {surahNo} {ayahNo} {reciter} {onlySurah} {userID}",
                 ),
             ],
         ]
     )
-    caption = f"<b>Audio of:</b> <code>{surahNo}:{ayahNo}</code>"
+    if onlySurah:
+        caption = f"<b>Audio of Surah <code>{surahNo}</code></b>"
+    else:
+        caption = f"<b>Audio of:</b> <code>{surahNo}:{ayahNo}</code>"
 
     try:
         await message.reply_audio(
@@ -291,15 +297,21 @@ async def audioCommand(u: Update, c):
         if str(e) == "Wrong file identifier/http url specified":
             # If the file ID is invalid, send the URL instead
             # This will happen if you're running your own instance of the bot
-            # NOTE: This will also raise an error when the file size is more than 20MB
-            urlOrFileID = getAudioUrlOrID(reciter, surahNo, ayahPref, forceUrl=True)
-            await message.reply_html(
-                "<b>Main Audio File is not available. Sending from the backup...</b>"
-            )
-            await message.reply_audio(
-                urlOrFileID, reply_markup=audioNavigation, caption=caption
-            )
+            # and trying to send the audio of a `Surah`
+            # NOTE: This will also raise an error when the file size is more than 25MB
 
+            # Not needed anymore
+            # urlOrFileID = getAudioUrlOrID(
+            #     surahNo, ayahNo, reciter, onlySurah=onlySurah, forceUrl=True
+            # )
+            # await message.reply_audio(
+            #     urlOrFileID, reply_markup=audioNavigation, caption=caption
+            # )
+
+            await message.reply_html(
+                "<b>Note:</b> The audio file is being sent as a URL because the bot is unable to send the audio file directly.\n\n"
+                "This may be due to the bot running on a different instance or the file size exceeding Telegram's limit.",
+            )
 
 # Command:  /tafsir
 async def tafsirCommand(u: Update, c):

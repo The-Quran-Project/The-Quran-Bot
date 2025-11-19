@@ -10,7 +10,7 @@ from telegram import (
 
 
 from bot.handlers import Quran
-from bot.handlers.helpers import getPrevAyah, getNextAyah
+from bot.handlers.helpers import getPrevAyah, getNextAyah, getNextSurah, getPrevSurah
 from bot.handlers import Constants
 from bot.handlers.localDB import db
 from bot.handlers.callbackQuery.handleSchedule import handleSchedule
@@ -35,7 +35,7 @@ async def handleButtonPress(u: Update, c):
     message = u.effective_message
     userID = u.effective_user.id
     chatID = u.effective_chat.id
-
+    forceUrl = bot.username != Constants.botUsername
     query = u.callback_query
     queryData = query.data
     method = queryData.split()[0]
@@ -135,32 +135,43 @@ async def handleButtonPress(u: Update, c):
     elif method == "prev_audio" or method == "next_audio":
         # Extract parameters from callback data
         values = queryData.split()[1:-1]
-        surahNo, ayahNo, reciter = map(int, values)
+        surahNo, ayahNo, reciter, onlySurah = map(int, values)
 
         # Determine next or previous audio
         if method == "prev_audio":
-            surahNo, ayahNo = getPrevAyah(surahNo, ayahNo)
+            if onlySurah:
+                surahNo = getPrevSurah(surahNo)
+            else:
+                surahNo, ayahNo = getPrevAyah(surahNo, ayahNo)
         else:
-            surahNo, ayahNo = getNextAyah(surahNo, ayahNo)
+            if onlySurah:
+                surahNo = getNextSurah(surahNo)
+            else:
+                surahNo, ayahNo = getNextAyah(surahNo, ayahNo)
 
         # Edit the audio message with the new audio
-        urlOrFileID = getAudioUrlOrID(reciter, surahNo, ayahNo)
+        urlOrFileID = getAudioUrlOrID(
+            surahNo, ayahNo, reciter, onlySurah=onlySurah, forceUrl=forceUrl
+        )
         audioNavigation = InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton(
                         "Previous",
-                        callback_data=f"prev_audio {surahNo} {ayahNo} {reciter} {userID}",
+                        callback_data=f"prev_audio {surahNo} {ayahNo} {reciter} {onlySurah} {userID}",
                     ),
                     InlineKeyboardButton(
                         "Next",
-                        callback_data=f"next_audio {surahNo} {ayahNo} {reciter} {userID}",
+                        callback_data=f"next_audio {surahNo} {ayahNo} {reciter} {onlySurah} {userID}",
                     ),
                 ],
             ]
         )
 
-        caption = f"<b>Audio of:</b> <code>{surahNo}:{ayahNo}</code>"
+        if onlySurah:
+            caption = f"<b>Audio of Surah <code>{surahNo}</code></b>"
+        else:
+            caption = f"<b>Audio of:</b> <code>{surahNo}:{ayahNo}</code>"
         try:
             await message.edit_media(
                 media=InputMediaAudio(
@@ -202,9 +213,9 @@ async def handleButtonPress(u: Update, c):
                 )
 
         try:
-            surahNo, ayahNo = map(int, queryData.split()[1:-1])
+            surahNo, ayahNo, onlySurah = map(int, queryData.split()[1:-1])
         except ValueError:
-            surahNo, ayahNo = map(int, queryData.split()[1:])
+            surahNo, ayahNo, onlySurah = map(int, queryData.split()[1:])
 
         user = db.users.get(userID)
         if user:
@@ -212,23 +223,28 @@ async def handleButtonPress(u: Update, c):
         else:
             reciter = 1
 
-        urlOrFileID = getAudioUrlOrID(reciter, surahNo, ayahNo)
+        urlOrFileID = getAudioUrlOrID(
+            surahNo, ayahNo, reciter, onlySurah=onlySurah, forceUrl=forceUrl
+        )
 
         audioNavigation = InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton(
                         "Previous",
-                        callback_data=f"prev_audio {surahNo} {ayahNo} {reciter} {userID}",
+                        callback_data=f"prev_audio {surahNo} {ayahNo} {reciter} {onlySurah} {userID}",
                     ),
                     InlineKeyboardButton(
                         "Next",
-                        callback_data=f"next_audio {surahNo} {ayahNo} {reciter} {userID}",
+                        callback_data=f"next_audio {surahNo} {ayahNo} {reciter} {onlySurah} {userID}",
                     ),
                 ],
             ]
         )
-        caption = f"<b>Audio of:</b> <code>{surahNo}:{ayahNo}</code>"
+        if onlySurah:
+            caption = f"<b>Audio of Surah <code>{surahNo}</code></b>"
+        else:
+            caption = f"<b>Audio of:</b> <code>{surahNo}:{ayahNo}</code>"
 
         await message.reply_audio(
             urlOrFileID, reply_markup=audioNavigation, caption=caption

@@ -4,4 +4,4 @@ from .generateSurahButtons import generateSurahButtons
 from .getAyahReply import getAyahReply, getAyahReplyFromPreference
 from .getValidReply import getValidReply, isValidFormat
 from .getAudioUrlOrID import getAudioUrlOrID
-from .utils import getNextAyah, getPrevAyah
+from .utils import getNextAyah, getPrevAyah, getPrevSurah, getNextSurah

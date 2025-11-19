@@ -3,6 +3,13 @@
 **Latests are on top**
 
 
+## 21) 19th November, 2025
+- Fix: `/audio <surahNo>` to only send the surah audio and implement the pagination
+- Save error files in `/errors` and ignore "media edit cancelled" errors
+- Add `/stats` command for the bot admin
+
+
+
 ## 20) 26th October, 2025
 - Add easier navigation in *audio* files too.
 - Fix bug where changing the `/settings` would change it globally for that user.

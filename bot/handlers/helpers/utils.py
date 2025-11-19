@@ -16,3 +16,13 @@ def getPrevAyah(surahNo: int, ayahNo: int):
         prev_surah = surahNo - 1
         return prev_surah, Quran.getAyahNumberCount(prev_surah)
     return surahNo, ayahNo - 1
+
+def getPrevSurah(surahNo: int):
+    if surahNo == 1:
+        return 114
+    return surahNo - 1
+
+def getNextSurah(surahNo: int):
+    if surahNo == 114:
+        return 1
+    return surahNo + 1
