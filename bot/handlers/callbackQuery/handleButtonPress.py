@@ -135,7 +135,11 @@ async def handleButtonPress(u: Update, c):
     elif method == "prev_audio" or method == "next_audio":
         # Extract parameters from callback data
         values = queryData.split()[1:-1]
-        surahNo, ayahNo, reciter, onlySurah = map(int, values)
+        try:
+            surahNo, ayahNo, reciter, onlySurah = map(int, values)
+        except ValueError:
+            surahNo, ayahNo, reciter = map(int, values)
+            onlySurah = 0
 
         # Determine next or previous audio
         if method == "prev_audio":
