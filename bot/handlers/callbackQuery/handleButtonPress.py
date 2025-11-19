@@ -230,11 +230,11 @@ async def handleButtonPress(u: Update, c):
                 [
                     InlineKeyboardButton(
                         "Previous",
-                        callback_data=f"prev_audio {surahNo} {ayahNo} {reciter} {userID}",
+                        callback_data=f"prev_audio {surahNo} {ayahNo} {reciter} 0 {userID}",
                     ),
                     InlineKeyboardButton(
                         "Next",
-                        callback_data=f"next_audio {surahNo} {ayahNo} {reciter} {userID}",
+                        callback_data=f"next_audio {surahNo} {ayahNo} {reciter} 0 {userID}",
                     ),
                 ],
             ]
