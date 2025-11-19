@@ -213,9 +213,9 @@ async def handleButtonPress(u: Update, c):
                 )
 
         try:
-            surahNo, ayahNo, onlySurah = map(int, queryData.split()[1:-1])
+            surahNo, ayahNo = map(int, queryData.split()[1:-1])
         except ValueError:
-            surahNo, ayahNo, onlySurah = map(int, queryData.split()[1:])
+            surahNo, ayahNo = map(int, queryData.split()[1:])
 
         user = db.users.get(userID)
         if user:
@@ -223,28 +223,24 @@ async def handleButtonPress(u: Update, c):
         else:
             reciter = 1
 
-        urlOrFileID = getAudioUrlOrID(
-            surahNo, ayahNo, reciter, onlySurah=onlySurah, forceUrl=forceUrl
-        )
+        urlOrFileID = getAudioUrlOrID(surahNo, ayahNo, reciter, forceUrl=forceUrl)
 
         audioNavigation = InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton(
                         "Previous",
-                        callback_data=f"prev_audio {surahNo} {ayahNo} {reciter} {onlySurah} {userID}",
+                        callback_data=f"prev_audio {surahNo} {ayahNo} {reciter} {userID}",
                     ),
                     InlineKeyboardButton(
                         "Next",
-                        callback_data=f"next_audio {surahNo} {ayahNo} {reciter} {onlySurah} {userID}",
+                        callback_data=f"next_audio {surahNo} {ayahNo} {reciter} {userID}",
                     ),
                 ],
             ]
         )
-        if onlySurah:
-            caption = f"<b>Audio of Surah <code>{surahNo}</code></b>"
-        else:
-            caption = f"<b>Audio of:</b> <code>{surahNo}:{ayahNo}</code>"
+
+        caption = f"<b>Audio of:</b> <code>{surahNo}:{ayahNo}</code>"
 
         await message.reply_audio(
             urlOrFileID, reply_markup=audioNavigation, caption=caption

@@ -7,6 +7,8 @@
 - Fix: `/audio <surahNo>` to only send the surah audio and implement the pagination
 - Save error files in `/errors` and ignore "media edit cancelled" errors
 - Add `/stats` command for the bot admin
+  - ### commit 2
+  - Fix: Bug sending only surah audio even for ayahs
 
 
 

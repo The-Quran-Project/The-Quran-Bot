@@ -261,7 +261,7 @@ async def audioCommand(u: Update, c):
         await message.reply_html(x["message"])
         return
 
-    onlySurah = int(x.get("onlySurah"))  # True if only Surah is provided
+    onlySurah = int(x.get("onlySurah", 0))  # True if only Surah is provided
     surahNo = x["surahNo"]
     ayahNo = x["ayahNo"]
     reciter = db.users.get(userID)["settings"]["reciter"]
@@ -312,6 +312,7 @@ async def audioCommand(u: Update, c):
                 "<b>Note:</b> The audio file is being sent as a URL because the bot is unable to send the audio file directly.\n\n"
                 "This may be due to the bot running on a different instance or the file size exceeding Telegram's limit.",
             )
+
 
 # Command:  /tafsir
 async def tafsirCommand(u: Update, c):

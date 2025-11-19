@@ -141,7 +141,8 @@ Reply to this message to send a message to the user. (Only Text) [Supports Forma
 
     try:
         if (
-            not "Canceled by new editmessagemedia request" in errorString
+            not "Canceled by new editmessagemedia request".lower()
+            in errorString.lower()
         ):  # Ignore edit message media errors
             msgID: Message = (
                 await bot.forwardMessage(
@@ -155,7 +156,7 @@ Reply to this message to send a message to the user. (Only Text) [Supports Forma
     await bot.sendDocument(
         chatID,
         BytesIO(json.dumps(data, indent=4, ensure_ascii=False).encode()),
-        filename=f"errors/error-{user.id if user else 12345}.json",
+        filename=f"error-{user.id if user else 12345}.json",
         caption=caption,
         reply_to_message_id=msgID,
     )
