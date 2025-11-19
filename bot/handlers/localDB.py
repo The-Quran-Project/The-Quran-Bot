@@ -10,7 +10,7 @@ from bot.handlers.defaults import (
 import threading
 import time
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional, Union
 
 from bot.utils.log import getLogger
@@ -370,6 +370,24 @@ class Database:
 
         # Add to queue using the existing mechanism
         self.analytics.set(date, analytics_doc)
+    
+    def getCounter(self, dateRel: int = 0) -> int:
+        """Get the request counter for a specific date.
+
+        Args:
+
+        Returns:
+            int: The number of requests for the given date.
+        """
+        # substract dateRel days from today
+        date = datetime.now()
+        date = date - timedelta(days=dateRel)
+        date = date.strftime("%Y-%m-%d")
+        doc = self.analytics.get(date)
+        
+        if doc:
+            return doc.get("requests", 0)
+        return 0
 
 
 dbName = "quranbot" if not LOCAL else "quranbot-test"

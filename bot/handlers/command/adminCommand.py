@@ -303,11 +303,27 @@ async def raiseError(u: Update, c):
     await message.reply_html("<b>Raising...</b>")
     raise IndexError("Meow")
 
+@onlyDeveloper()
+async def getStats(u: Update, c):
+    """Gets a daily stats"""
+    bot: Bot = c.bot
+    message = u.effective_message
+    reply = f"""
+<b>Daily Stats:</b>
+Today: <code>{db.getCounter()}</code>
+Yesterday: <code>{db.getCounter(1)}</code>
+Prev Day: <code>{db.getCounter(2)}</code>
+"""
+    await message.reply_html(reply)
+
+
+
 
 exportedHandlers = [
     CommandHandler("admin", adminCommand),
     CommandHandler("forward", forwardMessage),
     CommandHandler("getUser", getUser),
+    CommandHandler("stats", getStats),
     CommandHandler("eval", evaluateCode),
     CommandHandler("login", loginAsAdmin),
     CommandHandler("delete", deleteMessage),
