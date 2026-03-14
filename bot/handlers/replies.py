@@ -33,7 +33,7 @@ howToUse = """
 /settings - Change your settings
 /surah - The list of all the Surahs
 /get x:y - Get the <code>y</code> ayah from <code>x</code> surah
-/lang x:y - Get the ayah <code>x</code> from Surah <code>y</code> in the language &lt;lang&gt;
+/lang x:y - Get the <code>y</code> ayah from <code>x</code> surah in the language &lt;lang&gt;
 /schedule 11:30 - Get a random ayah at 11:30 everyday
 <i>See the Telegraph for more in depth usage of schedule</i>
 
