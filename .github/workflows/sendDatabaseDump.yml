@@ -2,8 +2,6 @@ name: MongoDB Export and Upload
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "*/59 * * * *"
 
 jobs:
   export-and-upload:
